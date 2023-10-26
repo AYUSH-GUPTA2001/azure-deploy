@@ -6,6 +6,7 @@ import DashboardClient from "../components/investor/Dashboard"
 import DashboardAdvisor from "../components/advisor/Dashboard"
 import Advisor from "../components/advisor/Advisor"
 import Investor from "../components/investor/Investor"
+import LandingPage from "../components/LandingPage/LandingPage"
 
 
 function MyRouter(){
@@ -13,7 +14,7 @@ function MyRouter(){
         <div>
            <BrowserRouter>
            <Routes>
-              <Route element={<Home />} path="/" />
+              <Route element={<LandingPage />} path="/" />
               
               <Route element={<Advisor/>} path="/advisor"/>
               <Route element={<Investor/>} path="/investor"/>
