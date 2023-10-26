@@ -17,8 +17,8 @@ return(
           <li><a href="#contact">Contact</a></li>
         
           
-          <li ><a href="/advisor">Advisor Sign In</a></li>
-          <li><a href='/investor'>Investor Sign In</a></li>
+          <li ><a href="./advisor">Advisor Sign In</a></li>
+          <li><a href='./investor'>Investor Sign In</a></li>
             
           
           
