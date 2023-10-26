@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import CloseIcon from '@mui/icons-material/Close';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import { useState  } from 'react';
 import axios from "axios";
 import Tab from '@mui/material/Tab';
@@ -26,12 +27,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { useNavigate } from 'react-router-dom';
 // import { PhoneInput } from 'react-international-phone';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+
 
 
 
 export default function Login(){
     const [message,setMessage]=useState("")
+    const [forgotMessage,setForgotMessage]=useState("")
+    const [loading,setLoading]=useState(false)
     const [loginEmail, setLoginEmail] = useState("")
     const [loginPassword, setLoginPassword] = useState("")
     const [loginEmailError, setLoginEmailError] = useState(false)
@@ -44,6 +47,7 @@ export default function Login(){
     const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
     const [dateOfBirth, setDateOfBirth] = useState("")
+    const [OTPloading,setOTPLoading]=useState(false)
     // const [phoneNumber, setPhoneNumber] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -54,9 +58,21 @@ export default function Login(){
     const [ifscCode,setIfscCode]= useState("")
     const [panNumber,setPanNumber]= useState("")
     const [riskCapacity,setRiskCapacity]=useState("")
-    const [loading,setLoading]=useState(false)
+    const [OTP,setOTP]=useState("")
+    const [forgotEmail,setForgotEmail]=useState('')
+    const [resetOTP,setResetOTP]=useState('')
+    const [resetPassword,setResetPassword]=useState('')
+    const [confirmResetPassword,setConfirmResetPassword]=useState('')
+
+
+    const [forgotEmailError,setForgotEmailError]=useState(false)
+    const [resetOTPError,setResetOTPError]=useState(false)
+    const [resetPasswordError,setResetPasswordError]=useState(false)
+    const [confirmResetPasswordError,setConfirmResetPasswordError]=useState(false)
 
   
+    const [OTPError,setOTPError]=useState(false)
+    const [buttonVisible, setButtonVisible] = useState(true);
     const [addressError,setAddressError]= useState(false)
     const [firstNameError, setFirstNameError] = useState(false)
     const [lastNameError, setLastNameError] = useState(false)
@@ -72,6 +88,64 @@ export default function Login(){
     const [panNumberError,setPanNumberError]=useState(false)
     const [ifscCodeError,setIfscCodeError]=useState(false)
     const [riskCapacityError,setRiskCapacityError]=useState(false)
+    const [loginMessage,setLoginMessage]=useState("")
+
+
+    const handleForgotPassword=()=>{
+      handleForgotOpen()
+    }
+
+    const handleGetOTP=()=>{
+      if(forgotEmail===''){
+       setForgotEmailError(true)
+       return
+      }
+      axios({
+       method:'post',
+       url:'https://localhost:7136/api/AdvisorSignUp/forgot-password',
+       data:{email:forgotEmail}
+      }).then((response)=>{
+       console.log(response)
+           setButtonVisible(false)
+      },(error)=>{
+         console.log(error)
+      })
+}
+
+const handleResetSubmit=()=>{
+  if(resetOTP===''){
+    setResetOTPError(true)
+  }
+  if(resetPassword===''){
+    setResetPasswordError(true)
+  }
+  if(confirmResetPassword===''){
+    setConfirmResetPasswordError(true)
+    return
+  }
+  const resetData={
+    "email": forgotEmail,
+    "otp": resetOTP,
+    "newPassword":  resetPassword,
+    "confirmPassword": confirmResetPassword
+  }
+
+ axios({
+    method:'post',
+    url:'https://localhost:7136/api/AdvisorSignUp/reset-password',
+    data:resetData
+  }).then((response)=>{
+     setForgotMessage(response.data.message)
+     setForgotEmail('')
+     setResetOTP('')
+     setResetPassword('')
+     setButtonVisible(true)
+     setConfirmResetPassword('')
+  },(error)=>{
+      setForgotMessage(error.response.data.message)
+  })
+
+}
 
      //handle modal
      const style = {
@@ -89,11 +163,19 @@ export default function Login(){
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setMessage("")
+    setLoginMessage('')
     setOpen(false)};
+
+
+    const [forgotOpen, setForgotOpen] = useState(false);
+    const handleForgotOpen = () => setForgotOpen(true);
+    const handleForgotClose = () => {
+      setForgotMessage('')
+      setForgotOpen(false)}; 
 
     // const dashboard="/advisor/dashboard"
     // const hash="#"
-    const [value, setValue] = React.useState('2');
+    const [value, setValue] = React.useState('1');
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
@@ -114,40 +196,40 @@ export default function Login(){
     
         if (firstName === '') {
           setFirstNameError(true)
-          
+          return
       }
         if (lastName === '') {
           setLastNameError(true)
-          
+          return
       } 
         if(address===""){
           setAddressError(true)
-        
+          return
         }
         if (email === '') {
         setEmailError(true)
-      
+        return
       }
         if (phone === '') {
         setPhoneError(true)
-        
+        return
       }
     
       if (dateOfBirth === '') {
         setDateOfBirthError(true)
-        
+        return
     }
       if (city === '') {
         setCityError(true)
-        
+        return
     } 
       if (state === '') {
       setStateError(true)
-      
+      return
     }
       if (password === '') {
       setPasswordError(true)
-      
+      return
     }
     if (confirmPassword === '') {
       setConfirmPasswordError(true)
@@ -160,6 +242,67 @@ export default function Login(){
     
     
         }
+        const [verifyOpen, setVerifyOpen] = React.useState(false);
+  const handleVerifyOpen = () => setVerifyOpen(true);
+  const handleVerifyClose = () => {
+    setMessage("")
+    setVerifyOpen(false)};
+
+    const handleVerify=(e)=>{
+    handleVerifyOpen()
+    
+
+
+
+}
+const handleOTPSubmit=(e)=>{
+  setOTPError(false)
+  if(OTP===""){
+    setOTPError(true)
+    return
+  }
+ const otpData = {
+    "email": email===''?loginEmail:email,
+    "otp": OTP
+  }
+  console.log(otpData)
+  setOTPLoading(true)
+  axios({
+    method:'post',
+    url:'https://localhost:7136/api/AdvisorSignUp/verify-otp',
+    data:otpData
+  }).then((response)=>{
+    setOTPLoading(false)
+    console.log(response)
+       setMessage(response.data.message)
+       setLoginMessage(response.data.message)
+       setOTP('')
+       setFirstName("")
+              setLastName("")
+              setDateOfBirth("")
+              setEmail("")
+              setPhone("")
+              setCity("")
+              setState("")
+              setAddress("")
+              setAccountNumber("")
+              setBankName("")
+              setIfscCode("")
+              setPanNumber("")
+              setRiskCapacity("")
+              setPassword("")
+              setConfirmPassword("")
+          
+            
+  },(error)=>{
+    setOTPLoading(false)
+    console.log(error)
+      if(error.response.data.message==="Invalid OTP."){
+        setOTPError(true)
+      }
+  })
+}
+
 
     const handleModalSubmit=(event)=>{
       event.preventDefault();
@@ -171,19 +314,19 @@ export default function Login(){
   
       if (bankName === '') {
           setBankNameError(true)
-          
+          return
       }
       if (ifscCode === '') {
           setIfscCodeError(true)
-          
+          return
       }
       if (panNumber === '') {
         setPanNumberError(true)
-        
+        return
     }
     if (accountNumber === '') {
         setAccountNumberError(true)
-        
+        return
     }
     if (riskCapacity === '') {
       setRiskCapacityError(true)
@@ -212,11 +355,15 @@ export default function Login(){
       setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
+        url:"https://localhost:7136/api/ClientSignUp/signup",
         data:investorData
     }).then(function(response){
+      setLoading(false)
+      console.log(response.data.message)
+      if(response.data.message==="OTP sent to your email for verification."){
+        handleVerify()
+      }
          if(response.data.message==="User registered successfully!"){
-          setLoading(false)
           setMessage(response.data.message)
               
               
@@ -224,7 +371,7 @@ export default function Login(){
               setLastName("")
               setDateOfBirth("")
               setEmail("")
-              setPhone("")
+              setPhone("+91")
               setCity("")
               setState("")
               setAddress("")
@@ -241,7 +388,7 @@ export default function Login(){
         
        
      } , function(error){
-      setLoading(false)
+            setLoading(false)
              console.log(error)
              if(error.response.data.message){
               setMessage(error.response.data.message)
@@ -257,7 +404,7 @@ export default function Login(){
   
       if (loginEmail === '') {
           setLoginEmailError(true)
-        
+          return
       }
       if (loginPassword === '') {
           setLoginPasswordError(true)
@@ -266,30 +413,36 @@ export default function Login(){
   const investorData={
         email:loginEmail,
         password:loginPassword,
-        firstName:"string"
+        firstName:'string'
   }
-     setLoading(true)
+  setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
+        url:"https://localhost:7136/api/ClientSignUp/login",
         data:investorData
     }).then(function(response){
-         
+      setLoading(false)
           console.log(response) 
           if(response.data.message==="Login successful!" || response.data.message==="Profile is not complete. Please provide the missing information."){
-            setLoading(false)
             const clientId=response.data.client.clientId
-           
             navigate(`/investor/dashboard/${clientId}`)
           }
         
        
      } , function(error){
       setLoading(false)
-      setMessage(error.response.data.message)
-           
-             console.log(error)
-             handleOpen()
+      if(error.response.data.message==='Invalid email or password.'){
+        setLoginMessage(error.response.data.message)
+        handleOpen()
+        return
+      }
+      if(error.response.data.message==="User is not verified."){
+      handleOpen()
+      return
+      }
+      setLoginMessage(error.response.data.message)
+      console.log(error)
+      handleOpen()
     })
     }
   return (
@@ -496,13 +649,10 @@ export default function Login(){
         aria-describedby="modal-modal-description"
       >
         <Box sx={style} >
-         {message?<>
-          <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-         <Typography id="modal-modal-title" variant="h6" component="h2">
+        <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+         {message?<Typography id="modal-modal-title" variant="h6" component="h2">
             {message}
-          </Typography></>:<> 
-          <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          </Typography>:<> <Typography id="modal-modal-title" variant="h6" component="h2">
             Please Fill Mandatory Fields For Starting Investment
           </Typography>
           <Grid container spacing={2}>
@@ -594,7 +744,39 @@ export default function Login(){
               {loading?<LoadingSpinner/>:<Button onClick={handleModalSubmit}>Create Account</Button>}</>}
         </Box>
       </Modal>
-
+      <Modal
+        open={verifyOpen}
+        onClose={handleVerifyClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      ><Box sx={style} >
+        <CloseIcon color="primary" onClick={handleVerifyClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      {message?<Typography id="modal-modal-title" variant="h6" component="h2">
+        {message}
+      </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
+        Enter OTP sent For Email Verification
+      </Typography><TextField
+                size="small"
+                margin="dense"
+                required
+                onChange={e => setOTP(e.target.value)}
+                name="OTP"
+                fullWidth
+                value={OTP}
+                error={OTPError}
+                label="Enter OTP"
+                type="OTP"
+                id="OTP"
+                autoComplete="OTP"
+              /> {OTPloading?<LoadingSpinner/>:<Button
+              onClick={handleOTPSubmit}
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+             Verify OTP
+            </Button>}</>}</Box></Modal>
               {/* <Copyright sx={{ mt: 5 }} /> */}
             </Box></TabPanel>
         <TabPanel value="2">
@@ -630,15 +812,48 @@ export default function Login(){
                 autoComplete="current-password"
               />
            
-             
-{loading?<LoadingSpinner/>: <Button
+              <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
                Sign In
-              </Button>}
+              </Button>
+              <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      ><Box sx={style} >
+        <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
+        {loginMessage}
+      </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
+        Enter OTP sent For Email Verification
+      </Typography><TextField
+                size="small"
+                margin="dense"
+                required
+                onChange={e => setOTP(e.target.value)}
+                name="OTP"
+                fullWidth
+                value={OTP}
+                error={OTPError}
+                label="Enter OTP"
+                type="OTP"
+                id="OTP"
+                autoComplete="OTP"
+              /> {OTPloading?<LoadingSpinner/>:<Button
+              onClick={handleOTPSubmit}
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+             Verify OTP
+            </Button>}</>}</Box></Modal>
+
 {/*               
               {
                 email&&password?
@@ -664,9 +879,93 @@ export default function Login(){
             </Button>} */}
               <Grid container>
                 <Grid item xs>
-                  <Link href="#"  variant="body2">
-                    {/* Forgot password? */}
+                  <Link onClick={handleForgotPassword} href="#"  variant="body2">
+                    Forgot password?
                   </Link>
+                  <Modal
+        open={forgotOpen}
+        onClose={handleForgotClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      ><Box sx={style} >
+        <CloseIcon color="primary" onClick={handleForgotClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      {forgotMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
+        {forgotMessage}
+      </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
+        Reset Password
+      </Typography><TextField
+                size="small"
+                margin="dense"
+                required
+                onChange={e => setForgotEmail(e.target.value)}
+                name="forgotEmail"
+                fullWidth
+                value={forgotEmail}
+                error={forgotEmailError}
+                label="Email"
+                type="email"
+                id="email"
+                autoComplete="email"
+              />{buttonVisible&&<Button
+              onClick={handleGetOTP}
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+             Get OTP
+            </Button>} 
+            <TextField
+                size="small"
+                margin="dense"
+                required
+                onChange={e => setResetOTP(e.target.value)}
+                name="resetOTP"
+                fullWidth
+                value={resetOTP}
+                error={resetOTPError}
+                label="Enter OTP"
+                type="password"
+                id="password"
+                autoComplete="password"
+              />
+            <TextField
+                size="small"
+                margin="dense"
+                required
+                onChange={e => setResetPassword(e.target.value)}
+                name="resetPassword"
+                fullWidth
+                value={resetPassword}
+                error={resetPasswordError}
+                label="Enter Password"
+                type="password"
+                id="password"
+                autoComplete="password"
+              />
+              <TextField
+                size="small"
+                margin="dense"
+                required
+                onChange={e => setConfirmResetPassword(e.target.value)}
+                name="confirmResetPassword"
+                fullWidth
+                value={confirmResetPassword}
+                error={confirmResetPasswordError}
+                label="Confirm Password"
+                type="password"
+                id="password"
+                autoComplete="password"
+              />
+            <Button
+              onClick={handleResetSubmit}
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+             Reset Password
+            </Button></>}</Box></Modal>
                 </Grid>
                 <Grid item>
                   <Link href="#" value="1" onClick={(e)=> setValue("1")}  variant="body2">
