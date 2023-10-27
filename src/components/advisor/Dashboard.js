@@ -294,7 +294,7 @@ const [clientId,setClientId]=useState('')
 const [clientIdError,setClientIdError]=useState(false)  
 const [modalOpen, setModalOpen] = React.useState(false);
 const handleOpen = () =>{ setModalOpen(true)
-                        setMessage("")};
+                    };
 const handleClose = () => setModalOpen(false);
 const [listOfRequests,setListOfRequests]=useState([])
 
@@ -459,7 +459,8 @@ function ReportsContent({advisorId}) {
   };   
 const [modalOpen, setModalOpen] = React.useState(false);
 const handleOpen = () => setModalOpen(true);
-const handleClose = () => setModalOpen(false);
+const handleClose = () => {setModalOpen(false)
+                          setMessage('')};
 const [strategyName,setStrategyName]=useState('')
 const [clientId,setClientId]=useState('')
 const [investmentId,setInvestmentId]=useState('')
