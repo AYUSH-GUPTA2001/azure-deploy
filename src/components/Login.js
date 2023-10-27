@@ -285,7 +285,7 @@ const handleResetSubmit=()=>{
 
  axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password',
+    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
      setForgotMessage(response.data.message)
