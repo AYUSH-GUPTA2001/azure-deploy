@@ -448,3 +448,62 @@ section {
     font-weight: 400;
     color: #aaaaaa;
 }
+
+footer {
+    background-color: #f6f9fe;
+    color: #000;
+    padding: 50px;
+    box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.02);
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.address {
+    flex: 1;
+    padding-left: 30px;
+}
+.address span{
+    color:blue;
+} 
+.links {
+    flex: 1;
+
+}
+
+.services {
+    flex: 1;
+}
+
+.social-media {
+    flex: 1;
+}
+
+.links ul,
+.services ul {
+    list-style: none;
+    padding: 0;
+}
+
+.links a,
+.services a {
+    text-decoration: none;
+    color: blue;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.social-media ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.social-media a {
+    text-decoration: none;
+    color: #000;
+    margin: 0 10px;
+}

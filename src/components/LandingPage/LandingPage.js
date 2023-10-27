@@ -1,5 +1,9 @@
 
 import './LandingPage.css'
+import TwitterIcon from '@mui/icons-material/Twitter';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import FacebookIcon from '@mui/icons-material/Facebook';
 export default function LandingPage(){
  
 return(
@@ -76,7 +80,7 @@ return(
 
         <div class="section-title">
           <h2>Team</h2>
-          <h3>Our<span>Team</span></h3>
+          <h3>Our<span> Team</span></h3>
         </div>
 <div class='row1'>
     
@@ -198,6 +202,51 @@ return(
 </div>
       
     </section>
+    <footer>
+    <div class="footer-container">
+        <div class="address">
+        <h2>INCvest<span>.</span></h2>
+            <p>
+              Plot No.-248, Phase IV <br/>
+              Udyog Vihar, Sector 18<br/>
+              Gurugram, Haryana 122015 <br/><br/>
+              <strong>Phone:</strong> +1 5589 55488 55<br/>
+              <strong>Email:</strong> info@example.com<br/>
+            </p>
+        </div>
+        <div class="links">
+        <h3>Links</h3>
+            <ul>
+              <li> <a href="#">Home</a></li>
+              <li> <a href="#">About us</a></li>
+              <li><a href="#">Services</a></li>
+              <li> <a href="#">Team</a></li>
+             
+            </ul>
+        </div>
+        <div class="services">
+        <h3>Our Services</h3>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Buy Stocks</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Markets</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Trusted Advisors</a></li>
+            </ul>
+        </div>
+        <div class="social-media">
+        <h3>Our Social Networks</h3>
+            <p>For more information check our Social Media handles.</p>
+            <ul>
+                <li><a href="#"><FacebookIcon  color="primary"/></a></li>
+                <li><a href="#"><TwitterIcon color='primary'/></a></li>
+                <li><a href="#"><LinkedInIcon color='primary'/></a></li>
+                <li><a href="#"><InstagramIcon color='primary'/></a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+
+
     </>
 )
 }
