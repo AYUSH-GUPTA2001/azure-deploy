@@ -15,7 +15,7 @@ function MyRouter(){
     const history = createHashHistory();
     return (
         <div>
-           Router history={history}>
+           <Router history={history}>
            <Routes>
               <Route element={<LandingPage />} path="/" />
               
