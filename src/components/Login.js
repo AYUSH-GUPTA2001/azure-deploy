@@ -136,7 +136,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
         method:'post',
-        url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp??api-version=1',
+        url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp?api-version=1',
         data:otpData
       }).then((response)=>{
         setOTPLoading(false)
