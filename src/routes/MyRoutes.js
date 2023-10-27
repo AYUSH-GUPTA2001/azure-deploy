@@ -1,4 +1,5 @@
-import {BrowserRouter , Routes , Route} from "react-router-dom"
+import {BrowserRouter , Routes, Router , Route} from "react-router-dom"
+import { createHashHistory } from '@remix-run/router';
 
 import Home from "../components/home/Home"
 
@@ -10,9 +11,10 @@ import LandingPage from "../components/LandingPage/LandingPage"
 
 
 function MyRouter(){
+    const history = createHashHistory();
     return (
         <div>
-           <BrowserRouter>
+           Router history={history}>
            <Routes>
               <Route element={<LandingPage />} path="/" />
               
@@ -20,11 +22,11 @@ function MyRouter(){
               <Route element={<Investor/>} path="/investor"/>
               <Route element={<DashboardAdvisor/>} path="advisor/dashboard/:advisorId"/>
               
-              <Route element={<DashboardClient/>} path="/investor/dashboard/:clientId"/>
+              <Route element={<DashboardClient/>} path="investor/dashboard/:clientId"/>
               
               
            </Routes>
-           </BrowserRouter>
+           </Router>
         </div>
     )
 }
