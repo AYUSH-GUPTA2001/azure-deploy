@@ -63,13 +63,15 @@ export default function Login(){
     const [resetOTP,setResetOTP]=useState('')
     const [resetPassword,setResetPassword]=useState('')
     const [confirmResetPassword,setConfirmResetPassword]=useState('')
+    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
 
     const [forgotEmailError,setForgotEmailError]=useState(false)
     const [resetOTPError,setResetOTPError]=useState(false)
     const [resetPasswordError,setResetPasswordError]=useState(false)
     const [confirmResetPasswordError,setConfirmResetPasswordError]=useState(false)
-
+    const [passwordHelperText,setPasswordHelperText]=useState('')
+    const [cPasswordHelperText,setCPasswordHelperText]=useState('')
   
     const [OTPError,setOTPError]=useState(false)
     const [buttonVisible, setButtonVisible] = useState(true);
@@ -193,48 +195,65 @@ const handleResetSubmit=()=>{
         setCityError(false)
         setStateError(false)
         setConfirmPasswordError(false)
+        setPasswordHelperText("")
+        setCPasswordHelperText("")
+
+
     
         if (firstName === '') {
           setFirstNameError(true)
-          return
+          
       }
         if (lastName === '') {
           setLastNameError(true)
-          return
+          
       } 
         if(address===""){
           setAddressError(true)
-          return
+        
         }
         if (email === '') {
         setEmailError(true)
-        return
+        
       }
         if (phone === '') {
         setPhoneError(true)
-        return
+        
       }
     
       if (dateOfBirth === '') {
         setDateOfBirthError(true)
-        return
+      
     }
       if (city === '') {
         setCityError(true)
-        return
+        
     } 
       if (state === '') {
       setStateError(true)
-      return
+      
     }
       if (password === '') {
       setPasswordError(true)
-      return
+    
     }
     if (confirmPassword === '') {
       setConfirmPasswordError(true)
       return
     }
+    if (!password.match(passwordPattern)) {
+      setPasswordError(true)
+      setPasswordHelperText("Password must contain at least 8 characters, including at least one digit, one lowercase letter, and one uppercase letter.");
+      return 
+  }
+  
+  if (password !== confirmPassword) {
+      setConfirmPasswordError(true)
+      setCPasswordHelperText("Passwords do not match.");
+      return 
+  }
+
+
    handleOpen();
     // console.log(dateOfBirth)
 
@@ -314,19 +333,19 @@ const handleOTPSubmit=(e)=>{
   
       if (bankName === '') {
           setBankNameError(true)
-          return
+          
       }
       if (ifscCode === '') {
           setIfscCodeError(true)
-          return
+          
       }
       if (panNumber === '') {
         setPanNumberError(true)
-        return
+        
     }
     if (accountNumber === '') {
         setAccountNumberError(true)
-        return
+        
     }
     if (riskCapacity === '') {
       setRiskCapacityError(true)
@@ -610,6 +629,7 @@ const handleOTPSubmit=(e)=>{
                 margin="dense"
                 required
                 fullWidth
+                helperText={passwordHelperText}
                 name="password"
                 value={password}
                   error={passwordError}
@@ -626,6 +646,7 @@ const handleOTPSubmit=(e)=>{
                 margin="dense"
                 required
                 fullWidth
+                helperText={cPasswordHelperText}
                 name="password"
                 value={confirmPassword}
                   error={confirmPasswordError}

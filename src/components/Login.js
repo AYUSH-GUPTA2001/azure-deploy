@@ -48,7 +48,9 @@ export default function Login(){
   const [city, setCity] = useState("")
   const [state, setState] = useState("")
   const [OTP,setOTP]=useState("")
-
+  const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  const [passwordHelperText,setPasswordHelperText]=useState('')
+  const [cPasswordHelperText,setCPasswordHelperText]=useState('')
   const [forgotEmail,setForgotEmail]=useState('')
   const [resetOTP,setResetOTP]=useState('')
   const [resetPassword,setResetPassword]=useState('')
@@ -180,48 +182,63 @@ export default function Login(){
         setCityError(false)
         setStateError(false)
         setConfirmPasswordError(false)
+        setPasswordHelperText('')
+        setCPasswordHelperText('')
     
         if (firstName === '') {
           setFirstNameError(true)
-          return
+          
       }
         if (lastName === '') {
           setLastNameError(true)
-          return
+        
       } 
         if(address===""){
           setAddressError(true)
-          return
+          
         }
         if (email === '') {
         setEmailError(true)
-        return
+        
       }
         if (phone === '') {
         setPhoneError(true)
-        return
+        
       }
     
       if (company === '') {
         setCompanyError(true)
-        return
+        
     }
       if (city === '') {
         setCityError(true)
-        return
+        
     } 
       if (state === '') {
       setStateError(true)
-      return
+      
     }
       if (password === '') {
       setPasswordError(true)
-      return
+      
     }
     if (confirmPassword === '') {
       setConfirmPasswordError(true)
       return
     }
+    if (!password.match(passwordPattern)) {
+      setPasswordError(true)
+      setPasswordHelperText("Password must contain at least 8 characters, including at least one digit, one lowercase letter, and one uppercase letter.");
+      return 
+  }
+  
+  if (password !== confirmPassword) {
+      setConfirmPasswordError(true)
+      setCPasswordHelperText("Passwords do not match.");
+      return 
+  }
+
+
     
     const advisorData={
       
@@ -257,7 +274,7 @@ export default function Login(){
                     if(error.response.data.message){
                       setMessage(error.response.data.message)
                     }else{
-                    setMessage("'Password' and 'Confirm Password' does not Match or Invalid Email")
+                    setMessage("Email Invalid or Passwords dont match")
                     }
                     handleOpen()
             }) 
@@ -524,6 +541,8 @@ const handleResetSubmit=()=>{
                 required
                 fullWidth
                 name="password"
+                helperText={passwordHelperText}
+
                 value={password}
                   error={passwordError}
                   onChange={e => setPassword(e.target.value)}
@@ -539,6 +558,7 @@ const handleResetSubmit=()=>{
                 margin="dense"
                 required
                 fullWidth
+                helperText={cPasswordHelperText}
                 name="password"
                 value={confirmPassword}
                   error={confirmPasswordError}
