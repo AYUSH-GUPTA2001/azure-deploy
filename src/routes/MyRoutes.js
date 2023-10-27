@@ -1,6 +1,7 @@
 import {BrowserRouter , Routes, Router , Route} from "react-router-dom"
 import { createHashHistory } from '@remix-run/router';
 
+
 import Home from "../components/home/Home"
 
 import DashboardClient from "../components/investor/Dashboard"
