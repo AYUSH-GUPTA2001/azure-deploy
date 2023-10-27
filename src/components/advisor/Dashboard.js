@@ -293,7 +293,8 @@ function ClientList({advisorId}) {
 const [clientId,setClientId]=useState('')
 const [clientIdError,setClientIdError]=useState(false)  
 const [modalOpen, setModalOpen] = React.useState(false);
-const handleOpen = () => setModalOpen(true);
+const handleOpen = () =>{ setModalOpen(true)
+                        setMessage("")};
 const handleClose = () => setModalOpen(false);
 const [listOfRequests,setListOfRequests]=useState([])
 
