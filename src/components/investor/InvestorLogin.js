@@ -102,7 +102,7 @@ export default function Login(){
       }
       axios({
        method:'post',
-       url:'https://localhost:7136/api/AdvisorSignUp/forgot-password',
+       url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
@@ -132,7 +132,7 @@ const handleResetSubmit=()=>{
 
  axios({
     method:'post',
-    url:'https://localhost:7136/api/AdvisorSignUp/reset-password',
+    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
      setForgotMessage(response.data.message)
@@ -269,7 +269,7 @@ const handleOTPSubmit=(e)=>{
   setOTPLoading(true)
   axios({
     method:'post',
-    url:'https://localhost:7136/api/AdvisorSignUp/verify-otp',
+    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp?api-version=1',
     data:otpData
   }).then((response)=>{
     setOTPLoading(false)
@@ -355,7 +355,7 @@ const handleOTPSubmit=(e)=>{
       setLoading(true)
       axios({
         method:"post",
-        url:"https://localhost:7136/api/ClientSignUp/signup",
+        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -418,7 +418,7 @@ const handleOTPSubmit=(e)=>{
   setLoading(true)
       axios({
         method:"post",
-        url:"https://localhost:7136/api/ClientSignUp/login",
+        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)

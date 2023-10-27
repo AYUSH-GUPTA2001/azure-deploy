@@ -12,6 +12,7 @@ import Grid from '@mui/material/Grid'
 import CloseIcon from '@mui/icons-material/Close';
 import Collapse from '@mui/material/Collapse';
 import { BarChart } from '@mui/x-charts/BarChart';
+import Tooltip from '@mui/material/Tooltip';
 import CollapsibleTable from "./table";
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -71,9 +72,9 @@ function Dashboard(){
       <div className="sidebar">
       <h1 id="logo"><span class="logo-text">INCvest</span><span class="dot">.</span></h1>
         <ul>
-          <li className="sidebar-item" onClick={() => handleOptionClick('ClientList')} id={selectedOption === 'ClientList' ? 'active' : ''}> <i className="material-icons">pie_chart</i> <span>List of Clients</span></li>
-          <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentStrategies')} id={selectedOption === 'InvestmentStrategies' ? 'active' : ''} ><i className="material-icons">swap_horiz</i><span>Strategies</span></li>
-          <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentRequests')} id={selectedOption === 'InvestmentRequests' ? 'active' : ''}><i className="material-icons">description</i><span>Investment Requests</span></li>
+       <Tooltip title="Click to see list of clients" placement="right-end"><li className="sidebar-item" onClick={() => handleOptionClick('ClientList')} id={selectedOption === 'ClientList' ? 'active' : ''}> <i className="material-icons">pie_chart</i> <span>List of Clients</span></li></Tooltip>
+       <Tooltip title="Click to see list of strategies" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentStrategies')} id={selectedOption === 'InvestmentStrategies' ? 'active' : ''} ><i className="material-icons">swap_horiz</i><span>Strategies</span></li></Tooltip>
+       <Tooltip title="Click to see list of investment requests" placement="right-end">  <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentRequests')} id={selectedOption === 'InvestmentRequests' ? 'active' : ''}><i className="material-icons">description</i><span>Investment Requests</span></li></Tooltip>
           {/* <li className="sidebar-item" onClick={() => handleOptionClick('Settings')}><i className="material-icons">settings</i><span>Settings</span></li> */}
         </ul>
       </div>
