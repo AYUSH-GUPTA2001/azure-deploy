@@ -536,11 +536,15 @@ const handleOTPSubmit=(e)=>{
             <PhoneInput
                   style={{"padding": "10px 0px",
                   "--react-international-phone-border-color" : "#bab2b2",
-                  "--react-international-phone-background-color":"#e4f1ff" 
+                  "--react-international-phone-background-color":"#e4f1ff" ,
+                  '--react-international-phone-dropdown-item-background-color' : "black",
+                  '--react-international-phone-dropdown-item-text-color' : 'white',
+                  
+                  '--react-international-phone-country-selector-background-color-hover' : "#bab2b2"
                 }}
-                hideDropdown={true}
+               
                 inputStyle ={ {
-                  "width" : "145px"
+                  "width" : "136px"
                   }}
                   defaultCountry="in"
                   name="phoneNumber"
