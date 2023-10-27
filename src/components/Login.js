@@ -185,46 +185,50 @@ export default function Login(){
         setPasswordHelperText('')
         setCPasswordHelperText('')
     
+        let count=0;
         if (firstName === '') {
           setFirstNameError(true)
-          
+          count++
       }
         if (lastName === '') {
           setLastNameError(true)
-        
+        count++
       } 
         if(address===""){
           setAddressError(true)
-          
+          count++
         }
         if (email === '') {
         setEmailError(true)
-        
+        count++
       }
         if (phone === '') {
         setPhoneError(true)
-        
+        count++
       }
     
       if (company === '') {
         setCompanyError(true)
-        
+        count++
     }
       if (city === '') {
         setCityError(true)
-        
+        count++
     } 
       if (state === '') {
       setStateError(true)
-      
+      count++
     }
       if (password === '') {
       setPasswordError(true)
-      
+      count++
     }
     if (confirmPassword === '') {
       setConfirmPasswordError(true)
       return
+    }
+    if(count>=1){
+       return
     }
     if (!password.match(passwordPattern)) {
       setPasswordError(true)

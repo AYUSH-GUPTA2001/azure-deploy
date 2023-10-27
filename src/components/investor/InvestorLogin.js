@@ -198,47 +198,52 @@ const handleResetSubmit=()=>{
         setPasswordHelperText("")
         setCPasswordHelperText("")
 
-
+let count=0;
     
         if (firstName === '') {
           setFirstNameError(true)
-          
+          count++
       }
         if (lastName === '') {
           setLastNameError(true)
-          
+          count++
       } 
         if(address===""){
           setAddressError(true)
-        
+        count++
         }
         if (email === '') {
         setEmailError(true)
-        
+        count++
       }
         if (phone === '') {
         setPhoneError(true)
-        
+        count++
       }
     
       if (dateOfBirth === '') {
         setDateOfBirthError(true)
-      
+      count++
     }
       if (city === '') {
         setCityError(true)
-        
+        count++
     } 
       if (state === '') {
       setStateError(true)
-      
+      count++
     }
       if (password === '') {
       setPasswordError(true)
-    
+    count++
     }
     if (confirmPassword === '') {
       setConfirmPasswordError(true)
+       count++
+      return
+    }
+
+    if(count>=1){
       return
     }
     if (!password.match(passwordPattern)) {
@@ -330,26 +335,31 @@ const handleOTPSubmit=(e)=>{
       setPanNumberError(false)
       setIfscCodeError(false)
       setRiskCapacityError(false)
-  
+  let count=0;
       if (bankName === '') {
           setBankNameError(true)
-          
+          count++
       }
       if (ifscCode === '') {
           setIfscCodeError(true)
-          
+          count++
       }
       if (panNumber === '') {
         setPanNumberError(true)
-        
+        count++
     }
     if (accountNumber === '') {
         setAccountNumberError(true)
-        
+        count++
     }
     if (riskCapacity === '') {
       setRiskCapacityError(true)
+      count++
       return
+  }
+
+  if(count>=1){
+return
   }
       const investorData={
         "clientId":0,
