@@ -26,7 +26,9 @@ body, ul {
   font-size: 1.5rem;
   margin-bottom: 20px;
 }
-
+.sidebar .dot{
+  color: blue;
+}
 .sidebar ul {
   list-style: none;
   padding: 0;
@@ -162,7 +164,7 @@ background-color: #f0f0f0;
 }
 
 .sidebar #active {
-  color: #9400ff;
+  color: blue;
   background-color: #f0f0f0;
   border-radius: 10px;
 }

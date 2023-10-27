@@ -69,7 +69,7 @@ function Dashboard(){
         )}
       </div>
       <div className="sidebar">
-      <h1 id="logo">INCVEST</h1>
+      <h1 id="logo"><span class="logo-text">INCvest</span><span class="dot">.</span></h1>
         <ul>
           <li className="sidebar-item" onClick={() => handleOptionClick('ClientList')} id={selectedOption === 'ClientList' ? 'active' : ''}> <i className="material-icons">pie_chart</i> <span>List of Clients</span></li>
           <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentStrategies')} id={selectedOption === 'InvestmentStrategies' ? 'active' : ''} ><i className="material-icons">swap_horiz</i><span>Strategies</span></li>

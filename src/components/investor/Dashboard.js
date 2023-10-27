@@ -8,8 +8,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import image2 from '../../assets/animation.gif'
 import image3 from '../../assets/seconds.gif'
+import Tooltip from '@mui/material/Tooltip';
 
-import CustomizedTables from "./Table";
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 
@@ -31,7 +31,6 @@ import Button from '@mui/material/Button';
 import axios from "axios";
 import * as React from 'react'
 import { useNavigate, useParams } from "react-router-dom";
-import { Margin } from "@mui/icons-material";
 
 function Dashboard(){
 
@@ -72,11 +71,11 @@ function Dashboard(){
         )}
       </div>
       <div className="sidebar">
-      <h1 id="logo">INCVEST</h1>
+      <h1 id="logo"><span class="logo-text">INCvest</span><span class="dot">.</span></h1>
         <ul>
-          <li className="sidebar-item" onClick={() => handleOptionClick('Portfolio')} id={selectedOption==='Portfolio'?'active':''}>  <i className="material-icons">pie_chart</i> <span>Portfolio</span></li>
+          <Tooltip title="Click to see your investments" placement="right-end"><li className="sidebar-item" onClick={() => handleOptionClick('Portfolio')} id={selectedOption==='Portfolio'?'active':''}>  <i className="material-icons">pie_chart</i> <span>Portfolio</span></li></Tooltip>
           {/* <li className="sidebar-item" onClick={() => handleOptionClick('Transactions')}><i className="material-icons">swap_horiz</i><span>Transactions</span></li> */}
-          <li className="sidebar-item" onClick={() => handleOptionClick('New Investment')} id={selectedOption==='New Investment'?'active':''}><i className="material-icons">description</i><span>New Investment</span></li>
+          <Tooltip title="Click to make investment requests and to see the strategies" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('New Investment')} id={selectedOption==='New Investment'?'active':''}><i className="material-icons">description</i><span>New Investment</span></li></Tooltip>
           {/* <li className="sidebar-item" onClick={() => handleOptionClick('Settings')}><i className="material-icons">settings</i><span>Settings</span></li> */}
         </ul>
       </div>
@@ -482,7 +481,7 @@ const handleModalSubmit=()=>{
   
 </div>
 <div class="button-container">
-  <button class="my-button" onClick={handleOpen}>Investment Requests</button>
+<button class="my-button" onClick={handleOpen}>Investment Requests</button>
   <Modal
         open={open}
         onClose={handleClose}
@@ -569,7 +568,7 @@ const handleModalSubmit=()=>{
                 autoFocus
               />} */}
       </Modal>
-  <button class="my-button" onClick={handleRecommendations} >Strategies</button>
+      <Tooltip title="Click here to investment strategies from advisor" placement="right-end"> <button class="my-button" onClick={handleRecommendations} >Strategies</button></Tooltip>
   <Modal
         open={recommendationsOpen}
         onClose={handleRecommendationsClose}

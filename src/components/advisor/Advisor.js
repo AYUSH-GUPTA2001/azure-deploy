@@ -3,10 +3,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Login from '../Login';
-import Image2 from "../../assets/drinkingshots-cuate.png"
-import Image1 from "../../assets/Exams-bro.png"
-import Image3 from "../../assets/highfive.png"
-import Image4 from "../../assets/Learning-rafiki.png"
+import image5 from "../../assets/first.png"
 import { useState,useEffect } from 'react';
 // function Copyright(props) {
 //   return (
@@ -27,7 +24,7 @@ const defaultTheme = createTheme();
 
 export default function Advisor() {
  
-  const backgroundImageURLs=[Image1,Image2,Image3,Image4]
+  const backgroundImageURLs=[image5]
 
     const [currentBackground, setCurrentBackground] = useState(backgroundImageURLs[0]);
   

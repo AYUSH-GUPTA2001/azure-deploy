@@ -25,6 +25,9 @@ body, ul {
   font-size: 1.5rem;
   margin-bottom: 20px;
 }
+.sidebar .dot{
+  color: blue;
+}
 
 .sidebar ul {
   list-style: none;

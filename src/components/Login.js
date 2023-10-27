@@ -14,6 +14,7 @@ import axios from "axios";
 import Tab from '@mui/material/Tab';
 import 'react-international-phone/style.css';
 import TabContext from '@mui/lab/TabContext';
+
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { useNavigate } from 'react-router-dom';
@@ -97,7 +98,7 @@ export default function Login(){
     
     // const dashboard="/advisor/dashboard"
     // const hash="#"
-    const [value, setValue] = React.useState('1');
+    const [value, setValue] = React.useState('2');
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
