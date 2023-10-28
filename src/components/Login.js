@@ -471,6 +471,7 @@ setResetLoading(true)
 
             <Grid item xs={12} sm={6}>
             <PhoneInput
+                  placeholder='phone Number'
                   style={{"padding": "10px 0px",
                   "--react-international-phone-border-color" : "#bab2b2",
                   "--react-international-phone-background-color":"#e4f1ff" ,
