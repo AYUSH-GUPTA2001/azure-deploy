@@ -365,8 +365,8 @@ const handleOTPSubmit=(e)=>{
 return
   }
       const investorData={
-        "clientId":0,
-        "advisorId":  '0',
+        "clientId":'string',
+        "advisorId":  'string',
         "firstName": firstName,
         "lastName" :  lastName,
         "email":     email,
