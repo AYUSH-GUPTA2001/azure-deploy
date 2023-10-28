@@ -65,7 +65,10 @@ export default function Login(){
     const [resetPassword,setResetPassword]=useState('')
     const [confirmResetPassword,setConfirmResetPassword]=useState('')
     const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    const [resetPasswordHelperText,setResetPasswordHelperText]=useState('')
 
+  const [cResetPasswordHelperText,setCResetPasswordHelperText]=useState('')
+  const [forgotEmailHelperText,setForgotEmailHelperText]=useState('')
 
     const [forgotEmailError,setForgotEmailError]=useState(false)
     const [resetOTPError,setResetOTPError]=useState(false)
@@ -103,29 +106,53 @@ export default function Login(){
        setForgotEmailError(true)
        return
       }
+      setOTPLoading(true)
       axios({
        method:'post',
        url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
-           setButtonVisible(false)
+       setOTPLoading(false)
+       setButtonVisible(false)
+       setForgotEmailError(false)
+       setForgotEmailHelperText('')
       },(error)=>{
+        setOTPLoading(false)
+        setForgotEmailHelperText(error.response.data.message)
+        setForgotEmailError(true)
          console.log(error)
       })
 }
 
 const handleResetSubmit=()=>{
+  let count=0;
   if(resetOTP===''){
     setResetOTPError(true)
+    count++
   }
   if(resetPassword===''){
     setResetPasswordError(true)
+    count++
   }
   if(confirmResetPassword===''){
     setConfirmResetPasswordError(true)
+    count++
+  }
+  if(count>=1){
     return
   }
+  if (!resetPassword.match(passwordPattern)) {
+    setResetPasswordError(true)
+    setResetPasswordHelperText("Password must contain at least 8 characters, including at least one digit, one lowercase letter, and one uppercase letter.");
+    return 
+}
+
+if (resetPassword !== confirmResetPassword) {
+    setConfirmResetPasswordError(true)
+    setCResetPasswordHelperText("Passwords do not match.");
+    return 
+}
   const resetData={
     "email": forgotEmail,
     "otp": resetOTP,
@@ -176,7 +203,20 @@ const handleResetSubmit=()=>{
     const handleForgotOpen = () => setForgotOpen(true);
     const handleForgotClose = () => {
       setForgotMessage('')
-      setForgotOpen(false)}; 
+      setForgotOpen(false)
+      setForgotEmail('')
+      setForgotEmailError(false)
+      setOTP('')
+      setButtonVisible(true)
+      setOTPError(false)
+      setResetPassword('')
+      setResetPasswordError(false)
+      setConfirmResetPassword('')
+      setConfirmResetPasswordError(false)
+      setForgotEmailHelperText('')
+      setResetPasswordHelperText('')
+      setCResetPasswordHelperText('')
+    }; 
 
     // const dashboard="/advisor/dashboard"
     // const hash="#"
@@ -939,6 +979,7 @@ return
                 required
                 onChange={e => setForgotEmail(e.target.value)}
                 name="forgotEmail"
+                helperText={forgotEmailHelperText}
                 fullWidth
                 value={forgotEmail}
                 error={forgotEmailError}
@@ -946,7 +987,7 @@ return
                 type="email"
                 id="email"
                 autoComplete="email"
-              />{buttonVisible&&<Button
+              />{buttonVisible&&(OTPloading?<LoadingSpinner/>:<Button
               onClick={handleGetOTP}
               type="submit"
               fullWidth
@@ -954,7 +995,7 @@ return
               sx={{ mt: 3, mb: 2 }}
             >
              Get OTP
-            </Button>} 
+            </Button>)} 
             <TextField
                 size="small"
                 margin="dense"
@@ -976,6 +1017,7 @@ return
                 onChange={e => setResetPassword(e.target.value)}
                 name="resetPassword"
                 fullWidth
+                helperText={resetPasswordHelperText}
                 value={resetPassword}
                 error={resetPasswordError}
                 label="Enter Password"
@@ -987,6 +1029,7 @@ return
                 size="small"
                 margin="dense"
                 required
+                helperText={cPasswordHelperText}
                 onChange={e => setConfirmResetPassword(e.target.value)}
                 name="confirmResetPassword"
                 fullWidth
