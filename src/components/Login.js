@@ -124,6 +124,8 @@ export default function Login(){
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
+      setEmail('')
+      setLoginEmail('')
     }; 
     const handleForgotPassword=()=>{
       handleForgotOpen()

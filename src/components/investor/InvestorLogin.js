@@ -224,6 +224,8 @@ if (resetPassword !== confirmResetPassword) {
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
+      setEmail('')
+      setLoginEmail('')
     }; 
     const handleSubmit = (event) => {
         //  const data = new FormData(event.currentTarget);
