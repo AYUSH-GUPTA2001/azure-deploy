@@ -126,6 +126,12 @@ export default function Login(){
 }
 
 const handleResetSubmit=()=>{
+  setResetPasswordError(false)
+  setResetOTPError(false)
+  setConfirmResetPasswordError(false)
+  setResetPasswordHelperText(false)
+  setCResetPasswordHelperText(false)
+
   let count=0;
   if(resetOTP===''){
     setResetOTPError(true)
@@ -206,7 +212,7 @@ if (resetPassword !== confirmResetPassword) {
       setForgotOpen(false)
       setForgotEmail('')
       setForgotEmailError(false)
-      setOTP('')
+      setResetOTP('')
       setButtonVisible(true)
       setOTPError(false)
       setResetPassword('')
@@ -1031,7 +1037,7 @@ return
                 size="small"
                 margin="dense"
                 required
-                helperText={cPasswordHelperText}
+                helperText={cResetPasswordHelperText}
                 onChange={e => setConfirmResetPassword(e.target.value)}
                 name="confirmResetPassword"
                 fullWidth

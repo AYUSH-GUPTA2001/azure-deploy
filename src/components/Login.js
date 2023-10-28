@@ -104,7 +104,7 @@ export default function Login(){
       setForgotOpen(false)
       setForgotEmail('')
       setForgotEmailError(false)
-      setOTP('')
+      setResetOTP('')
       setButtonVisible(true)
       setOTPError(false)
       setResetPassword('')
@@ -316,6 +316,11 @@ export default function Login(){
     // handleOpen()
     // }
 const handleResetSubmit=()=>{
+  setResetPasswordError(false)
+  setResetOTPError(false)
+  setConfirmResetPasswordError(false)
+  setResetPasswordHelperText(false)
+  setCResetPasswordHelperText(false)
   let count=0;
   if(resetOTP===''){
     setResetOTPError(true)
