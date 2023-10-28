@@ -36,6 +36,7 @@ export default function Login(){
   const [loginPasswordError, setLoginPasswordError] = useState(false)
   const [loading,setLoading]=useState(false)
   const [OTPloading,setOTPLoading]=useState(false)
+  const [resetLoading,setResetLoading]=useState(false)
   const [address,setAddress]=useState("")
   const [phone, setPhone] = useState('');
   const [firstName, setFirstName] = useState("")
@@ -252,7 +253,7 @@ export default function Login(){
       "email":     email,
       "password":  password,
       "confirmPassword": confirmPassword,
-      "phoneNumber":  phone.replace(/\s+/g, "").replace(/-/g, "").replace("+91",""),
+      "phoneNumber":  phone.replace(/[()\s+\-]/g, '').slice(-10),
       "address":address,
       "city": city,
       "state":  state,
@@ -304,12 +305,13 @@ const handleResetSubmit=()=>{
     "newPassword":  resetPassword,
     "confirmPassword": confirmResetPassword
   }
-
+setResetLoading(true)
  axios({
     method:'post',
     url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
+    setResetLoading(false)
      setForgotMessage(response.data.message)
      setForgotEmail('')
      setResetOTP('')
@@ -317,6 +319,7 @@ const handleResetSubmit=()=>{
      setButtonVisible(true)
      setConfirmResetPassword('')
   },(error)=>{
+    setResetLoading(false)
       setForgotMessage(error.response.data.message)
   })
 
@@ -650,7 +653,7 @@ const handleResetSubmit=()=>{
                 autoComplete="current-password"
               />
            
-           <Button
+           {loading?<LoadingSpinner/>:<Button
                 onClick={handleLoginSubmit}
                 type="submit"
                 fullWidth
@@ -658,7 +661,7 @@ const handleResetSubmit=()=>{
                 sx={{ mt: 3, mb: 2 }}
               >
                Sign In
-              </Button>
+              </Button>}
               <Modal
         open={open}
         onClose={handleClose}
@@ -796,7 +799,7 @@ const handleResetSubmit=()=>{
                 id="password"
                 autoComplete="password"
               />
-            <Button
+            {resetLoading?<LoadingSpinner/>:<Button
               onClick={handleResetSubmit}
               type="submit"
               fullWidth
@@ -804,7 +807,7 @@ const handleResetSubmit=()=>{
               sx={{ mt: 3, mb: 2 }}
             >
              Reset Password
-            </Button></>}</Box></Modal>
+            </Button>}</>}</Box></Modal>
                 </Grid>
                 <Grid item>
                   <Link href="#" value="1" onClick={(e)=> setValue("1")}  variant="body2">

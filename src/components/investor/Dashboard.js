@@ -461,7 +461,7 @@ const handleModalSubmit=()=>{
   console.log("advisorId:"+advisorId)
   axios({
     method:'get',
-    url:`https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+    url:`https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
   }).then((response)=>{
     const list=response.data.strategies
     // list.map((e)=>setData([e.investmentAmount,e.expectedAmount,e.amount,e.returnPercentage]))

@@ -35,6 +35,7 @@ export default function Login(){
     const [message,setMessage]=useState("")
     const [forgotMessage,setForgotMessage]=useState("")
     const [loading,setLoading]=useState(false)
+    const [resetLoading,setResetLoading]=useState(false)
     const [loginEmail, setLoginEmail] = useState("")
     const [loginPassword, setLoginPassword] = useState("")
     const [loginEmailError, setLoginEmailError] = useState(false)
@@ -104,7 +105,7 @@ export default function Login(){
       }
       axios({
        method:'post',
-       url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/forgot-password?api-version=1',
+       url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
@@ -131,12 +132,13 @@ const handleResetSubmit=()=>{
     "newPassword":  resetPassword,
     "confirmPassword": confirmResetPassword
   }
-
+ setResetLoading(true)
  axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
+    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
+    setResetLoading(false)
      setForgotMessage(response.data.message)
      setForgotEmail('')
      setResetOTP('')
@@ -144,6 +146,7 @@ const handleResetSubmit=()=>{
      setButtonVisible(true)
      setConfirmResetPassword('')
   },(error)=>{
+      setResetLoading(false)
       setForgotMessage(error.response.data.message)
   })
 
@@ -293,7 +296,7 @@ const handleOTPSubmit=(e)=>{
   setOTPLoading(true)
   axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp?api-version=1',
+    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/verify-otp?api-version=1',
     data:otpData
   }).then((response)=>{
     setOTPLoading(false)
@@ -369,7 +372,7 @@ return
         "email":     email,
         "password":  password,
         "confirmPassword": confirmPassword,
-        "phoneNumber":  phone.replace(/\s+/g, "").replace(/-/g, "").replace("+91",""),
+        "phoneNumber":  phone.replace(/[()\s+\-]/g, '').slice(-10),
         "address":address,
         "city": city,
         "state":  state,
@@ -847,14 +850,14 @@ return
                 autoComplete="current-password"
               />
            
-              <Button
+              {loading?<LoadingSpinner/>:<Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
                Sign In
-              </Button>
+              </Button>}
               <Modal
         open={open}
         onClose={handleClose}
@@ -992,7 +995,7 @@ return
                 id="password"
                 autoComplete="password"
               />
-            <Button
+            {resetLoading?<LoadingSpinner/>:<Button
               onClick={handleResetSubmit}
               type="submit"
               fullWidth
@@ -1000,7 +1003,7 @@ return
               sx={{ mt: 3, mb: 2 }}
             >
              Reset Password
-            </Button></>}</Box></Modal>
+            </Button>}</>}</Box></Modal>
                 </Grid>
                 <Grid item>
                   <Link href="#" value="1" onClick={(e)=> setValue("1")}  variant="body2">
