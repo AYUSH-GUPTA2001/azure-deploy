@@ -170,7 +170,7 @@ const valueFormatter = (value) => `Rs.${value}`;
           {/* <TableCell>{row.amount}</TableCell> */}
           <TableCell>{row.investmentAmount}</TableCell>
           <TableCell>{row.expectedAmount}</TableCell>
-          <TableCell><Button sx={{width:'100px',borderRadius:'20px'}} variant="contained" color={row.status === 'Pending' ? 'error' : 'primary'}>{row.status}</Button></TableCell>
+          <TableCell><Button sx={{width:'100px',borderRadius:'20px'}} variant="contained" color={row.status === 'Pending' ? 'primary' : 'success'}>{row.status}</Button></TableCell>
         </TableRow>
         <TableRow>
         <TableCell style={{ paddingRight:10,paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -262,6 +262,7 @@ function InvestmentContent({clientId}) {
     position: 'absolute',
     top: '30%',
     left: '50%',
+    overflow:'auto',
     transform: 'translate(-50%, -50%)',
     width: 800,
     bgcolor: '#e4f1ff',
@@ -481,7 +482,7 @@ const handleModalSubmit=()=>{
   
 </div>
 <div class="button-container">
-<button class="my-button" onClick={handleOpen}>Investment Requests</button>
+<button class="my-button" onClick={handleOpen}><Tooltip title='Click to make Investment request'>Investment Requests</Tooltip></button>
   <Modal
         open={open}
         onClose={handleClose}
@@ -523,15 +524,16 @@ const handleModalSubmit=()=>{
           error={timePeriodError}
           onChange={e => setTimePeriod(e.target.value)}
         >
-          <MenuItem value={'6m'}>6 month</MenuItem>
-          <MenuItem value={'1yr'}>1 year</MenuItem>
-          <MenuItem value={'3yr'}>3 year</MenuItem>
-          <MenuItem value={'5yr'}>5 year</MenuItem>
+          <MenuItem value={'6 months'}>6 months</MenuItem>
+          <MenuItem value={'1 year'}>1 year</MenuItem>
+          <MenuItem value={'3 year'}>3 year</MenuItem>
+          <MenuItem value={'5 year'}>5 year</MenuItem>
         
         </Select>
       </FormControl>
       </Grid>
-              <Grid sx={{mt:1}}>
+              <Grid sx={{
+                mt:1}}>
               <FormControl required fullWidth>
         <InputLabel id="demo-simple-select-label">Investment Type</InputLabel>
         <Select
@@ -568,7 +570,7 @@ const handleModalSubmit=()=>{
                 autoFocus
               />} */}
       </Modal>
-      <Tooltip title="Click here to investment strategies from advisor" placement="right-end"> <button class="my-button" onClick={handleRecommendations} >Strategies</button></Tooltip>
+      <Tooltip title="Click here to see investment strategies from advisor" > <button class="my-button" onClick={handleRecommendations} >Strategies</button></Tooltip>
   <Modal
         open={recommendationsOpen}
         onClose={handleRecommendationsClose}
@@ -576,7 +578,7 @@ const handleModalSubmit=()=>{
         aria-describedby="modal-modal-description"
       ><Box sx={recommendationStyle} >
         <CloseIcon color="primary" onClick={handleRecommendationsClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{overflow:'auto'}}>
         
       <Table   aria-label="simple table">
         <TableHead>
@@ -586,6 +588,10 @@ const handleModalSubmit=()=>{
             {/* <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Original Amount(Rs.)</TableCell> */}
             <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount(Rs.)</TableCell>
             <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Expected Amount(Rs.)</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>6 Months Return(%)</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>1 year Return(%)</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>3 year Return(%)</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>5 year Return(%)</TableCell>
             <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Status</TableCell>
           </TableRow>
         </TableHead>
@@ -600,7 +606,11 @@ const handleModalSubmit=()=>{
           {/* <TableCell>{.amount}</TableCell> */}
           <TableCell>{row.investmentAmount}</TableCell>
           <TableCell>{row.expectedAmount}</TableCell>
-          <TableCell><Button sx={{width:'100px',borderRadius:'20px'}} variant="contained" color={row.status === 'Pending' ? 'error' : 'primary'}>{row.status}</Button></TableCell>
+          <TableCell>{row.returnPercentageAfter6months}</TableCell>
+          <TableCell>{row.returnPercentageAfter1year}</TableCell>
+          <TableCell>{row.returnPercentageAfter3year}</TableCell>
+          <TableCell>{row.returnPercentageAfter5year}</TableCell>
+          <TableCell><Button sx={{width:'100px',borderRadius:'20px'}} variant="contained" color={row.status === 'Pending' ? 'primary' : 'error'}>{row.status}</Button></TableCell>
         </TableRow>
       </React.Fragment>
     );

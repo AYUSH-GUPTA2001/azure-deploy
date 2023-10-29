@@ -135,6 +135,7 @@ function InvestmentStrategies( {advisorId} ) {
             {/* <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Original Amount&nbsp;(Rs.) </TableCell> */}
             <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px'}}>Investment Amount&nbsp;(Rs.)</TableCell>
             <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Expected Amount&nbsp;(Rs.)</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Time Period</TableCell>
             <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Status&nbsp;</TableCell>
           
           </TableRow>
@@ -159,6 +160,7 @@ function InvestmentStrategies( {advisorId} ) {
           {/* <TableCell >{row.amount} </TableCell> */}
           <TableCell >{row.investmentAmount}</TableCell>
           <TableCell >{row.expectedAmount}</TableCell>
+          <TableCell>{row.timePeriod}</TableCell>
           <TableCell ><Button sx={{width:'100px',borderRadius:'20px'}} variant="contained" color={row.status === 'Pending' ? 'primary' : (row.status==='Rejected'?'error':'success')}>{row.status}</Button></TableCell>
         </TableRow>
             <TableRow>
@@ -467,21 +469,23 @@ const [investmentId,setInvestmentId]=useState('')
 const [amount,setAmount]=useState('')
 const [investmentAmount,setInvestmentAmount]=useState('')
 const [expectedAmount,setExpectedAmount]=useState('')
-const [Status,setStatus]=useState('')
+const [timePeriod,setTimePeriod]=useState("")
+// const [Status,setStatus]=useState('')
 const [sixMonReturns,setSixMonReturns]=useState('')
 const [oneYrReturns,setOneYrReturns]=useState('')
 const [threeYrReturns,setThreeYrReturns]=useState('')
 const [fiveYrReturns,setFiveYrReturns]=useState('')
+
 const [message,setMessage]=useState('')
 
-
+const [timePeriodError,setTimePeriodError]=useState(false)
 const [strategyNameError,setStrategyNameError]=useState(false)
 const [clientIdError,setClientIdError]=useState(false)
 // const [amountError,setAmountError]=useState(false)
 const [investmentIdError,setInvestmentIdError]=useState(false)
 const [investmentAmountError,setInvestmentAmountError]=useState(false)
 const [expectedAmountError,setExpectedAmountError]=useState(false)
-const [statusError,setStatusError]=useState(false)
+// const [statusError,setStatusError]=useState(false)
 const [sixMonReturnsError,setSixMonReturnsError]=useState(false)
 const [oneYrReturnsError,setOneYrReturnsError]=useState(false)
 const [threeYrReturnsError,setThreeYrReturnsError]=useState(false)
@@ -494,49 +498,57 @@ const handleModalSubmit=(event)=>{
   event.preventDefault();
   setStrategyNameError(false)
   setClientIdError(false)
+  setTimePeriodError(false)
   setSixMonReturnsError(false)
   setOneYrReturnsError(false)
   setThreeYrReturnsError(false)
   setFiveYrReturnsError(false)
-
+  let count=0;
   if(strategyName===""){
     setStrategyNameError(true)
-    
+    count++
   }
   if(clientId===""){
     setClientIdError(true)
-    
+    count++ 
   }
   if(investmentId===""){
     setInvestmentIdError(true)
-    
+    count++
   }
-  if(Status===''){
-    setStatusError(true)
-  
-  }
+  // if(Status===''){
+  //   setStatusError(true)
+  //   count++
+  // }
   if(investmentAmount===""){
     setInvestmentAmountError(true)
-    
+    count++
   }
   if(expectedAmount===""){
     setExpectedAmountError(true)
-    
+    count++
+  }
+  if(timePeriod===''){
+    setTimePeriodError(true)
+    count++
   }
   if(sixMonReturns===""){
     setSixMonReturnsError(true)
-    
+    count++
   }
   if(oneYrReturns===""){
     setOneYrReturnsError(true)
-    
+    count++
   }
   if(threeYrReturns===""){
     setThreeYrReturnsError(true)
-    
+    count++
   }
   if(fiveYrReturns===""){
     setFiveYrReturnsError(true)
+    count++
+  }
+  if(count>0){
     return
   }
   const strategyData ={
@@ -553,7 +565,7 @@ const handleModalSubmit=(event)=>{
     "returnPercentageAfter3year": threeYrReturns,
     "returnPercentageAfter5year": fiveYrReturns,
     "status": "string",
-    "timePeriod": "string",
+    "timePeriod": timePeriod,
     "remarks": "string",
     "completed": true
   }
@@ -571,6 +583,7 @@ const handleModalSubmit=(event)=>{
     setOneYrReturns('')
     setThreeYrReturns('')
     setFiveYrReturns('')
+    setTimePeriod('')
     setAmount('')
     setExpectedAmount('')
     setInvestmentAmount('')
@@ -704,7 +717,26 @@ const handleModalSubmit=(event)=>{
                   autoFocus
                 />
               
-              
+              <Grid sx={{mt:1}}>
+              <FormControl required fullWidth>
+        <InputLabel id="demo-simple-select-label">Time Period</InputLabel>
+        <Select
+          
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          label="Time Period"
+          value={timePeriod}
+          error={timePeriodError}
+          onChange={e => setTimePeriod(e.target.value)}
+        >
+          <MenuItem value={'6m'}>6 month</MenuItem>
+          <MenuItem value={'1yr'}>1 year</MenuItem>
+          <MenuItem value={'3yr'}>3 year</MenuItem>
+          <MenuItem value={'5yr'}>5 year</MenuItem>
+        
+        </Select>
+      </FormControl>
+      </Grid>
               
               <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -784,11 +816,13 @@ const handleModalSubmit=(event)=>{
       <Table   aria-label="simple table">
         <TableHead>
         <TableRow >
-        <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Id</TableCell>
-          <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Client Id</TableCell>
-           <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Time Period</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Id</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Client Id</TableCell>
+            <TableCell align='center'  sx={{ fontWeight: 'bold', fontSize: '16px' }}>Date</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount</TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', fontSize: '16px' }}>Time Period</TableCell>
             <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Type</TableCell>
+            
          
           </TableRow>
         </TableHead>
@@ -799,8 +833,9 @@ const handleModalSubmit=(event)=>{
         <TableRow>
           <TableCell>{row.investmentID}</TableCell>
           <TableCell>{row.clientId}</TableCell>
-          <TableCell>{row.investmentAmount}</TableCell>
-          <TableCell>{row.timePeriod}</TableCell>
+          <TableCell align='center'>{row.createdDate.slice(0,10)}</TableCell>
+          <TableCell align='center'>{row.investmentAmount}</TableCell>
+          <TableCell align='center'>{row.timePeriod}</TableCell>
           <TableCell><Button color={row.investmentType === 'High Risk' ? 'error' : (row.investmentType === 'Low Risk' ? 'primary' : 'success')}>{row.investmentType}</Button></TableCell>
           
         </TableRow>
