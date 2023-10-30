@@ -1,8 +1,18 @@
 // Navbar.js
 import React from 'react';
 import './Navbar.css';
-
+import Tooltip from '@mui/material/Tooltip';
+import { useNavigate } from 'react-router-dom/dist';
 export default function Navbar(props) {
+    const navigate=useNavigate()
+    const handleLogout=()=>{
+        if(props.user==='client'){
+            navigate('/investor')
+        }
+        else{
+            navigate('/advisor')
+        }
+    }
   return (
     <nav>
     <div className="navbar-content">
@@ -10,7 +20,7 @@ export default function Navbar(props) {
         <span className="logo-text">INCvest</span>
         <span className="dot">.</span>
       </h1>
-      <div className="welcome-message">Welcome, <span className='dot1'>{props.firstName}</span></div>
+      <div onClick={handleLogout}className="welcome-message"><Tooltip title='logout'>Welcome, <span className='dot1'>{props.firstName}</span></Tooltip></div>
     </div>
   </nav>
   );

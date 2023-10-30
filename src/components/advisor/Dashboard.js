@@ -35,7 +35,7 @@ import Navbar from '../Navbar/Navbar';
 function Dashboard(){
     
     const { advisorId } = useParams()
-    console.log(advisorId)
+    
     const navigate = useNavigate()
     const [firstName,setFirstName]=useState('')
 
@@ -43,7 +43,7 @@ axios({
   method:'get',
   url:`https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
 }).then((response)=>{
-  console.log(response)
+  
   setFirstName(response.data.advisor.firstName)
 
 },(error)=>{
@@ -90,14 +90,14 @@ console.log(error)
        <Tooltip title="Click to see list of clients" placement="right-end"><li className="sidebar-item" onClick={() => handleOptionClick('ClientList')} id={selectedOption === 'ClientList' ? 'active' : ''}> <i className="material-icons">pie_chart</i> <span>List of Clients</span></li></Tooltip>
        <Tooltip title="Click to see list of strategies" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentStrategies')} id={selectedOption === 'InvestmentStrategies' ? 'active' : ''} ><i className="material-icons">swap_horiz</i><span>Strategies</span></li></Tooltip>
        <Tooltip title="Click to see list of investment requests" placement="right-end">  <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentRequests')} id={selectedOption === 'InvestmentRequests' ? 'active' : ''}><i className="material-icons">description</i><span>Investment Requests</span></li></Tooltip>
-          {/* <li className="sidebar-item" onClick={() => handleOptionClick('Settings')}><i className="material-icons">settings</i><span>Settings</span></li> */}
+       {/* <Tooltip title="Update Profile" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('Settings')} id={selectedOption==='Settings'?'active':''}><i className="material-icons">settings</i><span>Settings</span></li></Tooltip> */}
         </ul>
       </div>
       <div className="content">
         {selectedOption === 'ClientList' && <ClientList advisorId={advisorId} />}
         {selectedOption === 'InvestmentStrategies' && <InvestmentStrategies advisorId={advisorId} />}
         {selectedOption === 'InvestmentRequests' && <ReportsContent advisorId={advisorId}/>}
-        {selectedOption === 'Settings' && <SettingsContent />}
+        {selectedOption === 'Settings' && <SettingsContent advisorId={advisorId} />}
       </div>
     </div></>
   );
@@ -221,11 +221,11 @@ function InvestmentStrategies( {advisorId} ) {
 }
 
 function ClientList({advisorId}) {
-  console.log(advisorId)
+  
   const [listOfClients,setListOfClients]=useState([])
   
   
-  useEffect(()=>{
+  
       
     axios({
       method:'get',
@@ -233,7 +233,7 @@ function ClientList({advisorId}) {
     }).then((response)=>{
       
      setListOfClients(response.data)
-    
+  
   
       }
       
@@ -242,7 +242,7 @@ function ClientList({advisorId}) {
 
 
 
-    },[listOfClients,advisorId])
+    
 
 
   //   axios({
@@ -869,12 +869,89 @@ const handleModalSubmit=(event)=>{
   );
 }
 
-function SettingsContent() {
-  return (
-    <div>
-      <h1>Settings Content</h1>
-      {/* Add your settings content here */}
+function SettingsContent({advisorId}) {
+  return (<>
+  <h1 style={{color:'blue'}}>Edit Profile</h1>
+<div className="settings-container">
+      
+      <div className="profile-section">
+        <div className="profile-pic">
+          {/* Insert your big profile picture here */}
+        </div>
+        
+      </div>
+      <div>
+      <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  margin="dense"
+                  autoComplete="given-name"
+                  name="firstName"
+                  required
+                  fullWidth
+                  // value={firstName}
+                  // error={firstNameError}
+                  // onChange={e => setFirstName(e.target.value)}
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  // value={lastName}
+                  // error={lastNameError}
+                  // onChange={e => setLastName(e.target.value)}
+                  autoComplete="family-name"
+                />
+              </Grid>
+              
+              </Grid>
+              <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  margin="dense"
+                  autoComplete="given-name"
+                  name="firstName"
+                  required
+                  fullWidth
+                  // value={firstName}
+                  // error={firstNameError}
+                  // onChange={e => setFirstName(e.target.value)}
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  size="small"
+                  margin="dense"
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  // value={lastName}
+                  // error={lastNameError}
+                  // onChange={e => setLastName(e.target.value)}
+                  autoComplete="family-name"
+                />
+              </Grid>
+              
+              </Grid>
+              </div>
     </div>
+    </>
   );
 }
 

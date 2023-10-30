@@ -63,7 +63,7 @@ function Dashboard(){
   navigate('/investor')
  }
   return (<>
-  <Navbar firstName={firstName}/>
+  <Navbar firstName={firstName} user='client'/>
     <div className="investorDashboard">
        {/* <div className="top-right">
         <div className="user-info" onClick={toggleDropdown}>

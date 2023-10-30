@@ -73,8 +73,7 @@ line-height: 2.5em;
 
 .content h1 {
   font-size: 1.5rem;
-  margin-bottom: 20px;
-}
+  }
 
 /* Add additional styles as needed for specific content sections */
 /* Add these styles to your existing CSS file */
@@ -168,6 +167,59 @@ background-color: #f0f0f0;
   background-color: #fff;
   border-radius: 10px;
 }
+
+.settings-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  width: fit-content;
+  /* border: 1px solid #ccc; */
+  border-radius: 5px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+}
+
+.profile-pic {
+  width: 100px; /* Set the desired width for the profile picture */
+  height: 100px; /* Set the desired height for the profile picture */
+  border-radius: 50%;
+  background-color: #ccc; /* Set a background color or add an image for the profile picture */
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+}
+
+input {
+  width: 200px; /* Set the desired width for the input fields */
+  padding: 5px;
+}
+
+.update-button {
+  text-align: center;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
 
 
 
