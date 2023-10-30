@@ -31,14 +31,22 @@ import Button from '@mui/material/Button';
 import axios from "axios";
 import * as React from 'react'
 import { useNavigate, useParams } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 
 function Dashboard(){
 
     const {clientId}=useParams()
     const navigate=useNavigate()    
+    const [firstName,setFirstName]=useState('')
     
-    
-   
+   axios({
+    method:'get',
+    url:`https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
+   }).then((response)=>{
+    setFirstName(response.data.client.firstName)
+   },(error)=>{
+
+   })
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
@@ -54,70 +62,57 @@ function Dashboard(){
  const handleLogout=()=>{
   navigate('/investor')
  }
-  return (
+  return (<>
+  <Navbar firstName={firstName}/>
     <div className="investorDashboard">
-       <div className="top-right">
+       {/* <div className="top-right">
         <div className="user-info" onClick={toggleDropdown}>
           <i className="material-icons">person</i>
           <span>Your Profile</span>
-        </div>
-        {isDropdownOpen && (
+        </div> */}
+        {/* {isDropdownOpen && (
           <div className="dropdown">
             <ul>
               <li onClick={handleLogout}>Logout</li>
               {/* Add other options as needed */}
-            </ul>
-          </div>
-        )}
-      </div>
+            {/* </ul>
+          </div> */}
+        {/* // )}
+      // </div> */} 
       <div className="sidebar">
-      <h1 id="logo"><span class="logo-text">INCvest</span><span class="dot">.</span></h1>
+     
         <ul>
           <Tooltip title="Click to see your investments" placement="right-end"><li className="sidebar-item" onClick={() => handleOptionClick('Portfolio')} id={selectedOption==='Portfolio'?'active':''}>  <i className="material-icons">pie_chart</i> <span>Portfolio</span></li></Tooltip>
-          {/* <li className="sidebar-item" onClick={() => handleOptionClick('Transactions')}><i className="material-icons">swap_horiz</i><span>Transactions</span></li> */}
+          <Tooltip title="Click to see past requests" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('pastRequests')} id={selectedOption==='pastRequests'?'active':''}><i className="material-icons">swap_horiz</i><span>Past Requests</span></li></Tooltip>
           <Tooltip title="Click to make investment requests and to see the strategies" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('New Investment')} id={selectedOption==='New Investment'?'active':''}><i className="material-icons">description</i><span>New Investment</span></li></Tooltip>
           {/* <li className="sidebar-item" onClick={() => handleOptionClick('Settings')}><i className="material-icons">settings</i><span>Settings</span></li> */}
         </ul>
       </div>
       <div className="content">
         {selectedOption === 'Portfolio' && <PortfolioContent clientId={clientId}/>}
-        {/* {selectedOption === 'Transactions' && <TransactionsContent />} */}
+        {selectedOption === 'pastRequests' && <PastRequestsContent clientId={clientId} />}
         {selectedOption === 'New Investment' && <InvestmentContent clientId={clientId}/>}
         {/* {selectedOption === 'Settings' && <SettingsContent />} */}
       </div>
     </div>
+    </>
   );
 }
 
 function PortfolioContent({clientId}) {
-  const [advisorId,setAdvisorId]=useState("")
-  const [data,setData]=useState([])
+  
+
   const [open, setOpen] = useState(false);
   const [listOfStratgies,setListOfStrategies]=useState([])
 
-  useEffect(()=>{
-      
-    axios({
-      method:'get',
-      url:`https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
-    }).then((response)=>{
-      response.data.map((e)=>{
-        if(advisorId===""){
-          console.log(e)
-          setAdvisorId(e.advisorId)
-          return
-        }
-      })
-      
-    },(error)=>{})
-  },[])
+ 
 
   
 
   useEffect(()=>{
     axios({
       method:'get',
-      url:`https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+      url:`https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
     }).then(function(response){
     const list=response.data.strategies
     
@@ -129,7 +124,7 @@ function PortfolioContent({clientId}) {
     {
       console.log(error)
     })
-},[listOfStratgies,advisorId])
+},[listOfStratgies])
 
 
 const valueFormatter = (value) => `Rs.${value}`;
@@ -144,11 +139,12 @@ const valueFormatter = (value) => `Rs.${value}`;
         <TableHead>
         <TableRow >
         <TableCell />
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Name</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Name</TableCell>
             {/* <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Original Amount(Rs.)</TableCell> */}
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount(Rs.)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Expected Amount(Rs.)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Status</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Amount(Rs.)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Expected Amount(Rs.)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Time Period</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -170,6 +166,7 @@ const valueFormatter = (value) => `Rs.${value}`;
           {/* <TableCell>{row.amount}</TableCell> */}
           <TableCell>{row.investmentAmount}</TableCell>
           <TableCell>{row.expectedAmount}</TableCell>
+          <TableCell>{row.timePeriod}</TableCell>
           <TableCell><Button sx={{width:'100px',borderRadius:'20px'}} variant="contained" color={row.status === 'Pending' ? 'primary' : 'success'}>{row.status}</Button></TableCell>
         </TableRow>
         <TableRow>
@@ -223,14 +220,66 @@ const valueFormatter = (value) => `Rs.${value}`;
   );
 }
 
-// function TransactionsContent() {
-//   return (
-//     <div>
-//       <h1>Transactions Content</h1>
-//       {/* Add your transactions content here */}
-//     </div>
-//   );
-// }
+function PastRequestsContent({clientId}) {
+  const [listOfPastRequests,setListOfPastRequests]=useState([])
+
+ 
+
+  
+
+  
+    axios({
+      method:'get',
+      url:`https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
+    }).then(function(response){
+    setListOfPastRequests(response.data)
+    console.log(listOfPastRequests)
+    },
+    function(error)
+    {
+      console.log(error)
+    })
+
+  return (
+    <div className="portfolio">
+      <div className="rectangle-div">
+    <TableContainer component={Paper}>
+    <Table   aria-label="simple table">
+      <TableHead>
+      <TableRow >
+      <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Id</TableCell>
+            
+            <TableCell   sx={{ color:'blue', fontSize: '16px' }}>Created Date</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Amount(Rs.)</TableCell>
+            <TableCell  sx={{color:'blue', fontSize: '16px' }}>Time Period</TableCell>
+            <TableCell sx={{color:'blue', fontSize: '16px' }}>Investment Type</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+      {listOfPastRequests?.map((row) => 
+          
+          <React.Fragment >
+        <TableRow>
+          <TableCell>{row.investmentID}</TableCell>
+          
+          <TableCell >{row.createdDate.slice(0,10)}</TableCell>
+          <TableCell >{row.investmentAmount}</TableCell>
+          <TableCell >{row.timePeriod}</TableCell>
+          <TableCell><Button color={row.investmentType === 'High Risk' ? 'error' : (row.investmentType === 'Low Risk' ? 'primary' : 'success')}>{row.investmentType}</Button></TableCell>
+          
+        </TableRow>
+      </React.Fragment>
+
+          )
+
+}
+      </TableBody>
+      </Table>
+      </TableContainer>
+      </div>
+      </div>
+  );
+}
 
 function InvestmentContent({clientId}) {
 
@@ -583,16 +632,16 @@ const handleModalSubmit=()=>{
       <Table   aria-label="simple table">
         <TableHead>
         <TableRow >
-           <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Strategy Id</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Strategy Name</TableCell>
+           <TableCell sx={{ color:'blue', fontSize: '16px' }}>Strategy Id</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Strategy Name</TableCell>
             {/* <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Original Amount(Rs.)</TableCell> */}
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount(Rs.)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Expected Amount(Rs.)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>6 Months Return(%)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>1 year Return(%)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>3 year Return(%)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>5 year Return(%)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Status</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Amount(Rs.)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Expected Amount(Rs.)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>6 Months Return(%)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>1 year Return(%)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>3 year Return(%)</TableCell>
+            <TableCell sx={{color:'blue', fontSize: '16px' }}>5 year Return(%)</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

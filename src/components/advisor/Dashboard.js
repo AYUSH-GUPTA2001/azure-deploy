@@ -30,13 +30,25 @@ import Box from '@mui/material/Box';
 
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { styled } from '@mui/material/styles';
+
+import Navbar from '../Navbar/Navbar';
 function Dashboard(){
     
     const { advisorId } = useParams()
     console.log(advisorId)
     const navigate = useNavigate()
+    const [firstName,setFirstName]=useState('')
 
+axios({
+  method:'get',
+  url:`https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+}).then((response)=>{
+  console.log(response)
+  setFirstName(response.data.advisor.firstName)
+
+},(error)=>{
+console.log(error)
+})
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
@@ -53,24 +65,27 @@ function Dashboard(){
   const handleLogout=()=>{
     navigate('/advisor')
   }
-  return (
+  return (<>
+    <Navbar firstName={firstName}
+      />
     <div className="investorDashboard">
-       <div className="top-right">
+     
+       {/* <div className="top-right">
         <div className="user-info" onClick={toggleDropdown}>
           <i className="material-icons">person</i>
           <span>Your Profile</span>
-        </div>
-        {isDropdownOpen && (
+        </div> */}
+        {/* {isDropdownOpen && (
           <div className="dropdown">
             <ul>
               <li onClick={handleLogout}>Logout</li>
-              {/* Add other options as needed */}
+              Add other options as needed
             </ul>
           </div>
-        )}
-      </div>
+        )} */}
+      {/* </div> */}
       <div className="sidebar">
-      <h1 id="logo"><span class="logo-text">INCvest</span><span class="dot">.</span></h1>
+      
         <ul>
        <Tooltip title="Click to see list of clients" placement="right-end"><li className="sidebar-item" onClick={() => handleOptionClick('ClientList')} id={selectedOption === 'ClientList' ? 'active' : ''}> <i className="material-icons">pie_chart</i> <span>List of Clients</span></li></Tooltip>
        <Tooltip title="Click to see list of strategies" placement="right-end"> <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentStrategies')} id={selectedOption === 'InvestmentStrategies' ? 'active' : ''} ><i className="material-icons">swap_horiz</i><span>Strategies</span></li></Tooltip>
@@ -84,7 +99,7 @@ function Dashboard(){
         {selectedOption === 'InvestmentRequests' && <ReportsContent advisorId={advisorId}/>}
         {selectedOption === 'Settings' && <SettingsContent />}
       </div>
-    </div>
+    </div></>
   );
 }
 
@@ -130,13 +145,13 @@ function InvestmentStrategies( {advisorId} ) {
         <TableRow >
             <TableCell />
             
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Name</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }} >Client Id&nbsp;</TableCell>
+            <TableCell sx={{color:'blue', fontSize: '16px' }}>Investment Name</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }} >Client Id&nbsp;</TableCell>
             {/* <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Original Amount&nbsp;(Rs.) </TableCell> */}
-            <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px'}}>Investment Amount&nbsp;(Rs.)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Expected Amount&nbsp;(Rs.)</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Time Period</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Status&nbsp;</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px'}}>Investment Amount&nbsp;(Rs.)</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }}>Expected Amount&nbsp;(Rs.)</TableCell>
+            <TableCell sx={{color:'blue', fontSize: '16px' }}>Time Period</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }}>Status&nbsp;</TableCell>
           
           </TableRow>
         </TableHead>
@@ -383,9 +398,9 @@ const requestsStyle = {
       <Table   aria-label="simple table">
         <TableHead>
         <TableRow >
-           <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Time Period</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Type</TableCell>
+           <TableCell sx={{color:'blue',  fontSize: '16px' }}>Investment Amount</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }}>Time Period</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }}>Investment Type</TableCell>
          
           </TableRow>
         </TableHead>
@@ -417,10 +432,10 @@ const requestsStyle = {
       <Table   aria-label="simple table">
         <TableHead>
         <TableRow >
-        <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Client Id</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Client Name</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Email Address</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Mobile Number</TableCell>
+        <TableCell sx={{ color:'blue', fontSize: '16px' }}>Client Id</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }}>Client Name</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Email Address</TableCell>
+            <TableCell sx={{color:'blue',  fontSize: '16px' }}>Mobile Number</TableCell>
            
           </TableRow>
         </TableHead>
@@ -619,7 +634,11 @@ const handleModalSubmit=(event)=>{
    })
   return (
 <div className='portfolio'>
-<Button  onClick={handleOpen} variant='contained'>Add Strategy</Button>
+<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Button onClick={handleOpen}  style={{ margin: '0 0 0 0' }}>
+        Add Strategy
+      </Button>
+    </div>
   <Modal
         open={modalOpen}
         onClose={handleClose}
@@ -816,12 +835,12 @@ const handleModalSubmit=(event)=>{
       <Table   aria-label="simple table">
         <TableHead>
         <TableRow >
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Id</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Client Id</TableCell>
-            <TableCell align='center'  sx={{ fontWeight: 'bold', fontSize: '16px' }}>Date</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Amount</TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', fontSize: '16px' }}>Time Period</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Investment Type</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Id</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Client Id</TableCell>
+            <TableCell align='center'  sx={{ color:'blue', fontSize: '16px' }}>Date</TableCell>
+            <TableCell sx={{ color:'blue', fontSize: '16px' }}>Investment Amount</TableCell>
+            <TableCell align='center' sx={{color:'blue', fontSize: '16px' }}>Time Period</TableCell>
+            <TableCell sx={{color:'blue', fontSize: '16px' }}>Investment Type</TableCell>
             
          
           </TableRow>
