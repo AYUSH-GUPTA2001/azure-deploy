@@ -382,14 +382,17 @@ setResetLoading(true)
       setLoginEmailError(false)
       setLoginPasswordError(false)
   
+      let isError = false;
       if (loginEmail === '') {
           setLoginEmailError(true)
-          return
+          isError = true;
       }
       if (loginPassword === '') {
           setLoginPasswordError(true)
-          return
+          isError = true;
       }
+
+      if(isError) return;
   const advisorData={
         email:loginEmail,
         password:loginPassword,
@@ -705,7 +708,15 @@ setResetLoading(true)
                 autoComplete="current-password"
               />
            
-           {loading?<LoadingSpinner/>:<Button
+           {loading?
+           <Button
+           fullWidth
+           variant="contained"
+           sx={{ mt: 3, mb: 2 }}
+         >
+          <i class="fa fa-spinner fa-spin"></i> 
+         </Button>
+           :<Button
                 onClick={handleLoginSubmit}
                 type="submit"
                 fullWidth

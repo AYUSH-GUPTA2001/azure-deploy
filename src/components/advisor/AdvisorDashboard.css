@@ -16,7 +16,8 @@ body, ul {
 .sidebar {
   width: 250px;
   min-height: 100vh;
-  background-color: #f6f9fe;
+  background-color: #1C2536;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   color: rgb(9, 1, 1);
   padding: 20px;
   /* box-shadow: 5px 0px 15px #00000040; */
@@ -48,7 +49,7 @@ body, ul {
   
   margin-bottom: 10px;
   cursor: pointer;
-  color: #27005d;
+  color: #9DA4AE;
 font-family: "Poppins-Regular", Helvetica;
 font-size: 15px;
 font-weight: 400;
@@ -103,6 +104,9 @@ border-radius: 10px; /* Rounded shape */
 background-color: #fff;
 position: relative;
 border-radius: 10px;
+margin-top: 30px;
+margin-left: 30px;
+margin-right: 30px
 
 }
 /* Add this CSS to your existing styles.css or App.css file */
@@ -159,21 +163,26 @@ background-color: #f0f0f0;
 }
 
 .sidebar-item:hover {
-  background-color: #fff;
+  background-color: rgb(255 255 255 / 4%);
 }
 
-.sidebar #active {
-  color: blue;
-  background-color: #fff;
+.sidebar  #active {
+  color: #fff;
+  background-color:rgb(255 255 255 / 4%);
   border-radius: 10px;
 }
 
+.sidebar #iactive {
+color:#6366F1;
+}
 .settings-container {
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
   width: fit-content;
+  margin-left: 230px;
+  margin-top: 30px;
   /* border: 1px solid #ccc; */
   border-radius: 5px;
   padding: 20px;
@@ -186,8 +195,8 @@ background-color: #f0f0f0;
 }
 
 .profile-pic {
-  width: 100px; /* Set the desired width for the profile picture */
-  height: 100px; /* Set the desired height for the profile picture */
+  width: 50px; /* Set the desired width for the profile picture */
+  height: 50px; /* Set the desired height for the profile picture */
   border-radius: 50%;
   background-color: #ccc; /* Set a background color or add an image for the profile picture */
 }
@@ -210,17 +219,21 @@ input {
 
 .update-button {
   text-align: center;
+  background-color: #007bff;
 }
 
 button {
-  background-color: #007bff;
+
   color: #fff;
   padding: 10px 20px;
   border: none;
+  font-size: 1rem;
   cursor: pointer;
+  border-radius: 5px;
 }
-
-
+.editUpdate{
+  align-self: flex-end;
+}
 
 
 

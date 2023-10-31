@@ -14,7 +14,7 @@ export default function Navbar(props) {
         }
     }
   return (
-    <nav>
+    <nav className='nav'>
     <div className="navbar-content">
       <h1 id="logo">
         <span className="logo-text">INCvest</span>

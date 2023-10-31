@@ -17,13 +17,13 @@ function MyRouter(){
         <div>
            <BrowserRouter history={history}>
            <Routes>
-              <Route element={<LandingPage />} path="/" />
+              <Route exact element={<LandingPage />} path="/" />
               
-              <Route element={<Advisor/>} path="/advisor"/>
-              <Route element={<Investor/>} path="/investor"/>
-              <Route element={<DashboardAdvisor/>} path="advisor/dashboard/:advisorId"/>
+              <Route exact element={<Advisor/>} path="/advisor"/>
+              <Route exact element={<Investor/>} path="/investor"/>
+              <Route exact element={<DashboardAdvisor/>} path="advisor/dashboard/:advisorId"/>
               
-              <Route element={<DashboardClient/>} path="investor/dashboard/:clientId"/>
+              <Route exact element={<DashboardClient/>} path="investor/dashboard/:clientId"/>
               
               
            </Routes>
