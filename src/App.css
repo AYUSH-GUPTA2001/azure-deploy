@@ -1,16 +1,18 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900");
 body {
   
     
   overflow-y: auto;
   overflow-x: hidden;
   margin: 0;
-  font-family: Verdana, sans-serif;
+  font-family:"Poppins", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color:#f6f9fe !important;
 }
 
 code {
-  font-family: Verdana, sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .phone {

@@ -33,21 +33,49 @@ import * as React from 'react'
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import { Skeleton } from "@mui/lab";
 
 function Dashboard() {
 
   const { clientId } = useParams()
   const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
+  const [lastName,setLastName]=useState('')
+  const [loading,setLoading]=useState(true)
+  
+  useEffect(()=>{
+
+    const body = document.querySelector("body");
+    const sidebar = body.querySelector(".sidebar");
+    const toggle = body.querySelector(".toggle");
+    // const searchBtn = body.querySelector(".search-box");
+    const content = body.querySelector(".content");
+    const materialicons = body.querySelectorAll(".Customicons");
+    // const modeText = body.querySelector(".mode-text");
+    debugger
+    
+    
+    toggle.addEventListener("click", () => {
+       sidebar.classList.toggle("close");
+       content.classList.toggle("inc-m-l");
+       for (const icons of materialicons) {
+        icons.classList.toggle(
+          'icon-toggle'
+        );
+      }
+    });
+    
 
   axios({
     method: 'get',
     url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
   }).then((response) => {
     setFirstName(response.data.client.firstName)
+    setLastName(response.data.client.lastName)
+    setLoading(false)
   }, (error) => {
-
-  })
+       setLoading(false)
+  })},[])
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
@@ -64,7 +92,7 @@ function Dashboard() {
     navigate('/investor')
   }
   return (<>
-    <Navbar firstName={firstName} user='client' />
+   
     <div className="investorDashboard">
       {/* <div className="top-right">
         <div className="user-info" onClick={toggleDropdown}>
@@ -80,7 +108,7 @@ function Dashboard() {
           </div> */}
       {/* // )}
       // </div> */}
-      <div className="sidebar">
+      {/* <div className="sidebar">
 
         <ul>
           <Tooltip title="Click to see your investments" placement="right-end">
@@ -108,8 +136,70 @@ function Dashboard() {
               <span>Settings</span></li>
           </Tooltip>
         </ul>
-      </div>
-      <div className="content">
+      </div> */}
+<div>
+<nav class="sidebar">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John Who" />
+            </span>
+            {loading?<div class="text header-text">
+            <Skeleton variant="text" sx={{ width:'160px', fontSize: '3rem' }} />
+            </div>:<div class="text header-text">
+                <span class="name">{firstName + ' '+ lastName}</span>
+                <span class="profession">Client:{clientId}</span>
+            </div>}
+        </div>
+
+        <i class="bx bx-chevron-right toggle"></i>
+    </header>
+
+    <div class="menu-bar">
+        <div class="menu">
+            <ul class="menu-links">
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('Portfolio')}>
+                <i id={selectedOption === 'Portfolio' ? 'iactive' : ''} className="material-icons Customicons">pie_chart</i>
+                <span  id={selectedOption === 'Portfolio' ? 'iactiveli' : ''} class="text nav-text">Portfolio</span>
+              </a>
+            </li>
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('pastRequests')}>
+                  <i id={selectedOption === 'pastRequests' ? 'iactive' : ''} className="material-icons Customicons">swap_horiz</i>
+                  <span  id={selectedOption === 'pastRequests' ? 'iactiveli' : ''}  class="text nav-text">Past Requests</span>
+                </a>
+            </li>
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('New Investment')}>
+                <i id={selectedOption === 'New Investment' ? 'iactive' : ''} className="material-icons Customicons">description</i>
+              <span   id={selectedOption === 'New Investment' ? 'iactiveli' : ''} class="text nav-text">New Investment</span>
+              </a>
+            </li>
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('Settings')}>
+                <i id={selectedOption === 'Settings' ? 'iactive' : ''} className="material-icons Customicons">settings</i>
+              <span  id={selectedOption === 'Settings' ? 'iactiveli' : ''} class="text nav-text">Settings</span>
+              </a>
+            </li>
+            </ul>
+        </div>
+
+        <div class="bottom-content">
+            <li class="nav-link">
+                <a>
+                    <i class="Customicons fa fa-sign-out"></i>
+                    <span onClick={()=>handleLogout()} class=" text nav-text">Logout</span>
+                    </a>
+            </li>
+        </div>
+    </div>
+</nav>
+</div>
+
+
+
+      <div className="content inc-m-l">
         {selectedOption === 'Portfolio' && <PortfolioContent clientId={clientId} />}
         {selectedOption === 'pastRequests' && <PastRequestsContent clientId={clientId} />}
         {selectedOption === 'New Investment' && <InvestmentContent clientId={clientId} />}
@@ -163,11 +253,12 @@ function PortfolioContent({ clientId }) {
     <div className="portfolio">
 
       {
-        loading?<div style={{ margin: "200px 10px 110px 10px" }}>
-        <LoadingSpinner />
-      </div> :(listOfStratgies.length === 0 ? <div style={{margin: "200px 369px 110px"}}>
-        No Investment available
-        </div>: <div className="rectangle-div">
+        loading?<div className="rectangle-div">
+        
+        <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+        <br />
+        <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+                </div> :( <div className="rectangle-div">
           <TableContainer component={Paper}>
             <Table size="small" aria-label="simple table">
               <TableHead>
@@ -182,7 +273,15 @@ function PortfolioContent({ clientId }) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {listOfStratgies?.map((row) => {
+                {listOfStratgies.length===0?
+                <React.Fragment >
+                <TableRow>
+                  <TableCell
+                  sx={{ textAlign: "center"}} 
+                   colSpan={6}>No Investment Created</TableCell>
+                </TableRow>
+              </React.Fragment> 
+                :listOfStratgies?.map((row) => {
                   if (row.status === 'Approved') {
                     return (
                       <React.Fragment >
@@ -279,12 +378,14 @@ function PastRequestsContent({ clientId }) {
     })
 
   return (
+    // loading
     <div className="portfolio">
-      {loading?<div style={{ margin: "200px 10px 110px 10px" }}>
-        <LoadingSpinner />
-      </div>:(listOfPastRequests.length === 0 ? <div style={{margin: "200px 369px 110px"}}>
-        No Request Created
-        </div> : <div className="rectangle-div">
+      {loading?<div className="rectangle-div">
+        
+        <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+        <br />
+        <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+                </div>:( <div className="rectangle-div">
         <TableContainer component={Paper}>
           <Table size="small" aria-label="simple table">
             <TableHead>
@@ -298,7 +399,17 @@ function PastRequestsContent({ clientId }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {listOfPastRequests?.map((row) =>
+              {
+              listOfPastRequests.length===0?
+                      <React.Fragment >
+                        <TableRow>
+                          <TableCell
+                          sx={{ textAlign: "center"}} 
+                           colSpan={5}>No Request Created</TableCell>
+                        </TableRow>
+                      </React.Fragment> 
+
+              :listOfPastRequests?.map((row) =>
 
                 <React.Fragment >
                   <TableRow>
@@ -699,11 +810,13 @@ setActionLoading(true)
             aria-describedby="modal-modal-description"
           ><Box sx={recommendationStyle} >
               <CloseIcon color="primary" onClick={handleRecommendationsClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-              {strategyLoading? <LoadingSpinner />:(listOfStratgies.length === 0 ? 
-              <div >
-              No Pending Strategy available
-              </div>
-                :<React.Fragment><TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
+              {strategyLoading? <div >
+        
+        <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+        <br />
+        <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+                </div>:(
+                <React.Fragment><TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
 
                   <Table size="small" aria-label="simple table">
                     <TableHead>
@@ -722,7 +835,17 @@ setActionLoading(true)
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {listOfStratgies?.map((row) => {
+                      {listOfStratgies.length===0?
+                        <React.Fragment >
+                        <TableRow>
+                          <TableCell
+                          sx={{ textAlign: "center"}} 
+                           colSpan={9}>No Pending Strategy Available</TableCell>
+                        </TableRow>
+                      </React.Fragment> 
+                      
+                      
+                     : listOfStratgies?.map((row) => {
                         if (row.status === 'Pending') {
                           return (
                             <React.Fragment key={row.strategyId}>
@@ -928,8 +1051,13 @@ function SettingsContent({clientId}) {
   }
   return (<>
 
-{settingsLoading?<div style={{margin: "200px 10px 110px 10px"}}>
-        <LoadingSpinner />
+{settingsLoading?<div className="settings-container">
+        {/* <LoadingSpinner /> */}
+        <Skeleton variant="circular" width={100} height={100} />
+<br></br>
+<Skeleton variant="rectangular" width={400} height={100} />
+<br></br>
+<Skeleton variant="rounded" width={400} height={100} />
         </div>:
     <div className="settings-container">
       <h1 style={{ color: '#27005d' }}>Edit Profile details</h1>

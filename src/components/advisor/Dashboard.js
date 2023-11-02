@@ -30,10 +30,12 @@ import Box from '@mui/material/Box';
 import image from '../../assets/download.png'
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+// import '../sidebar.js'
 
 import Navbar from '../Navbar/Navbar';
 import { LocationCitySharp } from '@mui/icons-material';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import { Skeleton } from '@mui/lab';
 function Dashboard() {
   // //debugger
   console.log("tester")
@@ -41,20 +43,55 @@ function Dashboard() {
 
   const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
-
+  const [lastName,setLastName] = useState('')
+  const [loading,setLoading]=useState(true)
+ 
   useEffect(() => {
+debugger
+    const body = document.querySelector("body");
+const sidebar = body.querySelector(".sidebar");
+const toggle = body.querySelector(".toggle");
+// const searchBtn = body.querySelector(".search-box");
+const content = body.querySelector(".content");
+const materialicons = body.querySelectorAll(".Customicons");
+// const modeText = body.querySelector(".mode-text");
+debugger
+
+
+toggle.addEventListener("click", () => {
+   sidebar.classList.toggle("close");
+   content.classList.toggle("inc-m-l");
+   for (const icons of materialicons) {
+    icons.classList.toggle(
+      'icon-toggle'
+    );
+  }
+});
+
+// modeSwitch.addEventListener("click", () => {
+//    body.classList.toggle("dark");
+// });
+
+    
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
       // //debugger
-      setFirstName(response.data.advisor.firstName)
+      let advisor=response.data.advisor
+      setFirstName(advisor.firstName)
+      setLastName(advisor.lastName)
+     setLoading(false)
   
     }, (error) => {
       console.log(error)
+      setLoading(false)
     })
   }, [])
 
+  const handleLogout=()=>{
+    navigate('/advisor')
+  }
   const handleOptionClick = (option) => {
      //debugger
     setSelectedOption(option);
@@ -64,8 +101,7 @@ function Dashboard() {
   const [selectedOption, setSelectedOption] = useState('ClientList');
 
   return (<>
-    <Navbar firstName={firstName}
-    />
+  
     <div className="investorDashboard">
 
       {/* <div className="top-right">
@@ -82,7 +118,7 @@ function Dashboard() {
           </div>}
         )} */}
       {/* </div> */}
-      <div className="sidebar">
+      {/* <div className="sidebar">
 
         <ul>
           <Tooltip title="Click to see list of clients" placement="right-end">
@@ -113,8 +149,70 @@ function Dashboard() {
               <span>Settings</span></li>
           </Tooltip>
         </ul>
-      </div>
-      <div className="content">
+      </div> */}
+
+
+<div>
+<nav class="sidebar">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John Who" />
+            </span>
+            {loading?<div class="text header-text">
+            <Skeleton variant="text" sx={{ width:'160px', fontSize: '3rem' }} />
+            </div>:<div class="text header-text">
+                <span class="name">{firstName + ' '+ lastName}</span>
+                <span class="profession">Advisor:{advisorId}</span>
+            </div>}
+        </div>
+
+        <i class="bx bx-chevron-right toggle"></i>
+    </header>
+
+    <div class="menu-bar">
+        <div class="menu">
+            <ul class="menu-links">
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('ClientList')}>
+                <i id={selectedOption === 'ClientList' ? 'iactive' : ''} className="material-icons Customicons">pie_chart</i>
+                <span  id={selectedOption === 'ClientList' ? 'iactiveli' : ''} class="text nav-text">List of Clients</span>
+              </a>
+            </li>
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('InvestmentStrategies')}>
+                  <i id={selectedOption === 'InvestmentStrategies' ? 'iactive' : ''} className="material-icons Customicons">swap_horiz</i>
+                  <span  id={selectedOption === 'InvestmentStrategies' ? 'iactiveli' : ''}  class="text nav-text">Strategies</span>
+                </a>
+            </li>
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('InvestmentRequests')}>
+                <i id={selectedOption === 'InvestmentRequests' ? 'iactive' : ''} className="material-icons Customicons">description</i>
+              <span   id={selectedOption === 'InvestmentRequests' ? 'iactiveli' : ''} class="text nav-text">Investment Requests</span>
+              </a>
+            </li>
+            <li class="nav-link">
+                <a  onClick={() => handleOptionClick('Settings')}>
+                <i id={selectedOption === 'Settings' ? 'iactive' : ''} className="material-icons Customicons">settings</i>
+              <span  id={selectedOption === 'Settings' ? 'iactiveli' : ''} class="text nav-text">Settings</span>
+              </a>
+            </li>
+            </ul>
+        </div>
+
+        <div class="bottom-content">
+            <li class="nav-link">
+                <a>
+                    <i class="Customicons fa fa-sign-out"></i>
+                    <span onClick={()=>handleLogout()} class=" text nav-text">Logout</span>
+                    </a>
+            </li>
+        </div>
+    </div>
+</nav>
+</div>
+
+      <div className="content inc-m-l">
         {selectedOption === 'ClientList' && <ClientList advisorId={advisorId} />}
         {selectedOption === 'InvestmentStrategies' && <InvestmentStrategies advisorId={advisorId} />}
         {selectedOption === 'InvestmentRequests' && <ReportsContent advisorId={advisorId} />}
@@ -168,12 +266,13 @@ function collapseRow(the)
   return (
     <div className="portfolio">
 
-      {loading?<div style={{margin: "200px 10px 110px 10px"}}>
-        <LoadingSpinner />
-        </div>
-        :(listOfStratgies.length==0?<div style={{margin: "200px 369px 110px"}}>
-        No Strategy available
-        </div>:
+      {loading?<div className="rectangle-div">
+        
+        <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+        <br />
+        <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+                </div>
+        :(
       <div className="rectangle-div">
       {/* <CollapsibleTable/> */}
       <TableContainer component={Paper}>
@@ -194,7 +293,17 @@ function collapseRow(the)
           </TableHead>
           <TableBody>
 
-            {listOfStratgies?.map((row) => (
+            {listOfStratgies.length==0?
+            <React.Fragment >
+            <TableRow>
+              <TableCell
+              sx={{ textAlign: "center"}} 
+               colSpan={7}>No Strategy Available</TableCell>
+            </TableRow>
+          </React.Fragment>
+            
+            :
+            listOfStratgies?.map((row) => (
               <React.Fragment>
                 <TableRow>
                   <TableCell>
@@ -386,11 +495,12 @@ function ClientList({ advisorId }) {
   const handleRequestsClose = () => setRequestsOpen(false);
   return (
     <div>
-{loading?<div style={{margin: "200px 10px 110px 10px"}}>
-      <LoadingSpinner />
-      </div>:(listOfClients.length===0? <div style={{margin: "200px 369px 110px"}}>
-        No Client available
-        </div>  :<div className="rectangle-div">
+{loading?<div className="rectangle-div">
+        
+        <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+        <br />
+        <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+                </div> :(<div className="rectangle-div">
         <TableContainer component={Paper}>
           <Table size='small' aria-label="simple table">
             <TableHead>
@@ -403,7 +513,16 @@ function ClientList({ advisorId }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {listOfClients?.map((row) =>
+              {listOfClients.length == 0 ? 
+            <React.Fragment >
+              <TableRow>
+                <TableCell
+                sx={{ textAlign: "center"}} 
+                 colSpan={4}>No Client Assigned</TableCell>
+              </TableRow>
+            </React.Fragment> :
+              
+              listOfClients?.map((row) =>
                 <React.Fragment>
                   <TableRow>
                     <TableCell>
@@ -842,21 +961,21 @@ setLoading(true)
         </Box>
       </Modal>
       
-      {requestLoading?<div style={{margin: "200px 10px 110px 10px"}}>
-      <LoadingSpinner />
-      </div> :  (reportListOfRequests.length == 0 ?
-      <div style={{margin: "200px 369px 110px"}}>
-      No Request available
-      </div>
-      : 
+      {requestLoading?<div className="rectangle-div">
+        
+<Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+<br />
+<Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+        </div> :  (
+      
       <div className="rectangle-div">
       <TableContainer component={Paper}>
       <Table size='small' aria-label="simple table">
         <TableHead>
           <TableRow >
             <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>#</TableCell>
-            <TableCell sx={{ color: 'white', fontSize: '16px' ,fontWeight: 'bold', backgroundColor: '#0000ff', width: '65px'}}>Client Id</TableCell>
-            <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px' , backgroundColor: '#0000ff', width: '100px'}}>Date</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px' ,fontWeight: 'bold', backgroundColor: '#0000ff'}}>Client Id</TableCell>
+            <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px' , backgroundColor: '#0000ff'}}>Date</TableCell>
             <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Amount</TableCell>
             <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px', backgroundColor: '#0000ff' }}>Time Period</TableCell>
             <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Type</TableCell>
@@ -865,7 +984,18 @@ setLoading(true)
           </TableRow>
         </TableHead>
         <TableBody>
-          {reportListOfRequests?.map((row) =>
+          {
+          reportListOfRequests.length == 0 ? 
+            <React.Fragment >
+              <TableRow>
+                <TableCell
+                sx={{ textAlign: "center"}} 
+                 colSpan={7}>No Investment Requests</TableCell>
+              </TableRow>
+            </React.Fragment> :
+
+
+          reportListOfRequests?.map((row) =>
 
             <React.Fragment >
               <TableRow>
@@ -1079,8 +1209,13 @@ function SettingsContent({ advisorId }) {
   }
   return (<>
 
-    {settingsLoading?<div style={{margin: "200px 10px 110px 10px"}}>
-        <LoadingSpinner />
+    {settingsLoading ?<div className="settings-container">
+        {/* <LoadingSpinner /> */}
+        <Skeleton variant="circular" width={100} height={100} />
+<br></br>
+<Skeleton variant="rectangular" width={400} height={100} />
+<br></br>
+<Skeleton variant="rounded" width={400} height={100} />
         </div>:<div className="settings-container">
       <h1 style={{ color: '#27005d' }}>Edit Profile details</h1>
       <div className="profile-section">
