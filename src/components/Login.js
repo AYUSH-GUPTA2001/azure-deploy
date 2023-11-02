@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { PhoneInput } from 'react-international-phone';
-
+import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -78,6 +78,7 @@ export default function Login(){
   const [confirmPasswordError, setConfirmPasswordError] = useState(false)
   const [loginMessage,setLoginMessage]=useState("")
   const [buttonVisible, setButtonVisible] = useState(true);
+  const [emailVisible,setEmailVisible]=useState(true)
 
     const style = {
       position: 'absolute',
@@ -144,6 +145,7 @@ export default function Login(){
             console.log(response)
                 setOTPLoading(false)
                 setButtonVisible(false)
+                setEmailVisible(false)
                 setForgotEmailError(false)
                 setForgotEmailHelperText('')
            },(error)=>{
@@ -377,6 +379,7 @@ setResetLoading(true)
 }
     const handleLoginSubmit = (event) => {
       event.preventDefault();
+      setLoginMessage('');
       
   
       setLoginEmailError(false)
@@ -418,22 +421,26 @@ setResetLoading(true)
       setLoading(false)
       if(error.response.data.message==='Invalid email or password.'){
         setLoginMessage(error.response.data.message)
-        handleOpen()
+       // handleOpen()
         return
       }
       if(error.response.data.message==="User is not verified."){
-      handleOpen()
+         setLoginMessage(error.response.data.message)
+      // handleOpen()
       return
       }
       
       setLoginMessage(error.response.data.message)
       console.log(error)
-      handleOpen()
+      // handleOpen()
     
     })
     }
   return (
-    
+    <>
+     <Tooltip title='Back to Homepage'>
+      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      </Tooltip>
     <Grid container spacing={7} item xs={12} sx={{backgroundColor:"#e4f1ff"}} sm={8} md={4} component={Paper} elevation={6} square>
           <Box
             sx={{
@@ -538,7 +545,7 @@ setResetLoading(true)
                 
                 inputStyle ={ {
                   "width" : "136px",
-                  
+                
                   }}
                   defaultCountry="in"
                   name="phoneNumber"
@@ -632,7 +639,14 @@ setResetLoading(true)
               />
              </Grid>
              </Grid>
-             {loading?<LoadingSpinner/>:<Button
+             {loading?<Button
+                
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                <i class="fa fa-spinner fa-spin"></i> 
+              </Button>:<Button
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -664,7 +678,15 @@ setResetLoading(true)
                 type="OTP"
                 id="OTP"
                 autoComplete="OTP"
-              /> {OTPloading?<LoadingSpinner/>:<Button
+              /> {OTPloading? <Button
+              
+              
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                <i class="fa fa-spinner fa-spin"></i> 
+              </Button> :<Button
               onClick={handleOTPSubmit}
               type="submit"
               fullWidth
@@ -707,7 +729,7 @@ setResetLoading(true)
                 id="password"
                 autoComplete="current-password"
               />
-           
+           {loginMessage? <span style={{ color: 'red' }}>*{loginMessage}</span>: loginMessage}
            {loading?
            <Button
            fullWidth
@@ -749,7 +771,15 @@ setResetLoading(true)
                 type="OTP"
                 id="OTP"
                 autoComplete="OTP"
-              /> {OTPloading?<LoadingSpinner/>:<Button
+              /> {OTPloading?<Button
+              
+              
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+               <i class="fa fa-spinner fa-spin"></i> 
+              </Button>:<Button
               onClick={handleOTPSubmit}
               type="submit"
               fullWidth
@@ -798,7 +828,7 @@ setResetLoading(true)
         {forgotMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Reset Password
-      </Typography><TextField
+      </Typography>{emailVisible&&<TextField
                 size="small"
                 margin="dense"
                 required
@@ -812,7 +842,15 @@ setResetLoading(true)
                 type="email"
                 id="email"
                 autoComplete="email"
-              />{buttonVisible&&(OTPloading?<LoadingSpinner/>:<Button
+              />}{buttonVisible&&(OTPloading?<Button
+              
+              
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              > <i class="fa fa-spinner fa-spin"></i> 
+          
+              </Button>:<Button
               onClick={handleGetOTP}
               type="submit"
               fullWidth
@@ -821,7 +859,7 @@ setResetLoading(true)
             >
              Get OTP
             </Button>)} 
-            <TextField
+            {!buttonVisible&&<><TextField
                 size="small"
                 margin="dense"
                 required
@@ -865,7 +903,15 @@ setResetLoading(true)
                 id="password"
                 autoComplete="password"
               />
-            {resetLoading?<LoadingSpinner/>:<Button
+            {resetLoading?<Button
+              
+            
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+             <i class="fa fa-spinner fa-spin"></i> 
+            </Button> :<Button
               onClick={handleResetSubmit}
               type="submit"
               fullWidth
@@ -873,7 +919,7 @@ setResetLoading(true)
               sx={{ mt: 3, mb: 2 }}
             >
              Reset Password
-            </Button>}</>}</Box></Modal>
+            </Button>}</>}</>}</Box></Modal>
                 </Grid>
                 <Grid item>
                   <Link href="#" value="1" onClick={(e)=> setValue("1")}  variant="body2">
@@ -888,7 +934,7 @@ setResetLoading(true)
             
           </Box>
         </Grid>
-    
+    </>
   )
 
         }

@@ -22,8 +22,8 @@ return(
           {/* <li><a href="#contact">Contact</a></li> */}
         
           
-          <li ><a href="./advisor">Advisor Sign In</a></li>
-          <li><a href='./investor'>Investor Sign In</a></li>
+          <li ><a href="./advisor">Advisor </a></li>
+          <li><a href='./investor'>Investor </a></li>
             
           
           
@@ -166,7 +166,7 @@ return(
               </div>
               <div class="member-info">
               <h4>Sahil Malpotra</h4>
-                <span>Devops Engineer</span>
+                <span>DevOps Engineer</span>
               </div>
             </div>
           </div>
@@ -211,25 +211,25 @@ return(
               Udyog Vihar, Sector 18<br/>
               Gurugram, Haryana 122015 <br/><br/>
               <strong>Phone:</strong> +1 5589 55488 55<br/>
-              <strong>Email:</strong> info@example.com<br/>
+              <strong>Email:</strong> hello.incvest@gmail.com<br/>
             </p>
         </div>
         <div class="links">
         <h3>Links</h3>
             <ul>
               <li> <a href="#">Home</a></li>
-              <li> <a href="#">About us</a></li>
-              <li><a href="#">Services</a></li>
-              <li> <a href="#">Team</a></li>
+              <li> <a href="#about">About us</a></li>
+           
+              <li> <a href="#team">Team</a></li>
              
             </ul>
         </div>
         <div class="services">
         <h3>Our Services</h3>
             <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Buy Stocks</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Markets</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Trusted Advisors</a></li>
+              <li><i class="bx bx-chevron-right"></i> Buy Stocks</li>
+              <li><i class="bx bx-chevron-right"></i> Markets</li>
+              <li><i class="bx bx-chevron-right"></i> Trusted Advisors</li>
             </ul>
         </div>
         <div class="social-media">

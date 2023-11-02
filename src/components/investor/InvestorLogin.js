@@ -9,6 +9,7 @@ import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import CloseIcon from '@mui/icons-material/Close';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import Tooltip from '@mui/material/Tooltip';
 import { useState  } from 'react';
 import axios from "axios";
 import Tab from '@mui/material/Tab';
@@ -79,6 +80,7 @@ export default function Login(){
   
     const [OTPError,setOTPError]=useState(false)
     const [buttonVisible, setButtonVisible] = useState(true);
+    const [emailVisible,setEmailVisible]=useState(true)
     const [addressError,setAddressError]= useState(false)
     const [firstNameError, setFirstNameError] = useState(false)
     const [lastNameError, setLastNameError] = useState(false)
@@ -115,6 +117,7 @@ export default function Login(){
        console.log(response)
        setOTPLoading(false)
        setButtonVisible(false)
+       setEmailVisible(false)
        setForgotEmailError(false)
        setForgotEmailHelperText('')
       },(error)=>{
@@ -478,7 +481,7 @@ return
     const handleLoginSubmit = (event) => {
       event.preventDefault();
       
-  
+      setLoginMessage('')
       setLoginEmailError(false)
       setLoginPasswordError(false)
   
@@ -511,22 +514,26 @@ return
        
      } , function(error){
       setLoading(false)
-      if(error.response.data.message==='Invalid email or password.'){
-        setLoginMessage(error.response.data.message)
-        handleOpen()
-        return
-      }
-      if(error.response.data.message==="User is not verified."){
-      handleOpen()
-      return
-      }
       setLoginMessage(error.response.data.message)
-      console.log(error)
-      handleOpen()
+      // if(.response.data.message==='Invalid email or password.'){
+      //   .response.data.message)
+      //   ()
+      //   return
+      // }
+      // if(.response.data.message==="User is not verified."){
+      // ()
+      // return
+      // }
+      // (.response.data.message)
+      // 
+      // ()
     })
     }
   return (
-    
+    <>
+    <Tooltip title='Back to Homepage'>
+      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      </Tooltip>
     <Grid container spacing={7} item xs={12} sx={{backgroundColor:"#e4f1ff"}} sm={8} md={4} component={Paper} elevation={6} square>
           <Box
             sx={{
@@ -829,7 +836,7 @@ return
         </Select>
       </FormControl>
       </Grid>
-              {loading?<LoadingSpinner/>:<Button onClick={handleModalSubmit}>Create Account</Button>}</>}
+              {loading?<Button > <i class="fa fa-spinner fa-spin"></i> </Button>:<Button onClick={handleModalSubmit}>Create Account</Button>}</>}
         </Box>
       </Modal>
       <Modal
@@ -856,7 +863,14 @@ return
                 type="OTP"
                 id="OTP"
                 autoComplete="OTP"
-              /> {OTPloading?<LoadingSpinner/>:<Button
+              /> {OTPloading?<Button
+       
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+               <i class="fa fa-spinner fa-spin"></i>
+              </Button>:<Button
               onClick={handleOTPSubmit}
               type="submit"
               fullWidth
@@ -899,8 +913,15 @@ return
                 id="password"
                 autoComplete="current-password"
               />
-           
-              {loading?<LoadingSpinner/>:<Button
+           {loginMessage? <span style={{ color: 'red' }}>*{loginMessage}</span>: loginMessage}
+              {loading?<Button
+              
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+              <i class="fa fa-spinner fa-spin"></i>
+              </Button>:<Button
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -932,7 +953,15 @@ return
                 type="OTP"
                 id="OTP"
                 autoComplete="OTP"
-              /> {OTPloading?<LoadingSpinner/>:<Button
+              /> {OTPloading?<Button
+              
+            
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+               <i class="fa fa-spinner fa-spin"></i>
+              </Button>:<Button
               onClick={handleOTPSubmit}
               type="submit"
               fullWidth
@@ -981,7 +1010,7 @@ return
         {forgotMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Reset Password
-      </Typography><TextField
+      </Typography>{emailVisible&&<TextField
                 size="small"
                 margin="dense"
                 required
@@ -995,7 +1024,14 @@ return
                 type="email"
                 id="email"
                 autoComplete="email"
-              />{buttonVisible&&(OTPloading?<LoadingSpinner/>:<Button
+              />}{buttonVisible&&(OTPloading?<Button
+           
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+              <i class="fa fa-spinner fa-spin"></i>
+              </Button>:<Button
               onClick={handleGetOTP}
               type="submit"
               fullWidth
@@ -1004,7 +1040,7 @@ return
             >
              Get OTP
             </Button>)} 
-            <TextField
+           {!buttonVisible && <><TextField
                 size="small"
                 margin="dense"
                 required
@@ -1048,7 +1084,14 @@ return
                 id="password"
                 autoComplete="password"
               />
-            {resetLoading?<LoadingSpinner/>:<Button
+            {resetLoading?<Button
+       
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+       <i class="fa fa-spinner fa-spin"></i>
+            </Button>:<Button
               onClick={handleResetSubmit}
               type="submit"
               fullWidth
@@ -1056,7 +1099,7 @@ return
               sx={{ mt: 3, mb: 2 }}
             >
              Reset Password
-            </Button>}</>}</Box></Modal>
+            </Button>}</>}</>}</Box></Modal>
                 </Grid>
                 <Grid item>
                   <Link href="#" value="1" onClick={(e)=> setValue("1")}  variant="body2">
@@ -1071,7 +1114,7 @@ return
             
           </Box>
         </Grid>
-    
+    </>
   )
 
         }

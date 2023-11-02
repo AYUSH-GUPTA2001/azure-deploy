@@ -44,4 +44,34 @@ nav {
     right: 1rem;
 
 }
-
+/* CSS for the dropdown */
+.dropdown {
+    position: absolute;
+    top: 100%; /* Position the dropdown below the parent element */
+    
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    width: 200px; /* Set the width to auto to adapt to content */
+  }
+  
+  .dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .dropdown li {
+    display: inline-block;
+    padding: 10px;
+    color:red;
+    margin-left: 60px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .dropdown li:hover {
+    background-color: #f0f0f0;
+  }
+  

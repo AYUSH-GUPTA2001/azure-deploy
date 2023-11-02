@@ -33,8 +33,9 @@ import axios from "axios";
 
 import Navbar from '../Navbar/Navbar';
 import { LocationCitySharp } from '@mui/icons-material';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 function Dashboard() {
-  // debugger
+  // //debugger
   console.log("tester")
   const { advisorId } = useParams()
 
@@ -46,7 +47,7 @@ function Dashboard() {
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
-      // debugger
+      // //debugger
       setFirstName(response.data.advisor.firstName)
   
     }, (error) => {
@@ -55,21 +56,13 @@ function Dashboard() {
   }, [])
 
   const handleOptionClick = (option) => {
-    // debugger
+     //debugger
     setSelectedOption(option);
   };
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
 
   const [selectedOption, setSelectedOption] = useState('ClientList');
-  const handleLogout = () => {
-    navigate('/advisor')
-  }
+
   return (<>
     <Navbar firstName={firstName}
     />
@@ -86,7 +79,7 @@ function Dashboard() {
               <li onClick={handleLogout}>Logout</li>
               Add other options as needed
             </ul>
-          </div>
+          </div>}
         )} */}
       {/* </div> */}
       <div className="sidebar">
@@ -132,141 +125,166 @@ function Dashboard() {
 }
 
 function InvestmentStrategies({ advisorId }) {
-  // debugger
+  // //debugger
   //handle modal
 
 
 
   const [open, setOpen] = useState(false);
+  const [coll, setColl] = useState("");
+  const [loading,setLoading]=useState(true)
   // const [data,setData]=useState([]);
   const [listOfStratgies, setListOfStrategies] = useState([])
   useEffect(() => {
+
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
     }).then(function (response) {
       const list = response.data.strategies
-
+     setLoading(false)
       setListOfStrategies(list)
       console.log(list)
 
     },
       function (error) {
+        setLoading(false)
         console.log(error)
       })
   }, [])
 
+function collapseRow(the)
+{
+  //debugger;
+  let _strategyId = the.row.strategyId;
+  //setOpen(!open);
+  if(coll === _strategyId)
+    _strategyId='';
+  setColl(_strategyId);
+}
 
 
 
   return (
     <div className="portfolio">
 
-      {/* Add your portfolio content here */}
-
+      {loading?<div style={{margin: "200px 10px 110px 10px"}}>
+        <LoadingSpinner />
+        </div>
+        :(listOfStratgies.length==0?<div style={{margin: "200px 369px 110px"}}>
+        No Strategy available
+        </div>:
       <div className="rectangle-div">
-        {/* <CollapsibleTable/> */}
-        <TableContainer component={Paper}>
-          <Table size='small' aria-label="simple table">
-            <TableHead>
-              <TableRow >
-                <TableCell />
+      {/* <CollapsibleTable/> */}
+      <TableContainer component={Paper}>
+        <Table size='small' aria-label="simple table">
+          <TableHead>
+            <TableRow >
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}/>
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }} >#</TableCell>
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Strategy Name</TableCell>
+             
+              {/* <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Original Amount&nbsp;(Rs.) </TableCell> */}
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Investment Amount (Rs.)</TableCell>
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Expected Amount (Rs.)</TableCell>
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Time Period</TableCell>
+              <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Status </TableCell>
 
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Investment Name</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }} >Client Id&nbsp;</TableCell>
-                {/* <TableCell sx={{ fontWeight: 'bold' , fontSize: '16px' }}>Original Amount&nbsp;(Rs.) </TableCell> */}
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Investment Amount&nbsp;(Rs.)</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Expected Amount&nbsp;(Rs.)</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Time Period</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Status&nbsp;</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
 
-              </TableRow>
-            </TableHead>
-            <TableBody>
+            {listOfStratgies?.map((row) => (
+              <React.Fragment>
+                <TableRow>
+                  <TableCell>
+                    <IconButton
+                      aria-label="expand row"
+                      size="small"
+                      // onClick={() => setOpen(!open)}
+                      onClick={() => collapseRow({row})}
+                    >
+                      {coll == row.strategyId ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                  </TableCell>
+                  <TableCell >{row.clientId} </TableCell>
+                  <TableCell >{row.investmentName}</TableCell>
+                  
+                  {/* <TableCell >{row.amount} </TableCell> */}
+                  <TableCell >{row.investmentAmount}</TableCell>
+                  <TableCell >{row.expectedAmount}</TableCell>
+                  <TableCell>{row.timePeriod}</TableCell>
+                  <TableCell ><Button sx={{ width: '100px', borderRadius: '20px' }} variant="contained" color={row.status === 'Pending' ? 'primary' : (row.status === 'Rejected' ? 'error' : 'success')}>{row.status}</Button></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell style={{ paddingBottom: 0, paddingTop: 0}} colSpan={6}>
+                    {/* <Collapse in={open} timeout="auto" unmountOnExit> */}
+                    <Collapse in = {coll == row.strategyId} style={{marginLeft: "145px"}} timeout="auto" unmountOnExit>
+                      <Box sx={{ margin: 1 }}>
+                        <BarChart
+                          xAxis={[
+                            {
+                              id: 'barCategories',
+                              data: ['6 Month', '1 Year', '3 Year', '5 Year'],
+                              scaleType: 'band',
+                              label: 'Time'
+                            },
+                          ]}
+                          yAxis={[
+                            {
+                              label: '% Returns'
+                            }
+                          ]}
+                          series={[
+                            {
+                              color: '#b7d9ff',
+                              data: [row.returnPercentageAfter6months, row.returnPercentageAfter1year, row.returnPercentageAfter3year, row.returnPercentageAfter5year],
+                              label: 'Percentage Returns'
+                            },
+                          ]}
+                          width={570}
+                          height={300}
+                        />
+                      </Box>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>)}
 
-              {listOfStratgies?.map((row) => (
-                <React.Fragment>
-                  <TableRow>
-                    <TableCell>
-                      <IconButton
-                        aria-label="expand row"
-                        size="small"
-                        onClick={() => setOpen(!open)}
-                      >
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                      </IconButton>
-                    </TableCell>
-
-                    <TableCell >{row.investmentName}</TableCell>
-                    <TableCell >{row.clientId} </TableCell>
-                    {/* <TableCell >{row.amount} </TableCell> */}
-                    <TableCell >{row.investmentAmount}</TableCell>
-                    <TableCell >{row.expectedAmount}</TableCell>
-                    <TableCell>{row.timePeriod}</TableCell>
-                    <TableCell ><Button sx={{ width: '100px', borderRadius: '20px' }} variant="contained" color={row.status === 'Pending' ? 'primary' : (row.status === 'Rejected' ? 'error' : 'success')}>{row.status}</Button></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                      <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ margin: 1 }}>
-                          <BarChart
-                            xAxis={[
-                              {
-                                id: 'barCategories',
-                                data: ['6 Month', '1 Year', '3 Year', '5 Year'],
-                                scaleType: 'band',
-                                label: 'Time'
-                              },
-                            ]}
-                            yAxis={[
-                              {
-                                label: '% Returns'
-                              }
-                            ]}
-                            series={[
-                              {
-                                color: '#b7d9ff',
-                                data: [row.returnPercentageAfter6months, row.returnPercentageAfter1year, row.returnPercentageAfter3year, row.returnPercentageAfter5year],
-                                label: 'Percentage Returns'
-                              },
-                            ]}
-                            width={800}
-                            height={300}
-                          />
-                        </Box>
-                      </Collapse>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
+      
     </div>
   );
 }
 
 function ClientList({ advisorId }) {
-  //  debugger
+  //  //debugger
   const [listOfClients, setListOfClients] = useState([])
+  const [loading,setLoading]=useState(true)
 
   useEffect(() => {
-    // debugger
+    // //debugger
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
-
+//debugger
       setListOfClients(response.data)
+      setLoading(false)
 
 
     }
 
-      , (error) => { console.log(error) })
+      , (error) => { 
+        setLoading(false)
+        console.log(error) })
   }, [])
 
-  // debugger
+  // //debugger
 
 
 
@@ -347,32 +365,7 @@ function ClientList({ advisorId }) {
 
   const [listOfRequests, setListOfRequests] = useState([])
 
-  const handleModalSubmit = () => {
-    if (clientId === "") {
-      setClientIdError(true)
-      return
-    }
-
-useEffect(()=>{
-
-  axios({
-    method: 'get',
-    url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
-  }).then((response) => {
-
-    setListOfRequests([response.data])
-
-    handleClose()
-    setClientId('')
-    handleRequestsOpen()
-
-  }, (error) => {
-
-
-  })
-
-},[])
-
+ 
 
 
   const requestsStyle = {
@@ -393,86 +386,19 @@ useEffect(()=>{
   const handleRequestsClose = () => setRequestsOpen(false);
   return (
     <div>
-
-      <Modal
-        open={modalOpen}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style} >
-          <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Enter Client ID to See Requests
-          </Typography>
-          <TextField
-
-            margin="dense"
-            autoComplete="given-name"
-            name="clientId"
-            required
-            fullWidth
-            value={clientId}
-            error={clientIdError}
-            onChange={e => setClientId(e.target.value)}
-            id="clientId"
-            label="Client Id"
-            autoFocus
-          />
-          <Button onClick={handleModalSubmit}>Submit</Button>
-        </Box>
-      </Modal>
-
-      <Modal
-
-        open={requestsOpen}
-        onClose={handleRequestsClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      ><Box sx={requestsStyle} >
-          <CloseIcon color="primary" onClick={handleRequestsClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-          <TableContainer component={Paper}>
-            <Table size='small' aria-label="simple table">
-              <TableHead>
-                <TableRow >
-                  <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Investment Amount</TableCell>
-                  <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Time Period</TableCell>
-                  <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Investment Type</TableCell>
-
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {listOfRequests?.map((row) =>
-                  row.map((e) =>
-                    <React.Fragment >
-                      <TableRow>
-                        <TableCell>{e.investmentAmount}</TableCell>
-                        <TableCell>{e.timePeriod}</TableCell>
-                        <TableCell><Button color={e.investmentType === 'High Risk' ? 'error' : (e.investmentType === 'Low Risk' ? 'primary' : 'success')}>{e.investmentType}</Button></TableCell>
-
-                      </TableRow>
-                    </React.Fragment>
-
-                  )
-
-
-
-
-
-
-                  // Exclude rows with status other than "pending"
-                )}
-              </TableBody></Table></TableContainer></Box>
-      </Modal>
-      <div className="rectangle-div">
+{loading?<div style={{margin: "200px 10px 110px 10px"}}>
+      <LoadingSpinner />
+      </div>:(listOfClients.length===0? <div style={{margin: "200px 369px 110px"}}>
+        No Client available
+        </div>  :<div className="rectangle-div">
         <TableContainer component={Paper}>
           <Table size='small' aria-label="simple table">
             <TableHead>
               <TableRow >
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Client Id</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Client Name</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Email Address</TableCell>
-                <TableCell sx={{ color: 'blue', fontSize: '16px' }}>Mobile Number</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>#</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Client Name</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Email Address</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Mobile Number</TableCell>
 
               </TableRow>
             </TableHead>
@@ -494,15 +420,21 @@ useEffect(()=>{
 
             </TableBody></Table></TableContainer>
 
-      </div>
-    </div>
-  );
-}
+      </div>)
 
 }
+      
+      
+    </div>
+  )
+}
+
+
 
 function ReportsContent({ advisorId }) {
-  //debugger
+  ////debugger
+  const [loading,setLoading]=useState(false)
+  const [requestLoading,setRequestLoading]=useState(true)
   const style = {
     position: 'absolute',
     top: '50%',
@@ -516,13 +448,30 @@ function ReportsContent({ advisorId }) {
   };
   const [modalOpen, setModalOpen] = React.useState(false);
   const [clientId, setClientId] = useState('')
-  const handleOpen = (clientID) => {
+  const handleOpen = (clientID,investmentID) => {
      setClientId(clientID);
+     setInvestmentId(investmentID)
     setModalOpen(true);
   }
   const handleClose = () => {
     setModalOpen(false)
     setMessage('')
+    setStrategyName('')
+    setInvestmentAmount('')
+    setExpectedAmount('')
+    setTimePeriod('')
+    setSixMonReturns('')
+    setOneYrReturns('')
+    setThreeYrReturns('')
+    setFiveYrReturns('')
+    setStrategyNameError(false)
+    setInvestmentAmountError(false)
+    setExpectedAmountError(false)
+    setTimePeriodError(false)
+    setSixMonReturnsError(false)
+    setOneYrReturnsError(false)
+    setThreeYrReturnsError(false)
+    setFiveYrReturnsError(false)
   };
   const [strategyName, setStrategyName] = useState('')
   const [investmentId, setInvestmentId] = useState('')
@@ -630,8 +579,8 @@ function ReportsContent({ advisorId }) {
       "completed": true
     }
 
-useEffect(()=>{
 
+setLoading(true)
   axios({
     method: 'post',
     url: 'https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
@@ -639,6 +588,8 @@ useEffect(()=>{
   }).then((response) => {
     console.log(response)
     setMessage(response.data.message)
+
+    setLoading(false)
     if (response.data.message = "Strategy added successfully.") {
       setStrategyName('')
       setClientId('')
@@ -654,13 +605,11 @@ useEffect(()=>{
     }
   }, (error) => {
     console.log(error)
+    setLoading(false)
+   
     setMessage(error.response.data.message)
   })
 
-
-
-},[])
-    
 
   }
 
@@ -675,20 +624,21 @@ useEffect(()=>{
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
-      // debugger;
+      // //debugger;
+      setRequestLoading(false)
       setReportListOfRequests(response.data);
-      // debugger;
+      // //debugger;
       // console.log(reportListOfRequests)
       console.log(response.data)
 
     }, (error) => {
       // consol.
-
-    })
+      setRequestLoading(false)
+ })
 
   }
   useEffect(() => {
-    // debugger
+    // //debugger
     handleInvestmentCall()
   }, [])
   return (
@@ -735,6 +685,7 @@ useEffect(()=>{
                   required
                   fullWidth
                   id="clientId"
+                  disabled
                   label="Client ID"
                   name="clientId"
                   value={clientId}
@@ -754,6 +705,7 @@ useEffect(()=>{
                   name="strategyName"
                   required
                   fullWidth
+                  disabled
                   value={investmentId}
                   error={investmentIdError}
                   onChange={e => setInvestmentId(e.target.value)}
@@ -885,59 +837,71 @@ useEffect(()=>{
 
             </Grid>
 
-            <Button onClick={handleModalSubmit}>Create Strategy</Button></>}
+            {loading?<Button  sx={{backgroundColor:'blue',marginTop:'5px'}} variant="contained"> Creating.... <i class="fa fa-spinner fa-spin"></i> </Button>:
+            <Button  sx={{backgroundColor:'blue',marginTop:'5px'}} variant="contained" onClick={handleModalSubmit}>Create Strategy</Button>}</>}
         </Box>
       </Modal>
-      <div className="rectangle-div">
-
-        <TableContainer component={Paper}>
-          <Table size='small' aria-label="simple table">
-            <TableHead>
-              <TableRow >
-                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>#Id</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px' ,fontWeight: 'bold', backgroundColor: '#0000ff', width: '65px'}}>Client Id</TableCell>
-                <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px' , backgroundColor: '#0000ff', width: '100px'}}>Date</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Amount</TableCell>
-                <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px', backgroundColor: '#0000ff' }}>Time Period</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Type</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}></TableCell>
-
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {reportListOfRequests?.map((row) =>
-
-                <React.Fragment >
-                  <TableRow>
-                    <TableCell>{row.investmentID}</TableCell>
-                    <TableCell>{row.clientId}</TableCell>
-                    <TableCell align='center'>{row.createdDate.slice(0, 10)}</TableCell>
-                    <TableCell align='center'>{row.investmentAmount}</TableCell>
-                    <TableCell align='center'>{row.timePeriod}</TableCell>
-                    <TableCell><Button color={row.investmentType === 'High Risk' ? 'error' : (row.investmentType === 'Low Risk' ? 'primary' : 'success')}>{row.investmentType}</Button></TableCell>
-                    <TableCell align='center'>
-                      <Button onClick={()=>handleOpen(row.clientId)}><i class="fa fa-plus" aria-hidden="true"></i> Strategy</Button>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-
-              )
-
-              }
-            </TableBody></Table></TableContainer>
+      
+      {requestLoading?<div style={{margin: "200px 10px 110px 10px"}}>
+      <LoadingSpinner />
+      </div> :  (reportListOfRequests.length == 0 ?
+      <div style={{margin: "200px 369px 110px"}}>
+      No Request available
       </div>
+      : 
+      <div className="rectangle-div">
+      <TableContainer component={Paper}>
+      <Table size='small' aria-label="simple table">
+        <TableHead>
+          <TableRow >
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>#</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px' ,fontWeight: 'bold', backgroundColor: '#0000ff', width: '65px'}}>Client Id</TableCell>
+            <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px' , backgroundColor: '#0000ff', width: '100px'}}>Date</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Amount</TableCell>
+            <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px', backgroundColor: '#0000ff' }}>Time Period</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}>Type</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#0000ff' }}></TableCell>
+
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {reportListOfRequests?.map((row) =>
+
+            <React.Fragment >
+              <TableRow>
+                <TableCell>{row.investmentID}</TableCell>
+                <TableCell>{row.clientId}</TableCell>
+                <TableCell align='center'>{row.createdDate.slice(0, 10)}</TableCell>
+                <TableCell align='center'>{row.investmentAmount}</TableCell>
+                <TableCell align='center'>{row.timePeriod}</TableCell>
+                <TableCell><Button color={row.investmentType === 'High Risk' ? 'error' : (row.investmentType === 'Low Risk' ? 'primary' : 'success')}>{row.investmentType}</Button></TableCell>
+                <TableCell align='center'>
+                  <Button onClick={()=>handleOpen(row.clientId,row.investmentID)}><i style={{marginRight :'4px' }}class="fa fa-plus" aria-hidden="true"></i>Strategy</Button>
+                </TableCell>
+              </TableRow>
+            </React.Fragment>
+
+          )
+
+          }
+        </TableBody></Table></TableContainer>
+        </div>)
+      
+      }
+       
+      
     </div>
   );
 }
 
 function SettingsContent({ advisorId }) {
 
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [city, setCity] = useState('')
-  const [State, setState] = useState('')
+  // const [firstName, setFirstName] = useState('')
+  // const [lastName, setLastName] = useState('')
+  // const [email, setEmail] = useState('')
+  // const [phone, setPhone] = useState('')
+  // const [city, setCity] = useState('')
+  // const [State, setState] = useState('')
   const [address, setAddress] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
@@ -950,6 +914,36 @@ function SettingsContent({ advisorId }) {
   const [stateError, setStateError] = useState(false)
   const [addressError, setAddressError] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
+  const [loading,setLoading]=useState(false)
+  const [settingsLoading,setSettingsLoading]=useState(true)
+  const [advisorData,setAdvisorData]=useState({})
+  const [updatedAdvisorData,setUpdatedAdvisorData]=useState({})
+  const [editVisible,setEditVisible]=useState(true)
+
+  const handleMessage=()=>{
+    setMessage("User Information Updated Successfully.")
+     setTimeout(setMessage,2000,"")
+  }
+
+  const handleChange = (el) => {
+    let inputName = el.target.name;
+    let inputValue = el.target.value;
+    let statusCopy = Object.assign({}, updatedAdvisorData);
+    statusCopy[inputName] = inputValue;
+
+    setUpdatedAdvisorData(statusCopy);
+  }
+
+  const ProfileBack = (el) => {
+    setUpdatedAdvisorData(advisorData);
+    
+  }
+
+  const handleBack=()=>{
+    ProfileBack()
+    setEditVisible(true)
+    setDisabled(true)
+  }
   const style = {
     position: 'absolute',
     top: '50%',
@@ -974,25 +968,32 @@ function SettingsContent({ advisorId }) {
       url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     })
       .then((response) => {
-        const advisorData = response.data.advisor;
-        setFirstName(advisorData.firstName);
-        setLastName(advisorData.lastName);
-        setEmail(advisorData.email);
-        setPhone(advisorData.phoneNumber);
-        setAddress(advisorData.address);
-        setCity(advisorData.city);
-        setState(advisorData.state);
-        setPassword(advisorData.confirmPassword);
+        setAdvisorData(response.data.advisor)
+        setUpdatedAdvisorData(response.data.advisor)
+        console.log(advisorData)
+        // setFirstName(advisorData.firstName);
+        // setLastName(advisorData.lastName);
+        // setEmail(advisorData.email);
+        // setPhone(advisorData.phoneNumber);
+        // setAddress(advisorData.address);
+        // setCity(advisorData.city);
+        // setState(advisorData.state);
+        // setPassword(advisorData.confirmPassword);
+        setSettingsLoading(false)
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false)
       });
   }, []);
   const [disabled, setDisabled] = useState(true)
   const handleEdit = () => {
     setDisabled(false)
+    setEditVisible(false)
   }
+
   const handleUpdate = () => {
+    debugger
     console.log(1)
     setFirstNameError(false)
     setLastNameError(false)
@@ -1003,35 +1004,35 @@ function SettingsContent({ advisorId }) {
     setStateError(false)
     setPasswordError(false)
     let count = 0;
-    if (firstName === '') {
+    if (updatedAdvisorData.firstName === '') {
       setFirstNameError(true)
       count++
     }
-    if (lastName === '') {
+    if (updatedAdvisorData.lastName === '') {
       setLastNameError(true)
       count++
     }
-    if (email === '') {
+    if (updatedAdvisorData.email === '') {
       setEmailError(true)
       count++
     }
-    if (phone === '') {
+    if (updatedAdvisorData.phoneNumber === '') {
       setPhoneError(true)
       count++
     }
-    if (address === '') {
+    if (updatedAdvisorData.address === '') {
       setAddressError(true)
       count++
     }
-    if (city === '') {
+    if (updatedAdvisorData.city === '') {
       setCityError(true)
       count++
     }
-    if (State === '') {
+    if (updatedAdvisorData.state === '') {
       setStateError(true)
       count++
     }
-    if (password === '') {
+    if (updatedAdvisorData.confirmPassword === '') {
       setPasswordError(true)
       count++
     }
@@ -1039,41 +1040,48 @@ function SettingsContent({ advisorId }) {
       return
     }
     console.log(2)
-    const updateData = {
-      "firstName": firstName,
-      "lastName": lastName,
-      "email": email,
-      "password": password,
-      "phoneNumber": phone,
-      "address": address,
-      "city": city,
-      "state": State,
-      "pinCode": "123456"
-    }
-    useEffect(()=>{
+    // const updateData = {
+    //   "firstName": firstName,
+    //   "lastName": lastName,
+    //   "email": email,
+    //   "password": password,
+    //   "phoneNumber": phone,
+    //   "address": address,
+    //   "city": city,
+    //   "state": State,
+    //   "pinCode": "123456"
+    // }
+    //updatedAdvisorData.pinCode = "123456";
+    setLoading(true)
       axios({
         method: 'put',
         url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
-        data: updateData
+        data: updatedAdvisorData
       }).then((response) => {
         console.log(response)
+        setLoading(false)
         if (response.data.message === "Advisor information updated successfully.") {
-          handleOpen()
+         
+          setAdvisorData(updatedAdvisorData)
           setDisabled(true)
+          setEditVisible(true)
+          handleMessage()
         }
   
   
       }, (error) => {
-  
+       setLoading(false)
   
       })
 
-    },[])
+    
     
   }
   return (<>
 
-    <div className="settings-container">
+    {settingsLoading?<div style={{margin: "200px 10px 110px 10px"}}>
+        <LoadingSpinner />
+        </div>:<div className="settings-container">
       <h1 style={{ color: '#27005d' }}>Edit Profile details</h1>
       <div className="profile-section">
         <div className="profile-pic">
@@ -1095,9 +1103,11 @@ function SettingsContent({ advisorId }) {
                 disabled: disabled
                 // readOnly:disabled
               }}
-              value={firstName}
+              value={updatedAdvisorData.firstName}
               error={firstNameError}
-              onChange={e => setFirstName(e.target.value)}
+              // onChange={e => setFirstName(e.target.value)}
+              // onChange={e => setUpdatedAdvisorData({updatedAdvisorData: {firstName: e.target.value}})}
+              onChange={e => handleChange(e)}
               id="firstName"
               label="First Name"
               autoFocus
@@ -1116,9 +1126,9 @@ function SettingsContent({ advisorId }) {
 
                 disabled: disabled
               }}
-              value={lastName}
+              value={updatedAdvisorData.lastName}
               error={lastNameError}
-              onChange={e => setLastName(e.target.value)}
+              onChange={e => handleChange(e)}
               autoComplete="family-name"
             />
           </Grid>
@@ -1137,9 +1147,9 @@ function SettingsContent({ advisorId }) {
 
                 disabled: disabled
               }}
-              value={email}
+              value={updatedAdvisorData.email}
               error={emailError}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => handleChange(e)}
               id="email"
               label="Email"
               autoFocus
@@ -1157,10 +1167,10 @@ function SettingsContent({ advisorId }) {
                 disabled: disabled
               }}
               label="Phone Number"
-              name="phone"
-              value={phone}
+              name="phoneNumber"
+              value={updatedAdvisorData.phoneNumber}
               error={phoneError}
-              onChange={e => setPhone(e.target.value)}
+              onChange={e => handleChange(e)}
               autoComplete="family-name"
             />
           </Grid>
@@ -1180,9 +1190,9 @@ function SettingsContent({ advisorId }) {
           }}
           multiline
           maxRows={4}
-          value={address}
+          value={updatedAdvisorData.address}
           error={addressError}
-          onChange={e => setAddress(e.target.value)}
+          onChange={e => handleChange(e)}
           id="address"
           label="Address"
           autoFocus
@@ -1201,9 +1211,9 @@ function SettingsContent({ advisorId }) {
                 disabled: disabled
               }}
               fullWidth
-              value={city}
+              value={updatedAdvisorData.city}
               error={cityError}
-              onChange={e => setCity(e.target.value)}
+              onChange={e => handleChange(e)}
               id="city"
               label="City"
               autoFocus
@@ -1222,15 +1232,15 @@ function SettingsContent({ advisorId }) {
               id="state"
               label="State"
               name="state"
-              value={State}
+              value={updatedAdvisorData.state}
               error={stateError}
-              onChange={e => setState(e.target.value)}
+              onChange={e => handleChange(e)}
               autoComplete="family-name"
             />
           </Grid>
 
         </Grid>
-        <TextField
+        {/* <TextField
           size="small"
           margin="dense"
           required
@@ -1247,8 +1257,9 @@ function SettingsContent({ advisorId }) {
           error={passwordError}
           onChange={e => setPassword(e.target.value)}
           autoComplete="family-name"
-        />
+        /> */}
       </div>
+      <span style={{color:'green'}}>{message}</span>
       <Modal
         open={modalOpen}
         onClose={handleClose}
@@ -1262,10 +1273,36 @@ function SettingsContent({ advisorId }) {
         </Box>
       </Modal>
       <div className='editUpdate'>
-        <button onClick={handleEdit} style={{ color: 'blue', backgroundColor: '#fff' }}>Edit</button>
-        <button onClick={handleUpdate} style={{ color: 'green', backgroundColor: '#fff' }}>Update</button>
+         {editVisible
+         ?
+         <Button variant='contained' onClick={()=>handleEdit()} 
+         style={{ width :'90px' , marginTop:'8px'  , color: '#fff', backgroundColor: 'blue' }}>Edit
+         </Button>
+        :
+        <>
+        {loading?
+    <Button variant='contained'  
+    style={{ width:'90px', marginTop:'8px', marginRight:'5px', color: '#fff', backgroundColor: 'green' }}>
+      Updating <i class="fa fa-spinner fa-spin"></i>
+      </Button>
+    :
+    <Button variant='contained' onClick={()=>handleUpdate()} 
+    style={{width:'90px',marginTop:'8px', marginRight:'5px', color: '#fff', backgroundColor: 'green' }}>
+      Update
+      </Button>}
+        <Button sx={{backgroundColor:'blue', marginTop:'8px'}} onClick={()=>handleBack()} variant='contained' >Go Back</Button>
+    </>
+      }
+        
+        
+        
+        
+        
+    
+        {/* {loading?<Button variant='contained' style={{ color: 'green', backgroundColor: 'green' }}></Button>:<Button onClick={()=>handleUpdate()} style={{ color: 'green', backgroundColor: '#fff' }}>Update</Button>} */}
       </div>
     </div>
+}
   </>
   );
 }
