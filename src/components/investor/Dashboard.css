@@ -283,6 +283,14 @@ body, ul {
   
 }
 
+.div-sidebar {
+  width: 5%; /* Adjust the width as needed */
+  /* background-color: #333;
+  color: #fff; */
+  padding: 20px;
+}
+
+
 /* Style the sidebar */
 .sidebar {
   width: 250px;
@@ -357,9 +365,8 @@ color:#6366F1;
 
 /* Style the content */
 .content {
-  flex-grow: 1;
+  flex: 1; /* Take up the remaining available space */
   padding: 20px;
-  /* box-shadow: 5px 0px 15px #00000040; */
   background-color: #f6f9fe;
 }
 
@@ -554,8 +561,7 @@ align-items: center;
   flex-direction: column;
   justify-content: space-between;
   width: fit-content;
-  margin-left: 230px;
-  margin-top: 30px;
+  margin: auto;
   /* border: 1px solid #ccc; */
   border-radius: 5px;
   padding: 20px;

@@ -103,56 +103,7 @@ toggle.addEventListener("click", () => {
   return (<>
   
     <div className="investorDashboard">
-
-      {/* <div className="top-right">
-        <div className="user-info" onClick={toggleDropdown}>
-          <i className="material-icons">person</i>
-          <span>Your Profile</span>
-        </div> */}
-      {/* {isDropdownOpen && (
-          <div className="dropdown">
-            <ul>
-              <li onClick={handleLogout}>Logout</li>
-              Add other options as needed
-            </ul>
-          </div>}
-        )} */}
-      {/* </div> */}
-      {/* <div className="sidebar">
-
-        <ul>
-          <Tooltip title="Click to see list of clients" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('ClientList')}
-              id={selectedOption === 'ClientList' ? 'active' : ''}>
-              <i id={selectedOption === 'ClientList' ? 'iactive' : ''} className="material-icons">pie_chart</i>
-              <span>List of Clients</span>
-            </li>
-          </Tooltip>
-          <Tooltip title="Click to see list of strategies" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentStrategies')}
-              id={selectedOption === 'InvestmentStrategies' ? 'active' : ''} >
-              <i id={selectedOption === 'InvestmentStrategies' ? 'iactive' : ''} className="material-icons">swap_horiz</i>
-              <span>Strategies</span>
-            </li>
-          </Tooltip>
-          <Tooltip title="Click to see list of investment requests" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('InvestmentRequests')}
-              id={selectedOption === 'InvestmentRequests' ? 'active' : ''}>
-              <i id={selectedOption === 'InvestmentRequests' ? 'iactive' : ''} className="material-icons">description</i>
-              <span>Investment Requests</span>
-            </li>
-          </Tooltip>
-          <Tooltip title="Update Profile" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('Settings')}
-              id={selectedOption === 'Settings' ? 'active' : ''}>
-              <i id={selectedOption === 'Settings' ? 'iactive' : ''} className="material-icons">settings</i>
-              <span>Settings</span></li>
-          </Tooltip>
-        </ul>
-      </div> */}
-
-
-<div>
+<div class="div-sidebar">
 <nav class="sidebar">
     <header>
         <div class="image-text">

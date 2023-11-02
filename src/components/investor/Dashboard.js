@@ -94,50 +94,10 @@ function Dashboard() {
   return (<>
    
     <div className="investorDashboard">
-      {/* <div className="top-right">
-        <div className="user-info" onClick={toggleDropdown}>
-          <i className="material-icons">person</i>
-          <span>Your Profile</span>
-        </div> */}
-      {/* {isDropdownOpen && (
-          <div className="dropdown">
-            <ul>
-              <li onClick={handleLogout}>Logout</li>
-              {/* Add other options as needed */}
-      {/* </ul>
-          </div> */}
-      {/* // )}
-      // </div> */}
-      {/* <div className="sidebar">
-
-        <ul>
-          <Tooltip title="Click to see your investments" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('Portfolio')} id={selectedOption === 'Portfolio' ? 'active' : ''}>
-              <i id={selectedOption === 'Portfolio' ? 'iactive' : ''} className="material-icons">pie_chart</i>
-              <span>Portfolio</span>
-            </li>
-          </Tooltip>
-          <Tooltip title="Click to see past requests" placement="right-end">
-             <li className="sidebar-item" onClick={() => handleOptionClick('pastRequests')} id={selectedOption === 'pastRequests' ? 'active' : ''}>
-              <i id={selectedOption === 'pastRequests' ? 'iactive' : ''} className="material-icons">swap_horiz</i>
-              <span>Past Requests</span>
-              </li>
-          </Tooltip>
-          <Tooltip title="Click to make investment requests and to see the strategies" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('New Investment')} id={selectedOption === 'New Investment' ? 'active' : ''}>
-              <i id={selectedOption === 'New Investment' ? 'iactive' : ''} className="material-icons">description</i>
-              <span>New Investment</span>
-              </li>
-          </Tooltip>
-          <Tooltip title="Update Profile" placement="right-end">
-            <li className="sidebar-item" onClick={() => handleOptionClick('Settings')}
-              id={selectedOption === 'Settings' ? 'active' : ''}>
-              <i id={selectedOption === 'Settings' ? 'iactive' : ''} className="material-icons">settings</i>
-              <span>Settings</span></li>
-          </Tooltip>
-        </ul>
-      </div> */}
-<div>
+     
+      
+      
+<div class="div-sidebar">
 <nav class="sidebar">
     <header>
         <div class="image-text">
