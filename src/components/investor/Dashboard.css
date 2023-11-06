@@ -211,11 +211,17 @@ background-color: #98BDFF!important;
 }
 .Approved,.Rejected,.Pending{
   border-radius: 25px!important;
+  cursor: default!important;
 }
 .High,.Low,.Medium,.Need{
   width:189px;
   color: #fff !important;;
   border-radius: 25px!important;
+  cursor: default!important;
+}
+.action{
+  border-radius: 25px!important;
+  background-color: #7DA0FA!important;
 }
 .MuiCard-root{
   /* background: #c5d2de; */

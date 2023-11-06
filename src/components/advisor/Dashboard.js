@@ -324,7 +324,7 @@ function collapseRow(the)
                   <TableCell >{row.investmentAmount}</TableCell>
                   <TableCell >{row.expectedAmount}</TableCell>
                   <TableCell>{row.timePeriod}</TableCell>
-                  <TableCell ><Button sx={{ width: '100px', borderRadius: '20px' }} variant="contained" className={row.status}>{row.status}</Button></TableCell>
+                  <TableCell ><Button sx={{ width: '100px', borderRadius: '20px' ,cursor:'default' }} variant="contained" className={row.status}>{row.status}</Button></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0}} colSpan={6}>
@@ -567,11 +567,8 @@ function ReportsContent({ advisorId }) {
   ////debugger
   const [loading,setLoading]=useState(false)
   const [requestLoading,setRequestLoading]=useState(true)
-  const extractBeforeSpace = (inputString) => {
-    const match = inputString.split(" "); 
-  
-    return match[0]; 
-  };
+  const [remainingAmount,setRemainingAmount]=useState('')
+
   const style = {
     position: 'absolute',
     top: '50%',
@@ -585,9 +582,11 @@ function ReportsContent({ advisorId }) {
   };
   const [modalOpen, setModalOpen] = React.useState(false);
   const [clientId, setClientId] = useState('')
-  const handleOpen = (clientID,investmentID) => {
+  const handleOpen = (clientID,investmentID,timePeriod,remainingAmount) => {
      setClientId(clientID);
      setInvestmentId(investmentID)
+     setTimePeriod(timePeriod)
+     setRemainingAmount(remainingAmount)
     setModalOpen(true);
   }
   const handleClose = () => {
@@ -636,6 +635,7 @@ function ReportsContent({ advisorId }) {
   const [oneYrReturnsError, setOneYrReturnsError] = useState(false)
   const [threeYrReturnsError, setThreeYrReturnsError] = useState(false)
   const [fiveYrReturnsError, setFiveYrReturnsError] = useState(false)
+  const [helperText,setHelperText] =useState('')
 
 
 
@@ -648,7 +648,9 @@ function ReportsContent({ advisorId }) {
     setSixMonReturnsError(false)
     setOneYrReturnsError(false)
     setThreeYrReturnsError(false)
+    setInvestmentAmountError(false)
     setFiveYrReturnsError(false)
+    setHelperText('')
     let count = 0;
     if (strategyName === "") {
       setStrategyNameError(true)
@@ -695,6 +697,10 @@ function ReportsContent({ advisorId }) {
       count++
     }
     if (count > 0) {
+      return
+    }
+    if(investmentAmount>remainingAmount){
+      setHelperText("Balance is less than investment Amount")
       return
     }
     const strategyData = {
@@ -805,9 +811,9 @@ setLoading(true)
       >
         <Box sx={style} >
           <CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
-          {message ? <Typography id="modal-modal-title" variant="h6" component="h2">
+          {message ? <Typography color='primary' id="modal-modal-title" variant="h6" component="h2">
             {message}
-          </Typography> : <><Typography id="modal-modal-title" variant="h6" component="h2">
+          </Typography> : <><Typography color='primary' id="modal-modal-title" variant="h6" component="h2">
             Create New Strategy For Client
           </Typography>
             <Grid container spacing={2}>
@@ -896,26 +902,21 @@ setLoading(true)
               autoFocus
             />
 
-            <Grid sx={{ mt: 1 }}>
-              <FormControl required fullWidth>
-                <InputLabel id="demo-simple-select-label">Time Period</InputLabel>
-                <Select
+                <TextField
 
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Time Period"
-                  value={timePeriod}
-                  error={timePeriodError}
-                  onChange={e => setTimePeriod(e.target.value)}
-                >
-                  <MenuItem value={'6m'}>6 month</MenuItem>
-                  <MenuItem value={'1yr'}>1 year</MenuItem>
-                  <MenuItem value={'3yr'}>3 year</MenuItem>
-                  <MenuItem value={'5yr'}>5 year</MenuItem>
-
-                </Select>
-              </FormControl>
-            </Grid>
+                margin="dense"
+                autoComplete="given-name"
+                name="timePeriod"
+                required
+                fullWidth
+                disabled
+                value={timePeriod}
+                error={timePeriodError}
+                onChange={e => setTimePeriod(e.target.value)}
+                id="timePeriod"
+                label="Time Period"
+                autoFocus
+                />
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -985,7 +986,7 @@ setLoading(true)
               </Grid>
 
             </Grid>
-
+            {helperText? <span style={{color:'red'}}>* {helperText}</span>:''}
             {loading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained"> Creating.... <i class="fa fa-spinner fa-spin"></i> </Button>:
             <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" onClick={handleModalSubmit}>Create Strategy</Button>}</>}
         </Box>
@@ -1066,10 +1067,10 @@ setLoading(true)
                 <TableCell align='center'>{row.investmentAmount}</TableCell>
                 <TableCell>{row.remainingAmount}</TableCell>
                 <TableCell align='center'>{row.timePeriod}</TableCell>
-                <TableCell><Button  class={row.investmentType} >{row.investmentType}</Button></TableCell>
+                <TableCell><Button class={row.investmentType}  sx={{cursor:'default'}} >{row.investmentType}</Button></TableCell>
                 {/* <TableCell><Button  >{row.investmentType}</Button></TableCell> */}
                 <TableCell align='center'>
-                <Button onClick={()=>handleOpen(row.clientId,row.investmentID)}><i style={{marginRight :'4px' }}class="fa fa-plus" aria-hidden="true"></i>Strategy</Button>
+                <Button onClick={()=>handleOpen(row.clientId,row.investmentID,row.timePeriod,row.remainingAmount)}><i style={{marginRight :'4px' }}class="fa fa-plus" aria-hidden="true"></i>Strategy</Button>
                 </TableCell>
               </TableRow>
             </React.Fragment>

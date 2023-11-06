@@ -659,7 +659,7 @@ setActionLoading(true)
 
     return (<>
       {action?<Button className={Status} variant='contained'>{Status}</Button>
-        :<Button variant='contained' className="Pending" onClick={()=>handleApprove(strategyId)}>Action</Button>}
+        :<Button variant='contained' className="action" onClick={()=>handleApprove(strategyId)}>Action</Button>}
       <Modal
         open={childOpen}
         onClose={handleChildClose}

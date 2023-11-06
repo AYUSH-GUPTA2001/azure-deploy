@@ -200,10 +200,13 @@
     }
     .Approved,.Rejected,.Pending{
       border-radius: 25px!important;
+      cursor: default!important;
+
     }
     .High,.Low,.Medium,.Need{
       width:189px;
       color: #fff !important;;
+      cursor: default!important;
       border-radius: 25px!important;
     }
     .MuiCard-root{
