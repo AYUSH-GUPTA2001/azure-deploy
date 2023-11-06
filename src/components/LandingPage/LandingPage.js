@@ -37,7 +37,7 @@ return(
       <h2>Your Go to Website for Investments</h2>
       <div class="d-flex">
         <a href="#about" class="btn-get-started ">Get Started</a>
-        <a href="https://youtu.be/tmryHfunyQ4?si=WpEubHRXrQZ4LrFy" class="btn-watch-video"><i class="bi bi-play-circle"></i><span>Watch Video</span></a>
+        <a href="https://youtu.be/tmryHfunyQ4?si=WpEubHRXrQZ4LrFy" target ="_blank" class="btn-watch-video"><i class="bi bi-play-circle"></i><span>Watch Video</span></a>
       </div>
     </div>
   </section>

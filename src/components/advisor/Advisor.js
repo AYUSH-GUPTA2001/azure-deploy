@@ -44,7 +44,7 @@ export default function Advisor() {
 
     
     <ThemeProvider theme={defaultTheme}>
-      <Grid container  sx={{ height: '100vh' }}>
+      <Grid container  sx={{ height: '100vh' ,overflow:"hidden" }}>
         
         <Grid
           item

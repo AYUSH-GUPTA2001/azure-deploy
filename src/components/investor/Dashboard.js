@@ -34,6 +34,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import { Skeleton } from "@mui/lab";
+import Card from "../Card/Card";
 
 function Dashboard() {
 
@@ -51,8 +52,9 @@ function Dashboard() {
     // const searchBtn = body.querySelector(".search-box");
     const content = body.querySelector(".content");
     const materialicons = body.querySelectorAll(".Customicons");
+    const navLinks = document.querySelectorAll('.nav-link a span')
     // const modeText = body.querySelector(".mode-text");
-    debugger
+    //debugger
     
     
     toggle.addEventListener("click", () => {
@@ -61,6 +63,11 @@ function Dashboard() {
        for (const icons of materialicons) {
         icons.classList.toggle(
           'icon-toggle'
+        );
+      }
+      for (const icons of navLinks) {
+        icons.classList.toggle(
+          'sidebarAnchor'
         );
       }
     });
@@ -119,25 +126,25 @@ function Dashboard() {
         <div class="menu">
             <ul class="menu-links">
             <li class="nav-link">
-                <a  onClick={() => handleOptionClick('Portfolio')}>
+                <a  id={selectedOption === 'Portfolio' ? 'iactiveanchor' : ''} className="sidebarAnchor" onClick={() => handleOptionClick('Portfolio')}>
                 <i id={selectedOption === 'Portfolio' ? 'iactive' : ''} className="material-icons Customicons">pie_chart</i>
                 <span  id={selectedOption === 'Portfolio' ? 'iactiveli' : ''} class="text nav-text">Portfolio</span>
               </a>
             </li>
             <li class="nav-link">
-                <a  onClick={() => handleOptionClick('pastRequests')}>
+                <a id={selectedOption === 'pastRequests' ? 'iactiveanchor' : ''} className="sidebarAnchor" onClick={() => handleOptionClick('pastRequests')}>
                   <i id={selectedOption === 'pastRequests' ? 'iactive' : ''} className="material-icons Customicons">swap_horiz</i>
                   <span  id={selectedOption === 'pastRequests' ? 'iactiveli' : ''}  class="text nav-text">Past Requests</span>
                 </a>
             </li>
             <li class="nav-link">
-                <a  onClick={() => handleOptionClick('New Investment')}>
+                <a id={selectedOption === 'New Investment' ? 'iactiveanchor' : ''} className="sidebarAnchor" onClick={() => handleOptionClick('New Investment')}>
                 <i id={selectedOption === 'New Investment' ? 'iactive' : ''} className="material-icons Customicons">description</i>
               <span   id={selectedOption === 'New Investment' ? 'iactiveli' : ''} class="text nav-text">New Investment</span>
               </a>
             </li>
             <li class="nav-link">
-                <a  onClick={() => handleOptionClick('Settings')}>
+                <a id={selectedOption === 'Settings' ? 'iactiveanchor' : ''} className="sidebarAnchor"  onClick={() => handleOptionClick('Settings')}>
                 <i id={selectedOption === 'Settings' ? 'iactive' : ''} className="material-icons Customicons">settings</i>
               <span  id={selectedOption === 'Settings' ? 'iactiveli' : ''} class="text nav-text">Settings</span>
               </a>
@@ -175,7 +182,9 @@ function PortfolioContent({ clientId }) {
   
   const [open, setOpen] = useState(false);
   const [listOfStratgies, setListOfStrategies] = useState([])
-  
+  const [TotalInv, setTotalInv] = useState(0);
+  const [TotalinvAmount, SetTotalInvAmount] = useState(0);
+  const [TotalExeAmount, SetTotalExeAmount] = useState(0);
 
 
   const [loading,setLoading]=useState(true)
@@ -185,7 +194,15 @@ function PortfolioContent({ clientId }) {
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
     }).then(function (response) {
-      const list = response.data.strategies
+      //debugger
+      const list = response.data.strategies;
+      setTotalInv(list.filter(x=>x.status==="Approved").length);
+      SetTotalInvAmount(list.map(x=>x.status==="Approved"? x.investmentAmount:0).reduce(function(a, b){
+        return a + b;
+      }));
+      SetTotalExeAmount(list.map(x=>x.status==="Approved"?x.expectedAmount:0 ).reduce(function(a, b){
+        return a + b;
+      }));
       setLoading(false)
       setListOfStrategies(list)
       console.log(list)
@@ -200,7 +217,7 @@ function PortfolioContent({ clientId }) {
   const [coll,setColl]=useState('')
   function collapseRow(the)
   {
-    debugger;
+    //debugger;
     let _strategyId = the.row.strategyId;
     //setOpen(!open);
     if(coll === _strategyId)
@@ -213,23 +230,39 @@ function PortfolioContent({ clientId }) {
     <div className="portfolio">
 
       {
-        loading?<div className="rectangle-div">
+        loading?
+        <>
+        <div className='card-container'>
+                    <Card  color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                     number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                    <Card   color="fifthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                     number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                    <Card  color="SixthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                    number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                  </div>
+        <div className="rectangle-div">
         
         <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
         <br />
         <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
-                </div> :( <div className="rectangle-div">
+                </div> </>:(<>
+                  <div className='card-container'>
+                    <Card  color="fourthCard" heading="Number of Investments" number={TotalInv}/>
+                    <Card   color="fifthCard" heading="Total Invested Amount" number={TotalinvAmount}/>
+                    <Card  color="SixthCard" heading="Total Expected Amount" number={TotalExeAmount}/>
+                  </div>
+                  <div className="rectangle-div">
           <TableContainer component={Paper}>
             <Table size="small" aria-label="simple table">
               <TableHead>
                 <TableRow >
-                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }} />
-                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Investment Name</TableCell>
+                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }} />
+                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Name</TableCell>
                   {/* <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Original Amount(Rs.)</TableCell> */}
-                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Investment Amount(Rs.)</TableCell>
-                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Expected Amount(Rs.)</TableCell>
-                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Time Period</TableCell>
-                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Status</TableCell>
+                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Amount(Rs.)</TableCell>
+                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Expected Amount(Rs.)</TableCell>
+                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Time Period</TableCell>
+                  <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -260,7 +293,7 @@ function PortfolioContent({ clientId }) {
                           <TableCell>{row.investmentAmount}</TableCell>
                           <TableCell>{row.expectedAmount}</TableCell>
                           <TableCell>{row.timePeriod}</TableCell>
-                          <TableCell><Button sx={{ width: '100px', borderRadius: '20px' }} variant="contained" color={row.status === 'Pending' ? 'primary' : 'success'}>{row.status}</Button></TableCell>
+                          <TableCell><Button class={row.status} sx={{ width: '100px', borderRadius: '20px' }} variant="contained" >{row.status}</Button></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell style={{ paddingRight: 10, paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -308,7 +341,7 @@ function PortfolioContent({ clientId }) {
                 })}
               </TableBody></Table></TableContainer>
 
-        </div>)
+        </div></>)
       }
 
 
@@ -318,7 +351,11 @@ function PortfolioContent({ clientId }) {
 
 function PastRequestsContent({ clientId }) {
   const [listOfPastRequests, setListOfPastRequests] = useState([])
-
+  const [totalRequest,setTotalRequest]=useState(0)
+  const [totalHighRiskRequest,setTotalHighRiskRequest]=useState(100)
+  const [totalLowRiskRequest,setTotalLowRiskRequest]=useState(1000)
+  const [totalMediumRiskRequest,setTotalMediumRiskRequest]=useState(100)
+  const [totalConsultationRequest,setTotalConsultationRequest]=useState(1000)
  const [loading,setLoading]=useState(true)
 
 
@@ -329,7 +366,14 @@ function PastRequestsContent({ clientId }) {
     url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
   }).then(function (response) {
     setListOfPastRequests(response.data)
+    const list = response.data
+
     console.log(listOfPastRequests)
+    setTotalRequest(list.length)
+    setTotalLowRiskRequest(list.filter(x=> x.investmentType== 'Low Risk').length)
+    setTotalHighRiskRequest(list.filter(x=> x.investmentType== 'High Risk').length)
+    setTotalMediumRiskRequest(list.filter(x=>x.investmentType=='Medium Risk').length)
+    setTotalConsultationRequest(list.filter(x=>x.investmentType=="Need Consultation").length)
     setLoading(false)
   },
     function (error) {
@@ -340,22 +384,48 @@ function PastRequestsContent({ clientId }) {
   return (
     // loading
     <div className="portfolio">
-      {loading?<div className="rectangle-div">
+      {loading?
+      <>
+       <div className='card-container'>
+                <Card color="firstCard"  heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                <Card  color="secondCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                <Card color="SixthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                <Card color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                
+                <Card color="fifthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+          </div>
+
+      <div className="rectangle-div">
         
         <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
         <br />
         <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
-                </div>:( <div className="rectangle-div">
+                </div></>:( <>
+                  <div className='card-container'>
+                <Card color="firstCard"  heading="Number of Requests" number={totalRequest}/>
+                <Card  color="secondCard" heading="Total High Risk Requests" number={totalHighRiskRequest}/>
+                <Card color="SixthCard" heading="Total Low Risk Requests" number={totalLowRiskRequest}/>
+                <Card color="fourthCard" heading="Total Medium Risk Requests" number={totalMediumRiskRequest}/>
+                
+                <Card color="fifthCard" heading="Total Consultation Requests" number={totalConsultationRequest}/>
+ </div>
+                
+                <div className="rectangle-div">
         <TableContainer component={Paper}>
           <Table size="small" aria-label="simple table">
             <TableHead>
               <TableRow >
-                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>#</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
 
-                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Created Date</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Investment Amount(Rs.)</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Time Period</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Investment Type</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Created Date</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Amount(Rs.)</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Time Period</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Type</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -378,7 +448,7 @@ function PastRequestsContent({ clientId }) {
                     <TableCell >{row.createdDate.slice(0, 10)}</TableCell>
                     <TableCell align='center' >{row.investmentAmount}</TableCell>
                     <TableCell >{row.timePeriod}</TableCell>
-                    <TableCell><Button color={row.investmentType === 'High Risk' ? 'error' : (row.investmentType === 'Low Risk' ? 'primary' : 'success')}>{row.investmentType}</Button></TableCell>
+                    <TableCell><Button className={row.investmentType}>{row.investmentType}</Button></TableCell>
 
                   </TableRow>
                 </React.Fragment>
@@ -389,7 +459,7 @@ function PastRequestsContent({ clientId }) {
             </TableBody>
           </Table>
         </TableContainer>
-      </div>)}
+      </div></>)}
     </div>
   );
 }
@@ -400,7 +470,7 @@ function InvestmentContent({ clientId }) {
   const [investmentType, setInvestmentType] = useState("")
   const [timePeriod, setTimePeriod] = useState("")
  
-
+ 
   const [investmentAmountError, setInvestmentAmountError] = useState(false)
   const [investmentTypeError, setInvestmentTypeError] = useState(false)
   const [timePeriodError, setTimePeriodError] = useState(false)
@@ -451,7 +521,9 @@ function InvestmentContent({ clientId }) {
 
   const [recommendationsOpen, setRecommendationsOpen] = useState(false);
   const handleRecommendationsOpen = () => setRecommendationsOpen(true);
-  const handleRecommendationsClose = () => setRecommendationsOpen(false);
+  const handleRecommendationsClose = () => {setRecommendationsOpen(false)
+      setListOfStrategies([])
+  };
 
   useEffect(() => {
     axios({
@@ -543,7 +615,7 @@ function InvestmentContent({ clientId }) {
     const [actionLoading,setActionLoading]=useState(false)
     const [investmentIdError, setInvestmentIDError] = useState(false)
     const [statusError, setStatusError] = useState(false)
-
+    const [action,setAction]=useState(false)
     const [childOpen, setChildOpen] = useState(false)
     const handleChildOpen = () => setChildOpen(true);
     const handleChildClose = () => setChildOpen(false);
@@ -574,7 +646,7 @@ setActionLoading(true)
         console.log(response)
         setActionLoading(false)
         handleChildClose()
-        handleRecommendationsClose()
+        setAction(true)
       }, (error) => {
         console.log(error)
         setActionLoading(false)
@@ -586,7 +658,8 @@ setActionLoading(true)
     }
 
     return (<>
-      <Button variant='contained' onClick={()=>handleApprove(strategyId)}>Action</Button>
+      {action?<Button className={Status} variant='contained'>{Status}</Button>
+        :<Button variant='contained' className="Pending" onClick={()=>handleApprove(strategyId)}>Action</Button>}
       <Modal
         open={childOpen}
         onClose={handleChildClose}
@@ -594,7 +667,7 @@ setActionLoading(true)
         aria-describedby="child-modal-description"
       >
         <Box sx={{ ...style, width: 300 }}>
-          <CloseIcon color="primary" onClick={handleChildClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+          <CloseIcon color="primary" onClick={handleChildClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Choose Investment
           </Typography>
@@ -602,14 +675,14 @@ setActionLoading(true)
             size="small"
             margin="normal"
             autoComplete="given-name"
-            name="bankName"
+            name="investmentId"
             required
             disabled
             fullWidth
             value={investmentId}
             error={investmentIdError}
             onChange={e => setInvestmentId(e.target.value)}
-            id="bankName"
+            id="InvestmentId"
             label="Strategy Id"
             autoFocus
           />
@@ -634,10 +707,10 @@ setActionLoading(true)
             </Select>
           </FormControl>
 
-          {actionLoading?<Button  sx={{backgroundColor:'blue',marginTop:'5px'}} variant="contained" > Submitting... 
+          {actionLoading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" > Submitting... 
           <i class="fa fa-spinner fa-spin"></i></Button>
           :
-          <Button  sx={{backgroundColor:'blue',marginTop:'5px'}} variant="contained" onClick={handleChildSubmit}>Submit</Button>}
+          <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" onClick={handleChildSubmit}>Submit</Button>}
         </Box>
       </Modal></>
 
@@ -647,6 +720,7 @@ setActionLoading(true)
     
     handleRecommendationsOpen()
     console.log("advisorId:" + advisorId)
+    setStrategyLoading(true)
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
@@ -681,10 +755,10 @@ setActionLoading(true)
             aria-describedby="modal-modal-description"
           >
 
-            <Box sx={style} > {message ? <><CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} /><Typography id="modal-modal-title" variant="h6" component="h2">
+            <Box sx={style} > {message ? <><CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} /><Typography id="modal-modal-title" variant="h6" component="h2">
               {message}
             </Typography></> : <>
-              <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+              <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
               <Typography id="modal-modal-title" variant="h6" component="h2">
                 Please Fill Mandatory Fields For Getting Recommendations
               </Typography>
@@ -744,7 +818,7 @@ setActionLoading(true)
                   </Select>
                 </FormControl>
               </Grid>
-              {loading?<Button sx={{backgroundColor:'blue',marginTop:'5px'}} variant="contained">Creating...<i class="fa fa-spinner fa-spin"></i> </Button>:<Button sx={{backgroundColor:'blue', marginTop:'5px'}}  variant='contained' onClick={handleModalSubmit}>Create</Button>}</>}
+              {loading?<Button sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained">Creating...<i class="fa fa-spinner fa-spin"></i> </Button>:<Button sx={{backgroundColor:'#4b49ac', marginTop:'5px'}}  variant='contained' onClick={handleModalSubmit}>Create</Button>}</>}
             </Box>
 
             {/* {selectedOption==='2'&& <TextField
@@ -769,7 +843,7 @@ setActionLoading(true)
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           ><Box sx={recommendationStyle} >
-              <CloseIcon color="primary" onClick={handleRecommendationsClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+              <CloseIcon color="primary" onClick={handleRecommendationsClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
               {strategyLoading? <div >
         
         <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
@@ -781,16 +855,16 @@ setActionLoading(true)
                   <Table size="small" aria-label="simple table">
                     <TableHead>
                       <TableRow size='small' >
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>#</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Strategy Name</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Strategy Name</TableCell>
                         {/* <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Original Amount(Rs.)</TableCell> */}
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Investment Amount(Rs.)</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Expected Amount(Rs.)</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>6 Months Return(%)</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>1 year Return(%)</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>3 year Return(%)</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>5 year Return(%)</TableCell>
-                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Approve/Reject</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Amount(Rs.)</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Expected Amount(Rs.)</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>6 Months Return(%)</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>1 year Return(%)</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>3 year Return(%)</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>5 year Return(%)</TableCell>
+                        <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Approve/Reject</TableCell>
                         {/* <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Status</TableCell> */}
                       </TableRow>
                     </TableHead>
@@ -853,7 +927,7 @@ function SettingsContent({clientId}) {
   const [ifscCode,setIfscCode]=useState('')
   const [panNumber,setPanNumber]=useState('')
   const [message, setMessage] = useState('')
-
+  const [backVisible,setBackVisible]=useState(true)
   const [firstNameError, setFirstNameError] = useState(false)
   const [lastNameError, setLastNameError] = useState(false)
   const [emailError, setEmailError] = useState(false)
@@ -862,6 +936,18 @@ function SettingsContent({clientId}) {
   const [stateError, setStateError] = useState(false)
   const [addressError, setAddressError] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
+  const [bankNameError,setBankNameError]=useState(false)
+  const [accountNumberError,setAccountNumberError]=useState(false)
+  const [ifscCodeError,setIfscCodeError]=useState(false)
+  const [panNumberError,setPanNumberError]=useState(false)
+  const [bankHelperText,setBankHelperText]=useState('')
+  const [accountNumberHelpertext,setAccountNumberHelperText]=useState('')
+  const [ifscHelperText,setIfscHelperText]=useState('')
+  const [panHelperText,setPanHelperText]=useState('')
+  const bankPattern= /^[A-Za-z\s]+$/;
+  const ifscPattern= /^[A-Z]{4}[0-9]{7}$/;
+  const panPattern=/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  const accountNumberPattern=/^[0-9]{14}$/;
   const [loading,setLoading]=useState(false)
   const [settingsLoading,setSettingsLoading]=useState(true)
   const [clientData,setClientData]=useState({})
@@ -876,9 +962,10 @@ function SettingsContent({clientId}) {
   const handleChange = (el) => {
     let inputName = el.target.name;
     let inputValue = el.target.value;
+   
     let statusCopy = Object.assign({}, updatedClientData);
     statusCopy[inputName] = inputValue;
-
+   
     setUpdatedClientData(statusCopy);
   }
 
@@ -918,6 +1005,7 @@ function SettingsContent({clientId}) {
       url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
     })
       .then((response) => {
+        console.log(response.data.client)
         setClientData(response.data.client)
         setUpdatedClientData(response.data.client)
         
@@ -937,7 +1025,7 @@ function SettingsContent({clientId}) {
   }
 
   const handleUpdate = () => {
-    console.log(1)
+    // console.log(1)
     setFirstNameError(false)
     setLastNameError(false)
     setEmailError(false)
@@ -946,6 +1034,14 @@ function SettingsContent({clientId}) {
     setCityError(false)
     setStateError(false)
     setPasswordError(false)
+    setBankNameError(false)
+    setAccountNumberError(false)
+    setIfscCodeError(false)
+    setPanNumberError(false)
+    setBankHelperText('')
+    setAccountNumberHelperText('')
+    setIfscHelperText('')
+    setPanHelperText('')
     let count = 0;
     if (updatedClientData.firstName === '') {
       setFirstNameError(true)
@@ -975,15 +1071,52 @@ function SettingsContent({clientId}) {
       setStateError(true)
       count++
     }
-    if (updatedClientData.password === '') {
-      setPasswordError(true)
+    if (updatedClientData.bankName === '') {
+      setBankNameError(true)
       count++
     }
+    if (updatedClientData.accountNumber === '') {
+      setAccountNumberError(true)
+      count++
+    }
+    if (updatedClientData.ifscCode === '') {
+      setIfscCodeError(true)
+      count++
+    }
+    if (updatedClientData.panNumber === '') {
+      setPanNumberError(true)
+      count++
+    }
+    console.log(bankName)
     if (count > 0) {
       return
     }
-       
+    
+    if (!updatedClientData.bankName.match(bankPattern)) {
+      setBankNameError(true)
+     
+      setBankHelperText("Bank name should contain only letters and spaces");
+    
+      return 
+  }
+  if (!updatedClientData.accountNumber.match(accountNumberPattern)) {
+    setAccountNumberError(true)
+    setAccountNumberHelperText("Account number should be exactly 14 digits");
+    return 
+  }
+  if (!updatedClientData.ifscCode.match(ifscPattern)) {
+    setIfscCodeError(true)
+    setIfscHelperText("IFSC code should be in the format: AAAA0123456");
+    return 
+  }
   
+  if (!updatedClientData.panNumber.match(panPattern)) {
+    setPanNumberError(true)
+    setPanHelperText("PAN number should be in the format: ABCDE1234F");
+    return 
+  } 
+
+    setBackVisible(false)
     setLoading(true)
       axios({
         method: 'put',
@@ -997,12 +1130,14 @@ function SettingsContent({clientId}) {
           setClientData(updatedClientData)
           setDisabled(true)
           setEditVisible(true)
+          setBackVisible(true)
           handleMessage()
         }
   
   
       }, (error) => {
        setLoading(false)
+       setBackVisible(true)
   
       })
 
@@ -1105,7 +1240,7 @@ function SettingsContent({clientId}) {
                 disabled: disabled
               }}
               label="Phone Number"
-              name="phone"
+              name="phoneNumber"
               value={updatedClientData.phoneNumber}
               error={phoneError}
               onChange={e => handleChange(e)}
@@ -1178,6 +1313,94 @@ function SettingsContent({clientId}) {
           </Grid>
 
         </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              size="small"
+              margin="dense"
+              autoComplete="given-name"
+              name="bankName"
+              required
+              InputProps={{
+
+                disabled: disabled
+              }}
+              fullWidth
+              value={updatedClientData.bankName}
+              error={bankNameError}
+              helperText={bankHelperText}
+              onChange={e => handleChange(e)}
+              id="bank"
+              label="Bank Name"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              size="small"
+              margin="dense"
+              required
+              fullWidth
+              InputProps={{
+
+                disabled: disabled
+              }}
+              id="account"
+              label="Account Number"
+              name="accountNumber"
+              value={updatedClientData.accountNumber}
+              error={accountNumberError}
+              helperText={accountNumberHelpertext}
+              onChange={e => handleChange(e)}
+              autoComplete="family-name"
+            />
+          </Grid>
+
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              size="small"
+              margin="dense"
+              autoComplete="given-name"
+              name="ifscCode"
+              required
+              InputProps={{
+
+                disabled: disabled
+              }}
+              fullWidth
+              value={updatedClientData.ifscCode}
+              error={ifscCodeError}
+              helperText={ifscHelperText}
+              onChange={e => handleChange(e)}
+              id="ifsc"
+              label="IFSC Code"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              size="small"
+              margin="dense"
+              required
+              fullWidth
+              InputProps={{
+
+                disabled: disabled
+              }}
+              id="pan"
+              label="PAN Number"
+              name="panNumber"
+              value={updatedClientData.panNumber}
+              error={panNumberError}
+              helperText={panHelperText}
+              onChange={e => handleChange(e)}
+              autoComplete="family-name"
+            />
+          </Grid>
+
+        </Grid>
         {/* <TextField
           size="small"
           margin="dense"
@@ -1204,7 +1427,7 @@ function SettingsContent({clientId}) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-          <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+          <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Client information updated successfully.
           </Typography>
@@ -1214,7 +1437,7 @@ function SettingsContent({clientId}) {
       {editVisible
          ?
          <Button variant='contained' onClick={()=>handleEdit()} 
-         style={{ width :'90px' , marginTop:'8px'  , color: '#fff', backgroundColor: 'blue' }}>Edit
+         style={{ width :'90px' , marginTop:'8px'  , color: '#fff', backgroundColor: '#4b49ac' }}>Edit
          </Button>
         :
         <>
@@ -1228,7 +1451,7 @@ function SettingsContent({clientId}) {
     style={{width:'90px',marginTop:'8px', marginRight:'5px', color: '#fff', backgroundColor: 'green' }}>
       Update
       </Button>}
-        <Button sx={{backgroundColor:'blue', marginTop:'8px'}} onClick={()=>handleBack()} variant='contained' >Go Back</Button>
+        {backVisible&&<Button sx={{backgroundColor:'#4b49ac', marginTop:'8px'}} onClick={()=>handleBack()} variant='contained' >Go Back</Button>}
     </>
       }
         

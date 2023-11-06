@@ -96,11 +96,13 @@
         }
 
         .material-icons,.fa-sign-out{
-          margin-right: 2%
+          margin-right: 2%;
+          padding: 5px;
         }
 
         .icon-toggle{
           margin-left: 25%;
+          padding: 0px !important;
         }
 
             .sidebar li .icon {
@@ -152,7 +154,7 @@
         height: 25px;
         cursor: pointer;
         width: 25px;
-        background: var(--primary-color);
+        background: #4b49ac;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -174,6 +176,49 @@
         border-radius: 6px;
         background: var(--primary-color-light);
     }
+    .firstCard{
+      background-color: #4b49ac!important;
+    }
+    .secondCard{
+    background-color: #98BDFF!important;
+    }
+    .thirdCard, .Need{
+      background-color:#7778E9!important;
+    
+    }
+    .fourthCard, .Rejected, .High{
+      background-color: #f3797e!important;
+     
+    }
+    .fifthCard, .Pending,.Medium{
+      background-color: #7DA0FA!important;
+     
+    }
+    .SixthCard,.Approved,.Low{
+      background-color: #1BCFB4!important;
+    
+    }
+    .Approved,.Rejected,.Pending{
+      border-radius: 25px!important;
+    }
+    .High,.Low,.Medium,.Need{
+      width:189px;
+      color: #fff !important;;
+      border-radius: 25px!important;
+    }
+    .MuiCard-root{
+      /* background: #c5d2de !important; */
+        color: white  !important;
+    }
+    
+    .css-ag7rrr-MuiTypography-root {
+      font-weight: 700  !important;
+    }
+    
+    .css-1jgmn5n-MuiTypography-root{
+      font-weight: 800  !important;
+    color: white  !important;
+    }
 
     .sidebar li a {
         height: 100%;
@@ -185,6 +230,10 @@
         transition: var(--tran-04);
     }
 
+    .sidebarAnchor{
+      display: none;
+    }
+
         .sidebar li a:hover {
             background: #d3d2e2;
         }
@@ -193,6 +242,17 @@
             .sidebar li a:hover .text {
                 color: var(--sidebar-color);
             }
+
+            .card-container{
+              display:flex;
+              flex-wrap: wrap;
+              /* background-color: #f6f9fe !important; */
+              margin-left: 27px;
+              align-items: center;
+             
+             
+            }
+           
 
     .sidebar .menu-bar {
         height: calc(100% - 50px);
@@ -281,7 +341,7 @@ body, ul {
   .content {
     flex: 1; /* Take up the remaining available space */
     padding: 20px;
-    background-color: #f6f9fe;
+    background-color: #f5f7ff;
   }
  
 
@@ -356,14 +416,14 @@ line-height: 2.5em;
 /* Add additional styles as needed for specific content sections */
 /* Add these styles to your existing CSS file */
 .portfolio{
-  background-color: #f6f9fe;
+  background-color: #f5f7ff;
 }
 /* Styles for the portfolio container */
 .portfolio-container {
 display: flex;
 justify-content: space-between;
 margin-top: 20px;
-background-color: #f6f9fe;
+/* background-color: #f6f9fe; */
 }
 
 /* Styles for the rounded divs */
@@ -378,7 +438,7 @@ border-radius: 10px; /* Rounded shape */
 .rectangle-div {
 
  /* Same height as the rounded divs */
-background-color: #fff;
+
 position: relative;
 border-radius: 10px;
 margin-top: 30px;
@@ -449,13 +509,17 @@ background-color: #f0f0f0;
   border-radius: 10px;
 }
 
-.sidebar #iactive {
-   color: #0000ff;
-}
 
-.sidebar #iactiveli {
-  color:#0000ff;
-}
+.sidebar #iactive {
+  color:#ffffff;
+  }
+  .sidebar #iactiveli {
+    color:#ffffff;
+  }
+  
+  .sidebar #iactiveanchor {
+    background-color:#4b49ac;
+  }
 
 .settings-container {
   display: flex;
@@ -495,10 +559,10 @@ background-color: #f0f0f0;
   align-items: center;
 }
 
-input {
+/* input {
   width: 200px; /* Set the desired width for the input fields */
-  padding: 5px;
-}
+  /* padding: 5px;
+} */ */
 
 .update-button {
   text-align: center;

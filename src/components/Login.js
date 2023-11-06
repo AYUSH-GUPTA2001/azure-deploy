@@ -59,6 +59,8 @@ export default function Login(){
   const [resetOTP,setResetOTP]=useState('')
   const [resetPassword,setResetPassword]=useState('')
   const [confirmResetPassword,setConfirmResetPassword]=useState('')
+  const [show,setShow]=useState(false)
+  const [signShow,setSignShow]=useState(false)
 
 
   const [forgotEmailError,setForgotEmailError]=useState(false)
@@ -126,6 +128,9 @@ export default function Login(){
     const handleChange = (event, newValue) => {
       setValue(newValue);
       setEmail('')
+      setLoginPassword('')
+      setLoginMessage('')
+      setMessage('')
       setLoginEmail('')
     }; 
     const handleForgotPassword=()=>{
@@ -175,7 +180,7 @@ export default function Login(){
         setOTPLoading(false)
         console.log(response)
            setMessage(response.data.message)
-           setLoginMessage(response.data.message)
+          //  setLoginMessage(response.data.message)
            setOTP('')
            setFirstName('')
                 setLastName('')
@@ -262,7 +267,7 @@ export default function Login(){
     }
     if (!password.match(passwordPattern)) {
       setPasswordError(true)
-      setPasswordHelperText("Password must contain at least 8 characters, including at least one digit, one lowercase letter, and one uppercase letter.");
+      setPasswordHelperText("Password must contain at least 8 characters, 1 digit, 1 lowercase letter,1 uppercase letter");
       return 
   }
   
@@ -439,7 +444,7 @@ setResetLoading(true)
   return (
     <>
      <Tooltip title='Back to Homepage'>
-      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" ,cursor:'pointer'}} />
       </Tooltip>
     <Grid container spacing={7} item xs={12} sx={{backgroundColor:"#e4f1ff"}} sm={8} md={4} component={Paper} elevation={6} square>
           <Box
@@ -602,8 +607,8 @@ setResetLoading(true)
                 multiline
                 maxRows={4}
         />
-        <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+      
+             
               <TextField
                 size="small"
                 margin="dense"
@@ -616,12 +621,12 @@ setResetLoading(true)
                   error={passwordError}
                   onChange={e => setPassword(e.target.value)}
                 label="Password"
-                type="password"
+                type={signShow?'text':'password'}
                 id="password"
                 autoComplete="current-password"
-              /></Grid>
+              />
               
-              <Grid item xs={12} sm={6}>
+              
               <TextField
                 size="small"
                 margin="dense"
@@ -633,24 +638,25 @@ setResetLoading(true)
                   error={confirmPasswordError}
                   onChange={e => setConfirmPassword(e.target.value)}
                 label="Confirm Password"
-                type="password"
+                type={signShow?'text':'password'}
                 id="confirmPassword"
               
               />
-             </Grid>
-             </Grid>
+             
+             <input onClick={()=>setSignShow(!signShow)} type="checkbox" id="showPassword" />
+                <label  for="showPassword"> Show Password</label><br/>
              {loading?<Button
                 
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 0.5, mb: 1 }}
               >
                 <i class="fa fa-spinner fa-spin"></i> 
               </Button>:<Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 0.5, mb: 1 }}
               >
                Sign In
               </Button>}
@@ -660,11 +666,11 @@ setResetLoading(true)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-      {message?<Typography id="modal-modal-title" variant="h6" component="h2">
+        <CloseIcon color="primary" onClick={handleClose} style={{ cursor:'pointer',position: "absolute", top: "10px", right: "10px" }} />
+      {message?<Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
         {message}
-      </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
-        Enter OTP sent For Email Verification
+      </Typography>:<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
+        Enter OTP sent to the Email
       </Typography><TextField
                 size="small"
                 margin="dense"
@@ -725,16 +731,18 @@ setResetLoading(true)
                 value={loginPassword}
                 error={loginPasswordError}
                 label="Password"
-                type="password"
+                type={show?'text':'password'}
                 id="password"
                 autoComplete="current-password"
               />
+              <input onClick={()=>setShow(!show)} type="checkbox" id="showPassword" />
+                <label  for="showPassword"> Show Password</label><br/>
            {loginMessage? <span style={{ color: 'red' }}>*{loginMessage}</span>: loginMessage}
            {loading?
            <Button
            fullWidth
            variant="contained"
-           sx={{ mt: 3, mb: 2 }}
+           sx={{ mt: 0.5, mb: 2 }}
          >
           <i class="fa fa-spinner fa-spin"></i> 
          </Button>
@@ -743,7 +751,7 @@ setResetLoading(true)
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 0.5, mb: 2 }}
               >
                Sign In
               </Button>}
@@ -753,7 +761,7 @@ setResetLoading(true)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} />
       {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {loginMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
@@ -823,7 +831,7 @@ setResetLoading(true)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleForgotClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon color="primary" onClick={handleForgotClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {forgotMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {forgotMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">

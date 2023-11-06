@@ -1,6 +1,6 @@
 /* Navbar.css */
 nav {
-    background-color: #f6f9fe;
+    /* background-color: #f6f9fe; */
     /* box-shadow: 5px 0px 15px #00000040; */
     padding-left: 2rem;
     padding-top: 1rem;
@@ -30,12 +30,12 @@ nav {
 }
   
 .dot {
-    color:blue;
+    color:#4b49ac;
     font-size: 2rem; /* Adjust the font size as needed */
     margin-left: 5px; /* Add space between "INCvest" and the dot */
   }
  .dot1{
-    color:blue;
+    color:#4b49ac;
  }
 .welcome-message {
     position: absolute;

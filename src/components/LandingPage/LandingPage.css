@@ -35,7 +35,7 @@ body {
 }
 
 .fixed-header .logo .dot {
-    color: blue;
+    color: #4b49ac;
 }
 
 .fixed-header nav ul {
@@ -59,12 +59,12 @@ body {
 }
 
 .fixed-header nav a:hover {
-    color: blue;
+    color: #4b49ac;
     text-decoration: underline;
 }
 .fixed-header nav a:active {
  /* Change the background color to blue when active */
-    color: blue; 
+    color: #4b49ac; 
     text-decoration: underline; /* Add underline when active */
 }
 /* ... existing styles ... */
@@ -104,7 +104,7 @@ body {
 }
 
 .fixed-header .dropdown .dropdown-content a:hover {
-    background-color: blue;
+    background-color: #4b49ac;
     color: #fff;
 }
 
@@ -186,7 +186,7 @@ section {
 }
 
 .section-bg {
-    background-color: #f6f9fe;
+    /* background-color: #f6f9fe; */
     display: flex;
     flex-direction: column;
 }
@@ -257,7 +257,7 @@ section {
 }
 
 .blue {
-    background-color: blue;
+    background-color: #4b49ac;
     color: white;
 }
 .container4 .box2 h3 {
@@ -452,7 +452,7 @@ section {
 }
 
 footer {
-    background-color: #f6f9fe;
+    /* background-color: #f6f9fe; */
     color: #000;
     padding: 50px;
     box-shadow: 0px -5px 10px 0px rgba(0, 0, 0, 0.02);
@@ -468,7 +468,7 @@ footer {
     padding-left: 30px;
 }
 .address span{
-    color:blue;
+    color:#4b49ac;
 } 
 .links {
     flex: 1;
@@ -487,13 +487,13 @@ footer {
 .services ul {
     list-style: none;
     padding: 0;
-    color: blue;
+    color: #4b49ac;
 }
 
 .links a,
 .services a {
     text-decoration: none;
-    color: blue;
+    color: #4b49ac;
     display: block;
     
 }

@@ -66,8 +66,17 @@ export default function Login(){
     const [resetPassword,setResetPassword]=useState('')
     const [confirmResetPassword,setConfirmResetPassword]=useState('')
     const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    const bankPattern= /^[A-Za-z\s]+$/;
+    const ifscPattern= /^[A-Z]{4}[0-9]{7}$/;
+    const panPattern=/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    const accountNumberPattern=/^[0-9]{14}$/;
+    const [bankHelperText,setBankHelperText]=useState('')
+    const [panHelperText,setPanHelperText]=useState('')
+    const [ifscHelperText,setIfscHelperText]=useState('')
+    const [accountNumberHelpertext,setAccountNumberHelperText]=useState('')
     const [resetPasswordHelperText,setResetPasswordHelperText]=useState('')
-
+    const [show,setShow]=useState(false)
+    const [signShow,setSignShow]=useState(false)
   const [cResetPasswordHelperText,setCResetPasswordHelperText]=useState('')
   const [forgotEmailHelperText,setForgotEmailHelperText]=useState('')
 
@@ -193,6 +202,7 @@ if (resetPassword !== confirmResetPassword) {
       position: 'absolute',
       top: '50%',
       left: '50%',
+      
       transform: 'translate(-50%, -50%)',
       width: 400,
       bgcolor: '#e4f1ff',
@@ -234,6 +244,9 @@ if (resetPassword !== confirmResetPassword) {
     const handleChange = (event, newValue) => {
       setValue(newValue);
       setEmail('')
+      setLoginPassword('')
+      setLoginMessage('')
+      setMessage('')
       setLoginEmail('')
     }; 
     const handleSubmit = (event) => {
@@ -302,7 +315,7 @@ let count=0;
     }
     if (!password.match(passwordPattern)) {
       setPasswordError(true)
-      setPasswordHelperText("Password must contain at least 8 characters, including at least one digit, one lowercase letter, and one uppercase letter.");
+      setPasswordHelperText("Password must contain at least 8 characters, 1 digit, 1 lowercase letter,1 uppercase letter");
       return 
   }
   
@@ -389,6 +402,10 @@ const handleOTPSubmit=(e)=>{
       setPanNumberError(false)
       setIfscCodeError(false)
       setRiskCapacityError(false)
+      setBankHelperText("")
+      setAccountNumberHelperText("")
+      setIfscHelperText("")
+      setPanHelperText('')
   let count=0;
       if (bankName === '') {
           setBankNameError(true)
@@ -415,6 +432,28 @@ const handleOTPSubmit=(e)=>{
   if(count>=1){
 return
   }
+
+  if (!bankName.match(bankPattern)) {
+    setBankNameError(true)
+    setBankHelperText("Bank name should contain only letters and spaces");
+    return 
+}
+if (!accountNumber.match(accountNumberPattern)) {
+  setAccountNumberError(true)
+  setAccountNumberHelperText("Account number should be exactly 14 digits");
+  return 
+}
+if (!ifscCode.match(ifscPattern)) {
+  setIfscCodeError(true)
+  setIfscHelperText("IFSC code should be in the format: AAAA0123456");
+  return 
+}
+
+if (!panNumber.match(panPattern)) {
+  setPanNumberError(true)
+  setPanHelperText("PAN number should be in the format: ABCDE1234F");
+  return 
+}
       const investorData={
         "clientId":'string',
         "advisorId":  'string',
@@ -445,6 +484,7 @@ return
       console.log(response.data.message)
       if(response.data.message==="OTP sent to your email for verification."){
         handleVerify()
+        setOpen(false)
       }
          if(response.data.message==="User registered successfully!"){
           setMessage(response.data.message)
@@ -484,15 +524,16 @@ return
       setLoginMessage('')
       setLoginEmailError(false)
       setLoginPasswordError(false)
-  
+     let count=0;
       if (loginEmail === '') {
           setLoginEmailError(true)
-          return
+          count++
       }
       if (loginPassword === '') {
           setLoginPasswordError(true)
-          return
+          count++
       }
+      if(count>0){return}
   const investorData={
         email:loginEmail,
         password:loginPassword,
@@ -532,7 +573,7 @@ return
   return (
     <>
     <Tooltip title='Back to Homepage'>
-      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" }} />
+      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       </Tooltip>
     <Grid container spacing={7} item xs={12} sx={{backgroundColor:"#e4f1ff"}} sm={8} md={4} component={Paper} elevation={6} square>
           <Box
@@ -692,8 +733,7 @@ return
                 />
               </Grid>
               </Grid>
-        <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+       
               <TextField
                 size="small"
                 margin="dense"
@@ -705,12 +745,12 @@ return
                   error={passwordError}
                   onChange={e => setPassword(e.target.value)}
                 label="Password"
-                type="password"
+                type={signShow?"text":"password"}
                 id="password"
                 autoComplete="current-password"
-              /></Grid>
+              />
               
-              <Grid item xs={12} sm={6}>
+     
               <TextField
                 size="small"
                 margin="dense"
@@ -722,18 +762,19 @@ return
                   error={confirmPasswordError}
                   onChange={e => setConfirmPassword(e.target.value)}
                 label="Confirm Password"
-                type="password"
+                type={signShow?"text":"password"}
                 id="confirmPassword"
               
               />
-             </Grid>
-             </Grid>
+             
+             <input onClick={()=>setSignShow(!signShow)} type="checkbox" id="showPassword" />
+                <label  for="showPassword"> Show Password</label><br/>
               <Button
                 
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 0.5, mb:1 }}
               >
                 Next
               </Button>
@@ -744,23 +785,25 @@ return
         aria-describedby="modal-modal-description"
       >
         <Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-         {message?<Typography id="modal-modal-title" variant="h6" component="h2">
+        <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+         {message?<Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
             {message}
-          </Typography>:<> <Typography id="modal-modal-title" variant="h6" component="h2">
-            Please Fill Mandatory Fields For Starting Investment
+          </Typography>:<> <Typography color='primary' id="modal-modal-title" variant="h6" component="h2">
+            Please Fill Mandatory Fields
           </Typography>
           <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
                 
                   margin="dense"
+                  // size='small'
                   autoComplete="given-name"
                   name="bankName"
                   required
                   fullWidth
                   value={bankName}
                   error={bankNameError}
+                  helperText={bankHelperText}
                   onChange={e => setBankName(e.target.value)}
                   id="bankName"
                   label="Bank Name"
@@ -771,11 +814,13 @@ return
                 <TextField
                   
                   margin="dense"
+                  // size='small'
                   required
                   fullWidth
                   id="accountNumber"
                   label="Account Number"
                   name="accountNumber"
+                  helperText={accountNumberHelpertext}
                   value={accountNumber}
                   error={accountNumberError}
                   onChange={e => setAccountNumber(e.target.value)}
@@ -789,10 +834,12 @@ return
                 <TextField
                   
                   margin="dense"
+                  // size='small'
                   autoComplete="given-name"
                   name="ifscCode"
                   required
                   fullWidth
+                  helperText={ifscHelperText}
                   value={ifscCode}
                   error={ifscCodeError}
                   onChange={e => setIfscCode(e.target.value)}
@@ -806,10 +853,12 @@ return
               
                   margin="dense"
                   required
+                  // size='small'
                   fullWidth
                   id="panNumber"
                   label="PAN Number"
                   name="panNumber"
+                  helperText={panHelperText}
                   value={panNumber}
                   error={panNumberError}
                   onChange={e => setPanNumber(e.target.value)}
@@ -818,14 +867,15 @@ return
               </Grid>
               
               </Grid>
-              <Grid sx={{mt:1}}>
+              <Grid  sx={{mt:1,mb:1}}>
               <FormControl required fullWidth>
         <InputLabel id="demo-simple-select-label">Risk Capacity</InputLabel>
         <Select
-          
+          // size='small'
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           label="Risk Capacity"
+          margin='dense'
           value={riskCapacity}
           error={riskCapacityError}
           onChange={e => setRiskCapacity(e.target.value)}
@@ -836,7 +886,8 @@ return
         </Select>
       </FormControl>
       </Grid>
-              {loading?<Button > <i class="fa fa-spinner fa-spin"></i> </Button>:<Button onClick={handleModalSubmit}>Create Account</Button>}</>}
+              {loading?<Button variant='contained' > Creating...<i class="fa fa-spinner fa-spin"></i> </Button>
+              :<Button variant='contained' onClick={handleModalSubmit}>Create </Button>}</>}
         </Box>
       </Modal>
       <Modal
@@ -845,11 +896,11 @@ return
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleVerifyClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
-      {message?<Typography id="modal-modal-title" variant="h6" component="h2">
+        <CloseIcon color="primary" onClick={handleVerifyClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+      {message?<Typography color="primary"  id="modal-modal-title" variant="h6" component="h2">
         {message}
-      </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
-        Enter OTP sent For Email Verification
+      </Typography>:<><Typography color="primary"  id="modal-modal-title" variant="h6" component="h2">
+        Enter OTP sent to the Email
       </Typography><TextField
                 size="small"
                 margin="dense"
@@ -909,23 +960,25 @@ return
                 value={loginPassword}
                 error={loginPasswordError}
                 label="Password"
-                type="password"
+                type={show?'text':'password'}
                 id="password"
                 autoComplete="current-password"
               />
+              <input onClick={()=>setShow(!show)} type="checkbox" id="showPassword" />
+                <label  for="showPassword"> Show Password</label><br/>
            {loginMessage? <span style={{ color: 'red' }}>*{loginMessage}</span>: loginMessage}
               {loading?<Button
               
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 1, mb: 2 }}
               >
               <i class="fa fa-spinner fa-spin"></i>
               </Button>:<Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 1, mb: 2 }}
               >
                Sign In
               </Button>}
@@ -935,7 +988,7 @@ return
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {loginMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
@@ -1005,7 +1058,7 @@ return
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleForgotClose} style={{ position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon color="primary" onClick={handleForgotClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {forgotMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {forgotMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">

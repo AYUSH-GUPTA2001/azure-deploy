@@ -46,7 +46,7 @@ export default function Investor() {
 
     
     <ThemeProvider theme={defaultTheme}>
-      <Grid container component="main" sx={{ height: '100vh' }}>
+      <Grid container component="main" sx={{ height: '100vh' , overflow:'hidden' }}>
         <CssBaseline />
         <Grid
           item

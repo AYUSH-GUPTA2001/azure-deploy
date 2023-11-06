@@ -97,11 +97,13 @@ body {
     }
 
     .material-icons,.fa-sign-out{
-      margin-right: 2%
+      margin-right: 2%;
+      padding: 5px;
     }
 
     .icon-toggle{
       margin-left: 25%;
+      padding: 0px !important;
     }
 
         .sidebar li .icon {
@@ -153,7 +155,7 @@ header .image-text .header-text {
     height: 25px;
     cursor: pointer;
     width: 25px;
-    background: var(--primary-color);
+    background: #4b49ac;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -176,6 +178,60 @@ header .image-text .header-text {
     background: var(--primary-color-light);
 }
 
+.card-container{
+  display:flex;
+  flex-wrap: wrap;
+  background-color: #f5f7ff !important;
+  margin-left: 27px;
+  align-items: center;
+ 
+ 
+}
+.firstCard{
+  background-color: #4b49ac!important;
+}
+.secondCard{
+background-color: #98BDFF!important;
+}
+.thirdCard, .Need{
+  background-color:#7778E9!important;
+  
+}
+.fourthCard, .Rejected, .High{
+  background-color: #f3797e!important;
+
+}
+.fifthCard, .Pending,.Medium{
+  background-color: #7DA0FA!important;
+
+}
+.SixthCard,.Approved,.Low{
+  background-color: #1BCFB4!important;
+  
+}
+.Approved,.Rejected,.Pending{
+  border-radius: 25px!important;
+}
+.High,.Low,.Medium,.Need{
+  width:189px;
+  color: #fff !important;;
+  border-radius: 25px!important;
+}
+.MuiCard-root{
+  /* background: #c5d2de; */
+    color: white;
+}
+
+.css-ag7rrr-MuiTypography-root {
+  font-weight: 700;
+}
+
+.css-1jgmn5n-MuiTypography-root{
+  font-weight: 800;
+color: white;
+}
+
+
 .sidebar li a {
     height: 100%;
     width: 100%;
@@ -184,6 +240,9 @@ header .image-text .header-text {
     text-decoration: none;
     border-radius: 6px;
     transition: var(--tran-04);
+}
+.sidebarAnchor{
+  display: none;
 }
 
     .sidebar li a:hover {
@@ -295,7 +354,7 @@ body, ul {
 .sidebar {
   width: 250px;
   min-height: 100vh;
-  background-color: #1C2536;
+  /* background-color: #1C2536; */
   color: rgb(9, 1, 1);
   padding: 20px;
 }
@@ -354,11 +413,17 @@ line-height: 2.5em;
 }
 
 .sidebar #iactive {
-color:#6366F1;
+color:#ffffff;
 }
 .sidebar #iactiveli {
-  color:#0000ff;
+  color:#ffffff;
 }
+
+.sidebar #iactiveanchor {
+  background-color:#4b49ac;
+}
+
+
 /* .sidebar li:hover {
   text-decoration: underline;
 } */
@@ -367,7 +432,7 @@ color:#6366F1;
 .content {
   flex: 1; /* Take up the remaining available space */
   padding: 20px;
-  background-color: #f6f9fe;
+  background-color: #f5f7ff;
 }
 
 .content h1 {
@@ -378,14 +443,14 @@ color:#6366F1;
 /* Add additional styles as needed for specific content sections */
 /* Add these styles to your existing CSS file */
 .portfolio{
-background-color: #f6f9fe;
+background-color: #f5f7ff;
 }
 /* Styles for the portfolio container */
 .portfolio-container {
 display: flex;
 justify-content: space-between;
 margin-top: 20px;
-background-color:#f6f9fe;
+/* background-color:#f6f9fe; */
 }
 
 /* Styles for the rounded divs */
@@ -400,7 +465,7 @@ border-radius: 10px; /* Rounded shape */
 .rectangle-div {
 
  /* Same height as the rounded divs */
-background-color: #fff;
+
 
 border-radius: 10px;
 /* box-shadow: 0px -5px 15px #cecaca26; */
@@ -467,7 +532,7 @@ margin-block-start: 0em;
 margin-block-end: 0em;
 }
 #leftcontainer{
-background-color:#f6f9fe;
+/* background-color:#f6f9fe; */
 border-radius: 25px;
 width: 641px;
 height: 81px;
@@ -517,10 +582,11 @@ width: 330px;
 }
 
 .rectangle-div-investment {
+  background-color: #fff;
 margin-top: 10px;
   width: 900px;
   height: 450px; /* Same height as the rounded divs */
-background-color: #fff;
+
 
 border-radius: 10px;
 /* box-shadow: 0px -5px 15px #cecaca26; */
@@ -547,7 +613,7 @@ align-items: center;
 .my-button {
   width: 250px;
   padding: 10px 20px; /* Add padding to the buttons */
-  background-color: #0074d9; /* Button background color */
+  background-color: #4b49ac !important; /* Button background color */
   color: #fff; /* Button text color */
   border: none; /* Remove button border */
   cursor: pointer; /* Add pointer cursor on hover */
@@ -590,11 +656,11 @@ align-items: center;
   display: flex;
   align-items: center;
 }
-
+/* 
 input {
   width: 200px; /* Set the desired width for the input fields */
-  padding: 5px;
-}
+  /* padding: 5px;
+} */ */
 
 .update-button {
   text-align: center;
