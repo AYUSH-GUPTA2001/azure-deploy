@@ -107,18 +107,20 @@ function Dashboard() {
 <div class="div-sidebar">
 <nav class="sidebar">
     <header>
-        <div class="image-text">
-            <span class="image">
-                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John Who" />
-            </span>
-            {loading?<div class="text header-text">
-            <Skeleton variant="text" sx={{ width:'160px', fontSize: '3rem' }} />
+    <div class="image-text">
+          <div class="img bg-wrap text-center py-4 bg1" >
+          <div class="user-logo">
+          <div class="img bg2" ></div>
+          {loading?<div class="text header-text">
+            <Skeleton  variant="text" sx={{ marginLeft:"60px", marginTop:'0px' , bgcolor:'#fff',  width:'160px', fontSize: '3rem' }} />
             </div>:<div class="text header-text">
                 <span class="name">{firstName + ' '+ lastName}</span>
                 <span class="profession">Client:{clientId}</span>
             </div>}
+          </div>
+          </div>
+            
         </div>
-
         <i class="bx bx-chevron-right toggle"></i>
     </header>
 
@@ -134,7 +136,7 @@ function Dashboard() {
             <li class="nav-link">
                 <a id={selectedOption === 'pastRequests' ? 'iactiveanchor' : ''} className="sidebarAnchor" onClick={() => handleOptionClick('pastRequests')}>
                   <i id={selectedOption === 'pastRequests' ? 'iactive' : ''} className="material-icons Customicons">swap_horiz</i>
-                  <span  id={selectedOption === 'pastRequests' ? 'iactiveli' : ''}  class="text nav-text">Past Requests</span>
+                  <span  id={selectedOption === 'pastRequests' ? 'iactiveli' : ''}  class="text nav-text">Past Investments</span>
                 </a>
             </li>
             <li class="nav-link">
@@ -149,17 +151,17 @@ function Dashboard() {
               <span  id={selectedOption === 'Settings' ? 'iactiveli' : ''} class="text nav-text">Settings</span>
               </a>
             </li>
+            <li class="nav-link">
+            <a  onClick={()=>handleLogout()}>
+                <i  className="material-icons Customicons">logout</i>
+                <span   class="text nav-text">Logout</span>
+                </a>
+              
+            </li>
             </ul>
         </div>
 
-        <div class="bottom-content">
-            <li class="nav-link">
-                <a>
-                    <i class="Customicons fa fa-sign-out"></i>
-                    <span onClick={()=>handleLogout()} class=" text nav-text">Logout</span>
-                    </a>
-            </li>
-        </div>
+        
     </div>
 </nav>
 </div>
@@ -204,7 +206,7 @@ function PortfolioContent({ clientId }) {
         return a + b;
       }));
       setLoading(false)
-      setListOfStrategies(list)
+      setListOfStrategies(list.filter(x=>x.status==="Approved"))
       console.log(list)
 
     },
@@ -358,28 +360,131 @@ function PastRequestsContent({ clientId }) {
   const [totalConsultationRequest,setTotalConsultationRequest]=useState(1000)
  const [loading,setLoading]=useState(true)
 
+let flag=[]
 
-
-
+const handleInvestmentCall = () => {
   axios({
     method: 'get',
     url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
   }).then(function (response) {
     setListOfPastRequests(response.data)
     const list = response.data
-
-    console.log(listOfPastRequests)
+    let _highRisk = list.filter(x=>x.investmentType==="High Risk").length;
+    let _lowRisk = list.filter(x=>x.investmentType==="Low Risk").length;
+    let _mediumRisk = list.filter(x=>x.investmentType==="Medium Risk").length;
+    let _needConsultation = list.filter(x=>x.investmentType==="Need Consultation").length;
+  
     setTotalRequest(list.length)
-    setTotalLowRiskRequest(list.filter(x=> x.investmentType== 'Low Risk').length)
-    setTotalHighRiskRequest(list.filter(x=> x.investmentType== 'High Risk').length)
-    setTotalMediumRiskRequest(list.filter(x=>x.investmentType=='Medium Risk').length)
-    setTotalConsultationRequest(list.filter(x=>x.investmentType=="Need Consultation").length)
+    setTotalLowRiskRequest(_lowRisk)
+    setTotalHighRiskRequest(_highRisk)
+    setTotalMediumRiskRequest(_mediumRisk)
+    setTotalConsultationRequest(_needConsultation)
     setLoading(false)
+
+    if(_highRisk > 0)
+    {   const _fourthCard=document.querySelector('.fourthCard')
+   
+    !!_fourthCard && (_fourthCard.classList.add('addPointer') ||  
+    _fourthCard.addEventListener('click',function() {
+        
+      _fourthCard.classList.toggle("addBorder");
+        if(!flag.includes("High Risk")){
+          
+          flag.push("High Risk");
+          setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+        }
+        else{
+          flag = flag.filter(item => item !== "High Risk");
+          
+          if(flag.length === 0){
+          setListOfPastRequests(list)
+          }
+          else{
+          
+          setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+        }
+        }
+    }))
+    }
+
+      
+    if(_lowRisk > 0)
+    { const _SixthCard=document.querySelector('.SixthCard')
+    
+       !!_SixthCard && ( _SixthCard.classList.add('addPointer') ||  
+       _SixthCard.addEventListener('click',function() {
+            
+        _SixthCard.classList.toggle("addBorder");
+        if(!flag.includes("Low Risk")){
+          
+          flag.push("Low Risk");
+          setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+        }
+        else{
+          flag = flag.filter(item => item !== "Low Risk");
+          if(flag.length === 0)
+          setListOfPastRequests(list)
+          else
+          setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+        }
+    }))
+    }
+
+    if(_mediumRisk > 0){
+      const _secondCard = document.querySelector('.secondCard')
+       !!_secondCard && (_secondCard.classList.add('addPointer') ||
+        _secondCard.addEventListener('click',function() {
+            
+        _secondCard.classList.toggle("addBorder");
+        if(!flag.includes("Medium Risk")){
+          
+          flag.push("Medium Risk");
+          setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+        }
+        else{
+          flag = flag.filter(item => item !== "Medium Risk");
+          if(flag.length === 0)
+          setListOfPastRequests(list)
+          else
+          setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+        }
+    }))
+    }
+    if(_needConsultation > 0){
+      const _thirdCard=document.querySelector('.thirdCard')
+    
+        !!_thirdCard && ( _thirdCard.classList.add('addPointer') || 
+          _thirdCard.addEventListener('click',function() {
+            
+      document.querySelector('.thirdCard').classList.toggle("addBorder");
+      if(!flag.includes("Need Consultation")){
+        
+        flag.push("Need Consultation");
+        setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+      }
+      else{
+        flag = flag.filter(item => item !== "Need Consultation");
+        if(flag.length === 0)
+        setListOfPastRequests(list)
+        else
+        setListOfPastRequests(list.filter(x=> flag.includes(x.investmentType)))
+      }
+    }))
+    }
+
+    
   },
     function (error) {
       console.log(error)
       setLoading(false)
     })
+  }
+
+
+    useEffect(() => {
+      // //debugger
+      handleInvestmentCall()
+    }, [])    
 
   return (
     // loading
@@ -389,14 +494,14 @@ function PastRequestsContent({ clientId }) {
        <div className='card-container'>
                 <Card color="firstCard"  heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card  color="secondCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                <Card  color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
                 <Card color="SixthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                <Card color="secondCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
                 
-                <Card color="fifthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                <Card color="thirdCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
           </div>
 
@@ -407,12 +512,12 @@ function PastRequestsContent({ clientId }) {
         <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
                 </div></>:( <>
                   <div className='card-container'>
-                <Card color="firstCard"  heading="Number of Requests" number={totalRequest}/>
-                <Card  color="secondCard" heading="Total High Risk Requests" number={totalHighRiskRequest}/>
-                <Card color="SixthCard" heading="Total Low Risk Requests" number={totalLowRiskRequest}/>
-                <Card color="fourthCard" heading="Total Medium Risk Requests" number={totalMediumRiskRequest}/>
+                <Card color="firstCard"  heading="Number of Investments" number={totalRequest}/>
+                <Card  color="fourthCard" heading="Total High Risk Investments" number={totalHighRiskRequest}/>
+                <Card color="SixthCard" heading="Total Low Risk Investments" number={totalLowRiskRequest}/>
+                <Card color="secondCard" heading="Total Medium Risk Investments" number={totalMediumRiskRequest}/>
                 
-                <Card color="fifthCard" heading="Total Consultation Requests" number={totalConsultationRequest}/>
+                <Card color="thirdCard" heading="Total Consultation Investments" number={totalConsultationRequest}/>
  </div>
                 
                 <div className="rectangle-div">
@@ -578,7 +683,8 @@ function InvestmentContent({ clientId }) {
       "investmentAmount": investmentAmount,
       "investmentType": investmentType,
       "timePeriod": timePeriod,
-      "createdDate": "2023-10-26T13:58:26.103Z"
+      "createdDate": "2023-10-26T13:58:26.103Z",
+      'status':'string'
 
 
 
@@ -755,11 +861,12 @@ setActionLoading(true)
             aria-describedby="modal-modal-description"
           >
 
-            <Box sx={style} > {message ? <><CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} /><Typography id="modal-modal-title" variant="h6" component="h2">
+            <Box sx={style} > {message ? <><CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} />
+            <Typography color="#4b49ac" id="modal-modal-title" variant="h6" component="h2">
               {message}
             </Typography></> : <>
               <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
-              <Typography id="modal-modal-title" variant="h6" component="h2">
+              <Typography color="#4b49ac" id="modal-modal-title" variant="h6" component="h2">
                 Please Fill Mandatory Fields For Getting Recommendations
               </Typography>
 

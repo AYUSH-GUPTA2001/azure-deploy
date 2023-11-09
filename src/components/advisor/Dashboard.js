@@ -33,10 +33,11 @@ import axios from "axios";
 // import '../sidebar.js'
 
 import Navbar from '../Navbar/Navbar';
-import { LocationCitySharp } from '@mui/icons-material';
+import { ListAltRounded, LocationCitySharp } from '@mui/icons-material';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import { Skeleton } from '@mui/lab';
 import Card from '../Card/Card';
+
 function Dashboard() {
   // //debugger
   console.log("tester")
@@ -114,15 +115,18 @@ toggle.addEventListener("click", () => {
 <nav class="sidebar">
     <header>
         <div class="image-text">
-            <span class="image">
-                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="John Who" />
-            </span>
-            {loading?<div class="text header-text">
-            <Skeleton variant="text" sx={{ width:'160px', fontSize: '3rem' }} />
+          <div class="img bg-wrap text-center py-4 bg1" >
+          <div class="user-logo">
+          <div class="img bg2" ></div>
+          {loading?<div class="text header-text">
+            <Skeleton  variant="text" sx={{ marginLeft:"60px", marginTop:'0px' , bgcolor:'#fff',  width:'160px', fontSize: '3rem' }} />
             </div>:<div class="text header-text">
                 <span class="name">{firstName + ' '+ lastName}</span>
                 <span class="profession">Advisor:{advisorId}</span>
             </div>}
+          </div>
+          </div>
+            
         </div>
 
         <i class="bx bx-chevron-right toggle"></i>
@@ -155,17 +159,28 @@ toggle.addEventListener("click", () => {
               <span  id={selectedOption === 'Settings' ? 'iactiveli' : ''} class="text nav-text">Settings</span>
               </a>
             </li>
+          
+            <li class="nav-link">
+            <a  onClick={()=>handleLogout()}>
+                <i  className="material-icons Customicons">logout</i>
+                <span   class="text nav-text">Logout</span>
+                </a>
+              
+            </li>
+        
+
+            
             </ul>
         </div>
 
-        <div class="bottom-content">
+        {/* <div class="bottom-content">
             <li class="nav-link">
                 <a>
                     <i class="Customicons fa fa-sign-out"></i>
                     <span onClick={()=>handleLogout()} class=" text nav-text">Logout</span>
                     </a>
             </li>
-        </div>
+        </div> */}
     </div>
 </nav>
 </div>
@@ -195,6 +210,8 @@ function InvestmentStrategies({ advisorId }) {
   const [totalApproved,setTotalApproved]=useState(0)
   const [totalRejected,setTotalRejected]=useState(0)
   const [totalPending,setTotalPending]=useState(0)
+  // const [flag,setFlag]=useState('')
+  let flag = [];
   // const [data,setData]=useState([]);
   const [listOfStratgies, setListOfStrategies] = useState([])
   useEffect(() => {
@@ -210,14 +227,75 @@ function InvestmentStrategies({ advisorId }) {
       setTotalExpAmount(list.map(x=> x.status==="Approved"? x.expectedAmount:0).reduce(function(a, b){
         return a + b;
       }));
+      const _approved  = list.filter(x=> x.status== 'Approved').length
+      const _rejected = list.filter(x=> x.status== 'Rejected').length
+      const _pending = list.filter(x=> x.status== 'Pending').length
       setTotalStrategies(list.length)
-      setTotalApproved(list.filter(x=> x.status== 'Approved').length)
-      setTotalRejected(list.filter(x=> x.status== 'Rejected').length)
-      setTotalPending(list.filter(x=> x.status== 'Pending').length)
+      setTotalApproved(_approved)
+      setTotalRejected(_rejected)
+      setTotalPending(_pending)
      setLoading(false)
 
       setListOfStrategies(list)
-      console.log(list)
+      if(_approved>0){
+
+      const _SixthCard = document.querySelector('.SixthCard');
+      !!_SixthCard && (_SixthCard.classList.add('addPointer') ||
+       _SixthCard.addEventListener('click',function() {
+        
+        _SixthCard.classList.toggle("addBorder");
+        if(!flag.includes("Approved")){
+          
+          flag.push("Approved");
+          setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+        }
+        else{
+          flag = flag.filter(item => item !== "Approved");
+          if(flag.length === 0)
+            setListOfStrategies(list)
+          else
+            setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+        }
+    }))
+  }
+   
+  if(_rejected>0){
+  const _fourthCard = document.querySelector('.fourthCard');
+  !!_fourthCard && (_fourthCard.classList.add('addPointer') 
+  || _fourthCard.addEventListener('click',function() {
+      _fourthCard.classList.toggle("addBorder");
+      if(!flag.includes("Rejected")){
+          flag.push("Rejected");
+          setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+        }
+        else{
+          flag = flag.filter(item => item !== "Rejected");
+          if(flag.length === 0)
+            setListOfStrategies(list)
+          else
+            setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+        }
+      
+  }))
+  }
+  if(_pending>0){
+  const _fifthCard = document.querySelector('.fifthCard');
+
+  !!_fifthCard && (_fifthCard.classList.add('addPointer')||_fifthCard.addEventListener('click',function() {
+    _fifthCard.classList.toggle("addBorder");
+    if(!flag.includes("Pending")){
+      flag.push("Pending");
+      setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+      }
+      else{
+        flag = flag.filter(item => item !== "Pending");
+        if(flag.length === 0)
+        setListOfStrategies(list)
+        else
+        setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+      }
+}))}
+      
 
     },
       function (error) {
@@ -249,11 +327,11 @@ function collapseRow(the)
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
                 <Card color="thirdCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                  number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
-                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card color="fifthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
-                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
                 <Card color="SixthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                <Card color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                <Card color="fifthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                  number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
 
           </div>
@@ -267,11 +345,11 @@ function collapseRow(the)
        </> :(<>
          <div className='card-container'>
                 <Card color="firstCard"  heading="Number of Strategies" number={totalStrategies}/>
-                <Card color="secondCard"  heading="Total Amount Invested" number={totalInvAmount}/>
-                <Card color="thirdCard" heading="Total Amount Expected" number={totalExpAmount}/>
-                <Card color="fourthCard" heading="Total Approved Strategies" number={totalApproved}/>
-                <Card color="fifthCard" heading="Total Rejected Strategies" number={totalRejected}/>
-                <Card color="SixthCard" heading="Total Pending Strategies" number={totalPending}/>
+                <Card color="secondCard"  heading="Total Invested Amount" number={totalInvAmount}/>
+                <Card color="thirdCard" heading="Total Expected  Amount" number={totalExpAmount}/>
+                <Card color="SixthCard" heading="Total Approved Holdings" number={totalApproved}/>
+                <Card color="fourthCard" heading="Total Rejected Holdings" number={totalRejected}/>
+                <Card color="fifthCard" heading="Total Pending Holdings" number={totalPending}/>
 
           </div>
       <div className="rectangle-div">
@@ -387,6 +465,20 @@ function ClientList({ advisorId }) {
       setTotalClients(list.length)
       setListOfClients(response.data)
       setLoading(false)
+
+      // $("#AdvisorClientTable").DataTable(
+      //   {
+      //         scrollCollapse: true,
+      //         scroller: true,
+      //         scrollY: 200
+      //   }
+      // );
+
+    //   new DataTable('#AdvisorClientTable', {
+    //     scrollCollapse: true,
+    //     scroller: true,
+    //     scrollY: 200
+    // });
       
 
     }
@@ -500,7 +592,7 @@ function ClientList({ advisorId }) {
     <div>
 {loading?<>
   <div className='card-container'>
-                <Card color="firstCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                <Card color="firstCard" heading={<Skeleton variant="text" sx={{fontSize: '2rem' }} />}
                  number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />} />
                 </div>
 <div className="rectangle-div">
@@ -515,7 +607,7 @@ function ClientList({ advisorId }) {
                 </div>
                 <div className="rectangle-div">
         <TableContainer component={Paper}>
-          <Table size='small' aria-label="simple table">
+          <Table size='small' aria-label="simple table" id="AdvisorClientTable">
             <TableHead>
               <TableRow >
                 <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
@@ -568,13 +660,15 @@ function ReportsContent({ advisorId }) {
   const [loading,setLoading]=useState(false)
   const [requestLoading,setRequestLoading]=useState(true)
   const [remainingAmount,setRemainingAmount]=useState('')
-
+  // const [_rate,setRate]=useState(0)
+  // const [_time,setTime]=useState(0)
+  const [data,setData]=useState([])
   const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 440,
+    width: 480,
     bgcolor: '#e4f1ff',
     borderRadius: '20px',
     boxShadow: 24,
@@ -582,12 +676,27 @@ function ReportsContent({ advisorId }) {
   };
   const [modalOpen, setModalOpen] = React.useState(false);
   const [clientId, setClientId] = useState('')
-  const handleOpen = (clientID,investmentID,timePeriod,remainingAmount) => {
-     setClientId(clientID);
-     setInvestmentId(investmentID)
-     setTimePeriod(timePeriod)
-     setRemainingAmount(remainingAmount)
-    setModalOpen(true);
+  const handleOpen = (row) => {
+      debugger
+     setClientId(row.clientId);
+     setInvestmentId(row.investmentID)
+    setRemainingAmount(row.remainingAmount)
+    setTimePeriod(row.timePeriod)
+    axios({
+      method:'get',
+      url:`https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
+    }).then(
+      (response)=>{
+        debugger
+        setData(response.data)
+        setModalOpen(true);
+        console.log(data)
+    //  const data =response.data
+    //  setData(data)
+      },()=>{}
+      
+    )
+    
   }
   const handleClose = () => {
     setModalOpen(false)
@@ -606,6 +715,7 @@ function ReportsContent({ advisorId }) {
     setTimePeriodError(false)
     setSixMonReturnsError(false)
     setOneYrReturnsError(false)
+    setHelperText('')
     setThreeYrReturnsError(false)
     setFiveYrReturnsError(false)
   };
@@ -613,13 +723,13 @@ function ReportsContent({ advisorId }) {
   const [investmentId, setInvestmentId] = useState('')
   const [amount, setAmount] = useState('')
   const [investmentAmount, setInvestmentAmount] = useState('')
-  const [expectedAmount, setExpectedAmount] = useState('')
+  const [expectedAmount, setExpectedAmount] = useState("")
   const [timePeriod, setTimePeriod] = useState("")
   // const [Status,setStatus]=useState('')
-  const [sixMonReturns, setSixMonReturns] = useState('')
-  const [oneYrReturns, setOneYrReturns] = useState('')
-  const [threeYrReturns, setThreeYrReturns] = useState('')
-  const [fiveYrReturns, setFiveYrReturns] = useState('')
+  const [sixMonReturns, setSixMonReturns] = useState("")
+  const [oneYrReturns, setOneYrReturns] = useState("")
+  const [threeYrReturns, setThreeYrReturns] = useState("")
+  const [fiveYrReturns, setFiveYrReturns] = useState("")
 
   const [message, setMessage] = useState('')
 
@@ -636,9 +746,44 @@ function ReportsContent({ advisorId }) {
   const [threeYrReturnsError, setThreeYrReturnsError] = useState(false)
   const [fiveYrReturnsError, setFiveYrReturnsError] = useState(false)
   const [helperText,setHelperText] =useState('')
+  
+const handleReturns=(strategyName)=>{
+  axios({
+    method:'get',
+    url:`https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
+    }).then((response)=>{
+     let data = response.data[0]
+     setSixMonReturns(data.returnPercentageAfter6months)
+     setOneYrReturns(data.returnPercentageAfter1year)
+     setThreeYrReturns(data.returnPercentageAfter3year)
+     setFiveYrReturns(data.returnPercentageAfter5year)
+    },(error)=>{
 
+    })
+}
 
-
+const handleCalculations=(investmentAmount)=>{
+  let _rate = 0
+  let _time = 0
+    if(timePeriod.includes('6')){
+      _rate=  +sixMonReturns
+      _time=  0.5
+    }
+    if(timePeriod.includes('1')){
+      _rate=  +oneYrReturns
+      _time=  1
+    }
+    if(timePeriod.includes('3')){
+      _rate=  +threeYrReturns
+      _time=  3    }
+    if(timePeriod.includes('5')){
+      _rate=  +fiveYrReturns
+      _time=  5
+    }
+    setExpectedAmount((+investmentAmount*(Math.pow((1 + _rate/100),_time))).toFixed(2))
+    // console.log(Number(investmentAmount) *
+                      // (Math.pow((1 + rate / 100), time)))
+}
   const handleModalSubmit = (event) => {
 
     event.preventDefault();
@@ -697,6 +842,10 @@ function ReportsContent({ advisorId }) {
       count++
     }
     if (count > 0) {
+      return
+    }
+    if(investmentAmount<=100){
+      setHelperText("Investment Amount should be greater than 100")
       return
     }
     if(investmentAmount>remainingAmount){
@@ -766,6 +915,7 @@ setLoading(true)
   const [totalLowRiskRequest,setTotalLowRiskRequest]=useState(0)
   const [totalMediumRiskRequest,setTotalMediumRiskRequest]=useState(0)
   const [totalConsultationRequest,setTotalConsultationRequest]=useState(0)
+  let flag=[]
   // const initialized = React.useRef(false);
 
   const handleInvestmentCall = () => {
@@ -777,11 +927,100 @@ setLoading(true)
       setRequestLoading(false)
       let list = response.data
       setTotalRequests(list.length)
-      setTotalHighRiskRequest(list.filter(x=>x.investmentType==="High Risk").length)
-      setTotalLowRiskRequest(list.filter(x=>x.investmentType==="Low Risk").length)
-      setTotalMediumRiskRequest(list.filter(x=>x.investmentType==="Medium Risk").length)
-      setTotalConsultationRequest(list.filter(x=>x.investmentType==="Need Consultation").length)
+      let _highRisk = list.filter(x=>x.investmentType==="High Risk").length;
+      let _lowRisk = list.filter(x=>x.investmentType==="Low Risk").length;
+      let _mediumRisk = list.filter(x=>x.investmentType==="Medium Risk").length;
+      let _needConsultation = list.filter(x=>x.investmentType==="Need Consultation").length;
+      setTotalHighRiskRequest(_highRisk)
+      setTotalLowRiskRequest(_lowRisk)
+      setTotalMediumRiskRequest(_mediumRisk)
+      setTotalConsultationRequest(_needConsultation)
       setReportListOfRequests(response.data);
+      
+      if(_highRisk > 0)
+      {   const _fourthCard=document.querySelector('.fourthCard')
+
+      !!_fourthCard && (_fourthCard.classList.add('addPointer') ||  
+      _fourthCard.addEventListener('click',function() {
+        
+        _fourthCard.classList.toggle("addBorder");
+          if(!flag.includes("High Risk")){
+            
+            flag.push("High Risk");
+            setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+          }
+          else{
+            flag = flag.filter(item => item !== "High Risk");
+            if(flag.length === 0)
+            setReportListOfRequests(list)
+            else
+            setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+          }
+      }))
+      }
+      
+if(_lowRisk > 0)
+{ const _SixthCard=document.querySelector('.SixthCard')
+
+   !!_SixthCard && ( _SixthCard.classList.add('addPointer') ||  
+   _SixthCard.addEventListener('click',function() {
+        
+    _SixthCard.classList.toggle("addBorder");
+    if(!flag.includes("Low Risk")){
+      
+      flag.push("Low Risk");
+      setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+    }
+    else{
+      flag = flag.filter(item => item !== "Low Risk");
+      if(flag.length === 0)
+      setReportListOfRequests(list)
+      else
+      setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+    }
+}))
+}
+if(_mediumRisk > 0){
+  const _secondCard = document.querySelector('.secondCard')
+   !!_secondCard && (_secondCard.classList.add('addPointer') ||
+    _secondCard.addEventListener('click',function() {
+        
+    _secondCard.classList.toggle("addBorder");
+    if(!flag.includes("Medium Risk")){
+      
+      flag.push("Medium Risk");
+      setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+    }
+    else{
+      flag = flag.filter(item => item !== "Medium Risk");
+      if(flag.length === 0)
+      setReportListOfRequests(list)
+      else
+      setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+    }
+}))
+}
+if(_needConsultation > 0){
+  const _thirdCard=document.querySelector('.thirdCard')
+
+    !!_thirdCard && ( _thirdCard.classList.add('addPointer') || 
+      _thirdCard.addEventListener('click',function() {
+        
+  document.querySelector('.thirdCard').classList.toggle("addBorder");
+  if(!flag.includes("Need Consultation")){
+    
+    flag.push("Need Consultation");
+    setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+  }
+  else{
+    flag = flag.filter(item => item !== "Need Consultation");
+    if(flag.length === 0)
+    setReportListOfRequests(list)
+    else
+    setReportListOfRequests(list.filter(x=> flag.includes(x.investmentType)))
+  }
+}))
+}
       // //debugger;
       // console.log(reportListOfRequests)
       console.log(response.data)
@@ -811,27 +1050,28 @@ setLoading(true)
       >
         <Box sx={style} >
           <CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
-          {message ? <Typography color='primary' id="modal-modal-title" variant="h6" component="h2">
+          {message ? <Typography color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
             {message}
-          </Typography> : <><Typography color='primary' id="modal-modal-title" variant="h6" component="h2">
+          </Typography> : <><Typography color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
             Create New Strategy For Client
           </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+            <TextField
 
-                  margin="dense"
-                  autoComplete="given-name"
-                  name="strategyName"
-                  required
-                  fullWidth
-                  value={strategyName}
-                  error={strategyNameError}
-                  onChange={e => setStrategyName(e.target.value)}
-                  id="strategyName"
-                  label="Strategy Name"
-                  autoFocus
-                />
+              margin="dense"
+              autoComplete="given-name"
+              name="strategyName"
+              required
+              fullWidth
+              disabled
+              value={investmentId}
+              error={investmentIdError}
+              // onChange={e => setInvestmentId(e.target.value)}
+              id="strategyName"
+              label="Investment ID"
+              autoFocus
+              />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -853,70 +1093,74 @@ setLoading(true)
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                
+              <FormControl margin='dense' required fullWidth>
+                  <InputLabel id="demo-simple-select-label">Strategy Name</InputLabel>
+                  <Select
 
-                  margin="dense"
-                  autoComplete="given-name"
-                  name="strategyName"
-                  required
-                  fullWidth
-                  disabled
-                  value={investmentId}
-                  error={investmentIdError}
-                  onChange={e => setInvestmentId(e.target.value)}
-                  id="strategyName"
-                  label="Investment ID"
-                  autoFocus
-                />
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Strategy Name"
+                    value={strategyName}
+                    error={strategyNameError}
+                    onChange={e => setStrategyName(e.target.value)}
+                    onBlur={e=>handleReturns(strategyName)}
+                  >
+                
+                   { data.map((row)=>
+                      
+                
+                    <MenuItem value={row.startegyName}>{row.startegyName}</MenuItem>
+                    
+                   )}
+                    
+
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                
+              <TextField
+
+                    margin="dense"
+                    autoComplete="given-name"
+                    name="timePeriod"
+                    required
+                    fullWidth
+                    disabled
+                    value={timePeriod}
+                    error={timePeriodError}
+                    onChange={e => setTimePeriod(e.target.value)}
+                    id="timePeriod"
+                    label="Time Period"
+                    autoFocus
+                    />
+              </Grid>
+
+            </Grid>
+            <TextField
 
                   margin="dense"
                   required
                   fullWidth
+                  type='number'
                   id="investmentAmount"
                   label="Investment Amount"
                   name="investmentAmount"
                   value={investmentAmount}
                   error={investmentAmountError}
-                  onChange={e => setInvestmentAmount(e.target.value)}
+                  onChange={e => {
+                
+                    setInvestmentAmount(e.target.value)
+                    
+                  }}
+                  onBlur={e=>handleCalculations(investmentAmount)}
 
                 />
-              </Grid>
 
-            </Grid>
+           
 
-            <TextField
-
-              margin="dense"
-              autoComplete="given-name"
-              name="strategyName"
-              required
-              fullWidth
-              value={expectedAmount}
-              error={expectedAmountError}
-              onChange={e => setExpectedAmount(e.target.value)}
-              id="strategyName"
-              label="Expected Amount"
-              autoFocus
-            />
-
-                <TextField
-
-                margin="dense"
-                autoComplete="given-name"
-                name="timePeriod"
-                required
-                fullWidth
-                disabled
-                value={timePeriod}
-                error={timePeriodError}
-                onChange={e => setTimePeriod(e.target.value)}
-                id="timePeriod"
-                label="Time Period"
-                autoFocus
-                />
+          
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -927,6 +1171,7 @@ setLoading(true)
                   name="6m Returns"
                   required
                   fullWidth
+                  disabled
                   value={sixMonReturns}
                   error={sixMonReturnsError}
                   onChange={e => setSixMonReturns(e.target.value)}
@@ -942,6 +1187,7 @@ setLoading(true)
                   required
                   fullWidth
                   id="1yr"
+                  disabled
                   label="1yr Returns(%) "
                   name="1yr"
                   value={oneYrReturns}
@@ -961,6 +1207,7 @@ setLoading(true)
                   name="3yr"
                   required
                   fullWidth
+                  disabled
                   value={threeYrReturns}
                   error={threeYrReturnsError}
                   onChange={e => setThreeYrReturns(e.target.value)}
@@ -976,6 +1223,7 @@ setLoading(true)
                   required
                   fullWidth
                   id="5yr"
+                  disabled
                   label="5yr Returns(%)"
                   name="5yr"
                   value={fiveYrReturns}
@@ -986,6 +1234,22 @@ setLoading(true)
               </Grid>
 
             </Grid>
+                    <TextField
+
+                      margin="dense"
+                      autoComplete="given-name"
+                      name="strategyName"
+                      required
+                      fullWidth
+                      disabled
+                      value={expectedAmount}
+                      error={expectedAmountError}
+                      onChange={e => setExpectedAmount(e.target.value)}
+                      id="strategyName"
+                      label="Expected Amount"
+                      autoFocus
+                      />
+
             {helperText? <span style={{color:'red'}}>* {helperText}</span>:''}
             {loading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained"> Creating.... <i class="fa fa-spinner fa-spin"></i> </Button>:
             <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" onClick={handleModalSubmit}>Create Strategy</Button>}</>}
@@ -996,14 +1260,14 @@ setLoading(true)
         <div className='card-container'>
                 <Card  color="firstCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card color="secondCard"  heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                <Card color="fourthCard"  heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card color="thirdCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
+                <Card color="SixthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />} 
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
-                <Card color="fourthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                <Card color="secondCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                  number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
                 
-                <Card color="SixthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                <Card color="thirdCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
 
 
@@ -1018,12 +1282,12 @@ setLoading(true)
         </div></> :  (
       <>
       <div className='card-container'>
-                <Card  color="firstCard" heading="Number of Requests" number={totalRequests}/>
-                <Card color="secondCard"  heading="Total High Risk Requests" number={totalHighRiskRequest}/>
-                <Card color="thirdCard" heading="Total Low Risk Requests" number={totalLowRiskRequest}/>
-                <Card color="fourthCard" heading="Total Medium Risk Requests" number={totalMediumRiskRequest}/>
+                <Card  color="firstCard" heading="Number of Investments" number={totalRequests}/>
+                <Card color="fourthCard"  heading="Total High Risk Investments" number={totalHighRiskRequest}/>
+                <Card color="SixthCard" heading="Total Low Risk Investments" number={totalLowRiskRequest}/>
+                <Card color="secondCard" heading="Total Medium Risk Investments" number={totalMediumRiskRequest}/>
                 
-                <Card color="SixthCard" heading="Total Consultation Requests" number={totalConsultationRequest}/>
+                <Card color="thirdCard" heading="Total Consultation Investments" number={totalConsultationRequest}/>
 
 
                 
@@ -1070,7 +1334,7 @@ setLoading(true)
                 <TableCell><Button class={row.investmentType}  sx={{cursor:'default'}} >{row.investmentType}</Button></TableCell>
                 {/* <TableCell><Button  >{row.investmentType}</Button></TableCell> */}
                 <TableCell align='center'>
-                <Button onClick={()=>handleOpen(row.clientId,row.investmentID,row.timePeriod,row.remainingAmount)}><i style={{marginRight :'4px' }}class="fa fa-plus" aria-hidden="true"></i>Strategy</Button>
+                <Button onClick={()=>handleOpen(row)}><i style={{marginRight :'4px' }}class="fa fa-plus" aria-hidden="true"></i>Strategy</Button>
                 </TableCell>
               </TableRow>
             </React.Fragment>

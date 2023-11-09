@@ -146,7 +146,7 @@ section {
 }
 
 #hero h1 span {
-    color: #106eea;
+    color: #4b49ac;
 }
 #hero h2 {
     color: #555555;
@@ -172,13 +172,13 @@ section {
     text-decoration: none;
     transition: 0.5s;
     color: #fff;
-    background: #106eea;
+    background: #4b49ac;
 }
 #hero .btn-watch-video {
     font-size: 16px;
     transition: 0.5s;
     margin-left: 25px;
-    color: #222222;
+    color: #4b49ac;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -202,7 +202,7 @@ section {
     padding: 8px 20px;
     margin: 0;
     background: #e7f1fd;
-    color: #106eea;
+    color: #4b49ac;
     display: inline-block;
     text-transform: uppercase;
     border-radius: 50px;
@@ -213,7 +213,7 @@ section {
     font-weight: 700;
 }
 .section-title h3 span {
-    color: #106eea;
+    color: #4b49ac;
 }
 .section-title p {
     margin: 15px auto 0 auto;
@@ -282,7 +282,7 @@ section {
     font-size: 24px;
     padding: 20px;
     margin-right: 15px;
-    color: #106eea;
+    color: #4b49ac;
     border-radius: 50px;
 }
 
@@ -337,7 +337,7 @@ section {
     padding: 8px 20px;
     margin: 0;
     background: #e7f1fd;
-    color: #106eea;
+    color: #4b49ac;
     display: inline-block;
     text-transform: uppercase;
     border-radius: 50px;
@@ -348,7 +348,7 @@ section {
     font-weight: 700;
 }
 .section-title h3 span {
-    color: #106eea;
+    color: #4b49ac;
 }
 .container6 .member {
     margin-bottom: 20px;

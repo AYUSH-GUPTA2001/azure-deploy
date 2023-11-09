@@ -17,10 +17,10 @@ const bull = (
 
 export default function BasicCard(props) {
   return (
-    <Card className={props.color} sx={{ width:'250px' ,height:'120px', margin:'5px' }}>
+    <Card  className={props.color} sx={{ width:'250px' ,height:'120px', margin:'5px' }}>
       <CardContent>
        
-        <Typography variant="h5" component="div">
+        <Typography variant="h6" component="div">
           {props.heading}
         </Typography>
         <Typography variant="h6" color="text.secondary">
