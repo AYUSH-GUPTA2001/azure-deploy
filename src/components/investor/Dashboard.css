@@ -149,8 +149,8 @@ header .image-text .header-text {
 
 .sidebar header .toggle {
     position: absolute;
-    top: 50%;
-    right: -25px;
+    top: 20%;
+    right: -12px;
     transform: translateY(-50%);
     height: 25px;
     cursor: pointer;
@@ -197,15 +197,18 @@ background-color: #98BDFF!important;
   background-color:#7778E9!important;
   
 }
-.fourthCard, .Rejected, .High{
+.fourthCard{
   background-color: #f3797e!important;
 
 }
-.fifthCard, .Pending,.Medium{
+.skeleton{
+  margin: 100px;
+}
+.fifthCard {
   background-color: #7DA0FA!important;
 
 }
-.SixthCard,.Approved,.Low{
+.SixthCard{
   background-color: #1BCFB4!important;
   
 }
@@ -213,6 +216,7 @@ background-color: #98BDFF!important;
   border-radius: 25px!important;
   cursor: default!important;
 }
+
 .High,.Low,.Medium,.Need{
   width:189px;
   color: #fff !important;;
@@ -254,11 +258,11 @@ background-position: center center;
 text-align: center!important;
 }
 .pb-4, .py-4 {
-padding-bottom: 1.5rem!important;
+padding-bottom: 1rem!important;
 }
-.pt-4, .py-4 {
+/* .pt-4, .py-4 {
 padding-top: 1.5rem!important;
-}
+} */
 
 .action{
   border-radius: 25px!important;

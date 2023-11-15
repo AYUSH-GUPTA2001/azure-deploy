@@ -18,10 +18,14 @@ code {
   box-sizing: border-box;
 }
 
-.phone {
-  width: '34px !important';
+.react-international-phone-country-selector-dropdown{
+  z-index: 100!important;
 }
 .dateofbirth{
   overflow: hidden;
 
 }
+.Mui-focused{
+  color:#4b49ac !important;
+  border-color :#4b49ac !important;
+  }

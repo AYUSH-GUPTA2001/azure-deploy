@@ -27,6 +27,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { useNavigate } from 'react-router-dom';
+import { Alert } from '@mui/lab';
 // import { PhoneInput } from 'react-international-phone';
 
 
@@ -120,7 +121,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
        method:'post',
-       url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
+       url:'https://localhost:7136/api/ClientSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
@@ -180,7 +181,7 @@ if (resetPassword !== confirmResetPassword) {
  setResetLoading(true)
  axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/reset-password?api-version=1',
+    url:'https://localhost:7136/api/ClientSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -360,7 +361,7 @@ const handleOTPSubmit=(e)=>{
   setOTPLoading(true)
   axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/verify-otp?api-version=1',
+    url:'https://localhost:7136/api/ClientSignUp/verify-otp?api-version=1',
     data:otpData
   }).then((response)=>{
     setOTPLoading(false)
@@ -477,7 +478,7 @@ if (!panNumber.match(panPattern)) {
       setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
+        url:"https://localhost:7136/api/ClientSignUp/signup?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -542,7 +543,7 @@ if (!panNumber.match(panPattern)) {
   setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
+        url:"https://localhost:7136/api/ClientSignUp/login?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -573,7 +574,7 @@ if (!panNumber.match(panPattern)) {
   return (
     <>
     <Tooltip title='Back to Homepage'>
-      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+      <CloseIcon sx={{color:'#4b49ac'}} onClick={()=>navigate('/')} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       </Tooltip>
     <Grid container spacing={7} item xs={12} sx={{backgroundColor:"#e4f1ff"}} sm={8} md={4} component={Paper} elevation={6} square>
           <Box
@@ -600,7 +601,7 @@ if (!panNumber.match(panPattern)) {
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   size="small"
                   margin="dense"
                   autoComplete="given-name"
@@ -616,7 +617,7 @@ if (!panNumber.match(panPattern)) {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   size="small"
                   margin="dense"
                   required
@@ -633,7 +634,7 @@ if (!panNumber.match(panPattern)) {
               
               </Grid>
               
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -667,8 +668,7 @@ if (!panNumber.match(panPattern)) {
                   style={{"padding": "10px 0px",
                   "--react-international-phone-border-color" : "#bab2b2",
                   "--react-international-phone-background-color":"#e4f1ff" ,
-                  '--react-international-phone-dropdown-item-background-color' : "black",
-                  '--react-international-phone-dropdown-item-text-color' : 'white',
+                
                   
                   '--react-international-phone-country-selector-background-color-hover' : "#bab2b2"
                 }}
@@ -688,7 +688,7 @@ if (!panNumber.match(panPattern)) {
           
               
               
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 name="address"
                 value={address}
                 error={addressError}
@@ -704,7 +704,7 @@ if (!panNumber.match(panPattern)) {
         />
         <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   size="small"
                   margin="dense"
                   name="city"
@@ -719,7 +719,7 @@ if (!panNumber.match(panPattern)) {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   size="small"
                   margin="dense"
                   required
@@ -734,7 +734,7 @@ if (!panNumber.match(panPattern)) {
               </Grid>
               </Grid>
        
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -751,7 +751,7 @@ if (!panNumber.match(panPattern)) {
               />
               
      
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -785,7 +785,7 @@ if (!panNumber.match(panPattern)) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
          {message?<Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
             {message}
           </Typography>:<> <Typography color='primary' id="modal-modal-title" variant="h6" component="h2">
@@ -793,7 +793,7 @@ if (!panNumber.match(panPattern)) {
           </Typography>
           <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                 
                   margin="dense"
                   // size='small'
@@ -811,7 +811,7 @@ if (!panNumber.match(panPattern)) {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   
                   margin="dense"
                   // size='small'
@@ -831,7 +831,7 @@ if (!panNumber.match(panPattern)) {
               </Grid>
               <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   
                   margin="dense"
                   // size='small'
@@ -849,7 +849,7 @@ if (!panNumber.match(panPattern)) {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
               
                   margin="dense"
                   required
@@ -886,8 +886,8 @@ if (!panNumber.match(panPattern)) {
         </Select>
       </FormControl>
       </Grid>
-              {loading?<Button variant='contained' > Creating...<i class="fa fa-spinner fa-spin"></i> </Button>
-              :<Button variant='contained' onClick={handleModalSubmit}>Create </Button>}</>}
+              {loading?<Button variant='contained' > Registering...<i class="fa fa-spinner fa-spin"></i> </Button>
+              :<Button variant='contained' onClick={handleModalSubmit}>Register </Button>}</>}
         </Box>
       </Modal>
       <Modal
@@ -896,12 +896,12 @@ if (!panNumber.match(panPattern)) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleVerifyClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleVerifyClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {message?<Typography color="primary"  id="modal-modal-title" variant="h6" component="h2">
         {message}
       </Typography>:<><Typography color="primary"  id="modal-modal-title" variant="h6" component="h2">
         Enter OTP sent to the Email
-      </Typography><TextField
+      </Typography><TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -935,7 +935,7 @@ if (!panNumber.match(panPattern)) {
         <TabPanel value="2">
             
             <Box component="form" noValidate onSubmit={handleLoginSubmit} sx={{ mt: 8 }}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
               
@@ -950,7 +950,7 @@ if (!panNumber.match(panPattern)) {
                 autoComplete="email"
                 autoFocus
               />
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -966,7 +966,7 @@ if (!panNumber.match(panPattern)) {
               />
               <input onClick={()=>setShow(!show)} type="checkbox" id="showPassword" />
                 <label  for="showPassword"> Show Password</label><br/>
-           {loginMessage? <span style={{ color: 'red' }}>*{loginMessage}</span>: loginMessage}
+           {loginMessage? <Alert severity='error' >*{loginMessage}</Alert>: loginMessage}
               {loading?<Button
               
                 fullWidth
@@ -988,12 +988,12 @@ if (!panNumber.match(panPattern)) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {loginMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Enter OTP sent For Email Verification
-      </Typography><TextField
+      </Typography><TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -1058,12 +1058,12 @@ if (!panNumber.match(panPattern)) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleForgotClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleForgotClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {forgotMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {forgotMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Reset Password
-      </Typography>{emailVisible&&<TextField
+      </Typography>{emailVisible&&<TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -1093,7 +1093,7 @@ if (!panNumber.match(panPattern)) {
             >
              Get OTP
             </Button>)} 
-           {!buttonVisible && <><TextField
+           {!buttonVisible && <><TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -1107,7 +1107,7 @@ if (!panNumber.match(panPattern)) {
                 id="password"
                 autoComplete="password"
               />
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -1122,7 +1122,7 @@ if (!panNumber.match(panPattern)) {
                 id="password"
                 autoComplete="password"
               />
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required

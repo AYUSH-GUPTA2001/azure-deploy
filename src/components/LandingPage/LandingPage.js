@@ -10,7 +10,7 @@ return(
     <>
   <header class="fixed-header">
         <div class="logo">
-        <h1><a href="index.html"><span class="logo-text">INCvest</span><span class="dot">.</span></a></h1>
+        <h1><a><span class="logo-text">INCvest</span><span class="dot">.</span></a></h1>
         </div>
         <nav>
             <ul>

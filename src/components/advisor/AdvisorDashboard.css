@@ -188,27 +188,34 @@
       background-color:#7778E9!important;
     
     }
-    .fourthCard, .Rejected, .High{
+    .fourthCard{
       background-color: #f3797e!important;
      
     }
-    .fifthCard, .Pending,.Medium{
+    .fifthCard{
       background-color: #7DA0FA!important;
      
     }
-    .SixthCard,.Approved,.Low{
+    .SixthCard{
       background-color: #1BCFB4!important;
     
     }
     .Approved,.Rejected,.Pending{
-      border-radius: 25px!important;
+      
       cursor: default!important;
+      margin: 0 !important;
+      padding: 5px!important;
+    }
 
+    .table-img{
+      width: 30px;
+      height: 20px;
     }
     .High,.Low,.Medium,.Need{
       width:189px;
       color: #fff !important;;
       cursor: default!important;
+     
       border-radius: 25px!important;
     }
     .addBorder{
@@ -242,15 +249,19 @@
     background-repeat: no-repeat;
     background-position: center center;
 }
+.save{
+  margin-top: 10px!important;
+  left: 783px;
+}
 .text-center {
   text-align: center!important;
 }
 .pb-4, .py-4 {
-  padding-bottom: 1.5rem!important;
+  padding-bottom: 1rem!important;
 }
-.pt-4, .py-4 {
+/* .pt-4, .py-4 {
   padding-top: 1.5rem!important;
-}
+} */
     .MuiCard-root{
       /* background: #c5d2de !important; */
         color: white  !important;

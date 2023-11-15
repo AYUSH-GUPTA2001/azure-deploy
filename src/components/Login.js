@@ -20,7 +20,8 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-import LoadingSpinner from './LoadingSpinner/LoadingSpinner';
+
+import { Alert } from '@mui/lab';
 
 // import { PhoneInput } from 'react-international-phone';
 
@@ -144,7 +145,7 @@ export default function Login(){
            setOTPLoading(true)
            axios({
             method:'post',
-            url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/forgot-password?api-version=1',
+            url:'https://localhost:7136/api/AdvisorSignUp/forgot-password?api-version=1',
             data:{email:forgotEmail}
            }).then((response)=>{
             console.log(response)
@@ -174,7 +175,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
         method:'post',
-        url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp?api-version=1',
+        url:'https://localhost:7136/api/AdvisorSignUp/verify-otp?api-version=1',
         data:otpData
       }).then((response)=>{
         setOTPLoading(false)
@@ -298,7 +299,7 @@ export default function Login(){
     setLoading(true)
     axios({
                 method:"post",
-                url:"https://investmentportal.azurewebsites.net/api/AdvisorSignUp/signup?api-version=1",
+                url:"https://localhost:7136/api/AdvisorSignUp/signup?api-version=1",
                 data:advisorData
             }).then(function(response){
               setLoading(false)
@@ -366,7 +367,7 @@ if (resetPassword !== confirmResetPassword) {
 setResetLoading(true)
  axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
+    url:'https://localhost:7136/api/AdvisorSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -409,7 +410,7 @@ setResetLoading(true)
   setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/AdvisorSignUp/login?api-version=1",
+        url:"https://localhost:7136/api/AdvisorSignUp/login?api-version=1",
         data:advisorData
     }).then(function(response){
       setLoading(false)
@@ -444,7 +445,7 @@ setResetLoading(true)
   return (
     <>
      <Tooltip title='Back to Homepage'>
-      <CloseIcon color="primary" onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" ,cursor:'pointer'}} />
+      <CloseIcon sx={{color:'#4b49ac'}} onClick={()=>navigate('/')} style={{ position: "absolute", top: "10px", right: "10px" ,cursor:'pointer'}} />
       </Tooltip>
     <Grid container spacing={7} item xs={12} sx={{backgroundColor:"#e4f1ff"}} sm={8} md={4} component={Paper} elevation={6} square>
           <Box
@@ -471,7 +472,8 @@ setResetLoading(true)
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
+              
                   size="small"
                   margin="dense"
                   autoComplete="given-name"
@@ -487,7 +489,8 @@ setResetLoading(true)
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
+              
                   size="small"
                   margin="dense"
                   required
@@ -504,7 +507,8 @@ setResetLoading(true)
               
               </Grid>
               
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
+              
                 size="small"
                 margin="dense"
                 required
@@ -520,7 +524,8 @@ setResetLoading(true)
               />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
+            
                   size="small"
                   margin="dense"
                   name="company"
@@ -537,12 +542,13 @@ setResetLoading(true)
 
             <Grid item xs={12} sm={6}>
             <PhoneInput
+                  className='phonefield'
                   placeholder='phone Number'
                   style={{"padding": "10px 0px",
                   "--react-international-phone-border-color" : "#bab2b2",
                   "--react-international-phone-background-color":"#e4f1ff" ,
-                  '--react-international-phone-dropdown-item-background-color' : "black",
-                  '--react-international-phone-dropdown-item-text-color' : 'white',
+                 
+                  '--react-international-phone-dropdown-z-index':'100',
                   
                   '--react-international-phone-country-selector-background-color-hover' : "#bab2b2"
                 }}
@@ -563,7 +569,7 @@ setResetLoading(true)
           </Grid>
           <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   size="small"
                   margin="dense"
                   name="city"
@@ -578,7 +584,7 @@ setResetLoading(true)
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
                   size="small"
                   margin="dense"
                   required
@@ -593,7 +599,7 @@ setResetLoading(true)
               </Grid>
               
               </Grid>
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 name="address"
                 value={address}
                 error={addressError}
@@ -609,7 +615,7 @@ setResetLoading(true)
         />
       
              
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -627,7 +633,7 @@ setResetLoading(true)
               />
               
               
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -666,12 +672,12 @@ setResetLoading(true)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{ cursor:'pointer',position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{ cursor:'pointer',position: "absolute", top: "10px", right: "10px" }} />
       {message?<Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
         {message}
       </Typography>:<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
         Enter OTP sent to the Email
-      </Typography><TextField
+      </Typography><TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -706,7 +712,7 @@ setResetLoading(true)
         <TabPanel value="2">
             
             <Box component="form" noValidate onSubmit={handleLoginSubmit} sx={{ mt: 8 }}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
               
@@ -721,7 +727,7 @@ setResetLoading(true)
                 autoComplete="email"
                 autoFocus
               />
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -737,7 +743,7 @@ setResetLoading(true)
               />
               <input onClick={()=>setShow(!show)} type="checkbox" id="showPassword" />
                 <label  for="showPassword"> Show Password</label><br/>
-           {loginMessage? <span style={{ color: 'red' }}>*{loginMessage}</span>: loginMessage}
+           {loginMessage? <Alert severity='error'>*{loginMessage}</Alert>: loginMessage}
            {loading?
            <Button
            fullWidth
@@ -761,12 +767,12 @@ setResetLoading(true)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} />
       {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {loginMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Enter OTP sent For Email Verification
-      </Typography><TextField
+      </Typography><TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -831,12 +837,12 @@ setResetLoading(true)
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-        <CloseIcon color="primary" onClick={handleForgotClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+        <CloseIcon sx={{color:'#4b49ac'}} onClick={handleForgotClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
       {forgotMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
         {forgotMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Reset Password
-      </Typography>{emailVisible&&<TextField
+      </Typography>{emailVisible&&<TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -867,7 +873,7 @@ setResetLoading(true)
             >
              Get OTP
             </Button>)} 
-            {!buttonVisible&&<><TextField
+            {!buttonVisible&&<><TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -881,7 +887,7 @@ setResetLoading(true)
                 id="password"
                 autoComplete="password"
               />
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
@@ -896,7 +902,7 @@ setResetLoading(true)
                 id="password"
                 autoComplete="password"
               />
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required

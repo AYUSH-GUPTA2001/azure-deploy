@@ -1,9 +1,16 @@
 import * as React from 'react'
 import { useEffect, useState } from "react";
 import './AdvisorDashboard.css'
+import LinearProgress from '@mui/material/LinearProgress';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import HelpIcon from '@mui/icons-material/Help';
+import lowRisk from '../../assets/low_risk.jpg'
+import highRisk from '../../assets/high_risk.jpg'
+import mediumRisk from '../../assets/medium_risk.jpg'
 import Select from '@mui/material/Select';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import FormControl from '@mui/material/FormControl'
 import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
@@ -35,14 +42,18 @@ import axios from "axios";
 import Navbar from '../Navbar/Navbar';
 import { ListAltRounded, LocationCitySharp } from '@mui/icons-material';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import { Skeleton } from '@mui/lab';
+import { Alert, Skeleton } from '@mui/lab';
 import Card from '../Card/Card';
+
+
+// const [loading,setLoading]=useState(true)
 
 function Dashboard() {
   // //debugger
   console.log("tester")
   const { advisorId } = useParams()
-
+  // global [dashboardLoading,setDashboardLoading] = useState(true) 
+ let [dashboardLoading,setDashboardLoading]=useState(true)
   const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
   const [lastName,setLastName] = useState('')
@@ -83,17 +94,18 @@ toggle.addEventListener("click", () => {
     
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
       // //debugger
       let advisor=response.data.advisor
       setFirstName(advisor.firstName)
       setLastName(advisor.lastName)
      setLoading(false)
-  
+     setDashboardLoading(false);
     }, (error) => {
       console.log(error)
       setLoading(false)
+      setDashboardLoading(false);
     })
   }, [])
 
@@ -109,17 +121,20 @@ toggle.addEventListener("click", () => {
   const [selectedOption, setSelectedOption] = useState('ClientList');
 
   return (<>
-  
+ {dashboardLoading? <Box sx={{ width: '100%' }}>
+      <LinearProgress color='error' />
+    </Box>:''}
     <div className="investorDashboard">
 <div class="div-sidebar">
 <nav class="sidebar">
     <header>
+
         <div class="image-text">
           <div class="img bg-wrap text-center py-4 bg1" >
           <div class="user-logo">
           <div class="img bg2" ></div>
           {loading?<div class="text header-text">
-            <Skeleton  variant="text" sx={{ marginLeft:"60px", marginTop:'0px' , bgcolor:'#fff',  width:'160px', fontSize: '3rem' }} />
+            <Skeleton  variant="text" sx={{ marginLeft:"60px", marginBottom:'0px' ,marginTop:'0px' , bgcolor:'#fff',  width:'160px', fontSize: '3rem' }} />
             </div>:<div class="text header-text">
                 <span class="name">{firstName + ' '+ lastName}</span>
                 <span class="profession">Advisor:{advisorId}</span>
@@ -153,13 +168,20 @@ toggle.addEventListener("click", () => {
               <span   id={selectedOption === 'InvestmentRequests' ? 'iactiveli' : ''} class="text nav-text">Investment Requests</span>
               </a>
             </li>
+          
+            <li class="nav-link">
+                <a id={selectedOption === 'PastInvestments' ? 'iactiveanchor' : ''} onClick={() => handleOptionClick('PastInvestments')}>
+                <i id={selectedOption === 'PastInvestments' ? 'iactive' : ''} className="material-icons Customicons">history</i>
+
+                <span  id={selectedOption === 'PastInvestments' ? 'iactiveli' : ''} class="text nav-text">Approved Investments</span>
+              </a>
+            </li>
             <li class="nav-link">
                 <a id={selectedOption === 'Settings' ? 'iactiveanchor' : ''} onClick={() => handleOptionClick('Settings')}>
                 <i id={selectedOption === 'Settings' ? 'iactive' : ''} className="material-icons Customicons">settings</i>
               <span  id={selectedOption === 'Settings' ? 'iactiveli' : ''} class="text nav-text">Settings</span>
               </a>
             </li>
-          
             <li class="nav-link">
             <a  onClick={()=>handleLogout()}>
                 <i  className="material-icons Customicons">logout</i>
@@ -186,20 +208,25 @@ toggle.addEventListener("click", () => {
 </div>
 
       <div className="content inc-m-l">
-        {selectedOption === 'ClientList' && <ClientList advisorId={advisorId} />}
-        {selectedOption === 'InvestmentStrategies' && <InvestmentStrategies advisorId={advisorId} />}
-        {selectedOption === 'InvestmentRequests' && <ReportsContent advisorId={advisorId} />}
-        {selectedOption === 'Settings' && <SettingsContent advisorId={advisorId} />}
+     
+        {selectedOption === 'ClientList' && <ClientList advisorId={advisorId}
+        setDashboardLoading={setDashboardLoading} />}
+        {selectedOption === 'InvestmentStrategies' && <InvestmentStrategies advisorId={advisorId} dashboardLoading={dashboardLoading}
+        setDashboardLoading={setDashboardLoading} />}
+        {selectedOption === 'InvestmentRequests' && <ReportsContent advisorId={advisorId} 
+         setDashboardLoading={setDashboardLoading}/>}
+         {selectedOption === 'PastInvestments' && <PastInvestments advisorId={advisorId}
+        setDashboardLoading={setDashboardLoading} />}
+        {selectedOption === 'Settings' && <SettingsContent advisorId={advisorId} 
+         setDashboardLoading={setDashboardLoading}/>}
       </div>
     </div></>
   );
 }
 
-function InvestmentStrategies({ advisorId }) {
+function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
   // //debugger
   //handle modal
-
-
 
   const [open, setOpen] = useState(false);
   const [coll, setColl] = useState("");
@@ -215,10 +242,11 @@ function InvestmentStrategies({ advisorId }) {
   // const [data,setData]=useState([]);
   const [listOfStratgies, setListOfStrategies] = useState([])
   useEffect(() => {
-
+    
+setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+      url: `https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
     }).then(function (response) {
       const list = response.data.strategies
       setTotalInvAmount(list.map(x=> x.status === "Approved" ? x.investmentAmount : 0).reduce(function(a, b){
@@ -227,6 +255,7 @@ function InvestmentStrategies({ advisorId }) {
       setTotalExpAmount(list.map(x=> x.status==="Approved"? x.expectedAmount:0).reduce(function(a, b){
         return a + b;
       }));
+      debugger
       const _approved  = list.filter(x=> x.status== 'Approved').length
       const _rejected = list.filter(x=> x.status== 'Rejected').length
       const _pending = list.filter(x=> x.status== 'Pending').length
@@ -235,7 +264,8 @@ function InvestmentStrategies({ advisorId }) {
       setTotalRejected(_rejected)
       setTotalPending(_pending)
      setLoading(false)
-
+   
+    setDashboardLoading(false)
       setListOfStrategies(list)
       if(_approved>0){
 
@@ -300,6 +330,7 @@ function InvestmentStrategies({ advisorId }) {
     },
       function (error) {
         setLoading(false)
+        setDashboardLoading(false)
         console.log(error)
       })
   }, [])
@@ -316,8 +347,11 @@ function collapseRow(the)
 
 
 
-  return (
+  return (<>
+
+   
     <div className="portfolio">
+      
 
       {loading?<>
         <div className='card-container'>
@@ -346,7 +380,7 @@ function collapseRow(the)
          <div className='card-container'>
                 <Card color="firstCard"  heading="Number of Strategies" number={totalStrategies}/>
                 <Card color="secondCard"  heading="Total Invested Amount" number={totalInvAmount}/>
-                <Card color="thirdCard" heading="Total Expected  Amount" number={totalExpAmount}/>
+                <Card color="thirdCard" heading="Total Expected  Amount" number={totalExpAmount.toFixed(2)}/>
                 <Card color="SixthCard" heading="Total Approved Holdings" number={totalApproved}/>
                 <Card color="fourthCard" heading="Total Rejected Holdings" number={totalRejected}/>
                 <Card color="fifthCard" heading="Total Pending Holdings" number={totalPending}/>
@@ -402,7 +436,7 @@ function collapseRow(the)
                   <TableCell >{row.investmentAmount}</TableCell>
                   <TableCell >{row.expectedAmount}</TableCell>
                   <TableCell>{row.timePeriod}</TableCell>
-                  <TableCell ><Button sx={{ width: '100px', borderRadius: '20px' ,cursor:'default' }} variant="contained" className={row.status}>{row.status}</Button></TableCell>
+                  <TableCell >{row.status}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0}} colSpan={6}>
@@ -445,27 +479,30 @@ function collapseRow(the)
     </div></>)}
 
       
-    </div>
+    </div></>
   );
 }
 
-function ClientList({ advisorId }) {
+function ClientList({ advisorId ,setDashboardLoading }) {
   //  //debugger
+  // dashboardLoading=true
   const [listOfClients, setListOfClients] = useState([])
   const [loading,setLoading]=useState(true)
   const [totalClients,setTotalClients]=useState(0)
   useEffect(() => {
     // //debugger
+    setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
 //debugger
       let list=response.data
       setTotalClients(list.length)
       setListOfClients(response.data)
       setLoading(false)
-
+      setDashboardLoading(false)
+      // dashboardLoading=false
       // $("#AdvisorClientTable").DataTable(
       //   {
       //         scrollCollapse: true,
@@ -485,6 +522,7 @@ function ClientList({ advisorId }) {
 
       , (error) => { 
         setLoading(false)
+        setDashboardLoading(false)
         console.log(error) })
   }, [])
 
@@ -655,13 +693,31 @@ function ClientList({ advisorId }) {
 
 
 
-function ReportsContent({ advisorId }) {
+function ReportsContent({ advisorId ,setDashboardLoading }) {
   ////debugger
+  // dashboardLoading=true
+ 
   const [loading,setLoading]=useState(false)
   const [requestLoading,setRequestLoading]=useState(true)
   const [remainingAmount,setRemainingAmount]=useState('')
   // const [_rate,setRate]=useState(0)
   // const [_time,setTime]=useState(0)
+
+  
+const [snackOpen, setSnackOpen] = React.useState(false);
+
+ 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const handleSnackClose = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+
+  setSnackOpen(false);
+};
   const [data,setData]=useState([])
   const style = {
     position: 'absolute',
@@ -684,7 +740,7 @@ function ReportsContent({ advisorId }) {
     setTimePeriod(row.timePeriod)
     axios({
       method:'get',
-      url:`https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
+      url:`https://localhost:7136/api/strategies/bytype/${row.investmentType}?api-version=1`,
     }).then(
       (response)=>{
         debugger
@@ -750,7 +806,7 @@ function ReportsContent({ advisorId }) {
 const handleReturns=(strategyName)=>{
   axios({
     method:'get',
-    url:`https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
+    url:`https://localhost:7136/api/strategies/byname/${strategyName}?api-version=1`
     }).then((response)=>{
      let data = response.data[0]
      setSixMonReturns(data.returnPercentageAfter6months)
@@ -875,13 +931,14 @@ const handleCalculations=(investmentAmount)=>{
 setLoading(true)
   axios({
     method: 'post',
-    url: 'https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
+    url: 'https://localhost:7136/api/strategies/Add?api-version=1',
     data: strategyData
   }).then((response) => {
     console.log(response)
     setMessage(response.data.message)
-
+    setSnackOpen(true)
     setLoading(false)
+    handleClose()
     if (response.data.message = "Strategy added successfully.") {
       setStrategyName('')
       setClientId('')
@@ -919,12 +976,15 @@ setLoading(true)
   // const initialized = React.useRef(false);
 
   const handleInvestmentCall = () => {
+    setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
-      // //debugger;
+      debugger
+      // dashboardLoading=false
       setRequestLoading(false)
+      setDashboardLoading(false)
       let list = response.data
       setTotalRequests(list.length)
       let _highRisk = list.filter(x=>x.investmentType==="High Risk").length;
@@ -1027,6 +1087,7 @@ if(_needConsultation > 0){
 
     }, (error) => {
       // consol.
+      setDashboardLoading(false)
       setRequestLoading(false)
  })
 
@@ -1042,6 +1103,15 @@ if(_needConsultation > 0){
         Add Strategy
       </Button>
     </div> */}
+    <Snackbar 
+      anchorOrigin={{  vertical: 'bottom',
+      horizontal: 'right', }}
+      open={snackOpen} 
+      autoHideDuration={6000} onClose={handleSnackClose}>
+        <Alert onClose={handleSnackClose} severity="success" sx={{ width: '100%' }}>
+          Strategy Added Successfully!
+        </Alert>
+      </Snackbar>
       <Modal
         open={modalOpen}
         onClose={handleClose}
@@ -1049,15 +1119,13 @@ if(_needConsultation > 0){
         aria-describedby="modal-modal-description"
       >
         <Box sx={style} >
-          <CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
-          {message ? <Typography color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
-            {message}
-          </Typography> : <><Typography color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
+          <CloseIcon sx={{color:'#4b49ac'}}onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+           <><Typography color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
             Create New Strategy For Client
           </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
 
               margin="dense"
               autoComplete="given-name"
@@ -1074,7 +1142,7 @@ if(_needConsultation > 0){
               />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
                   required
@@ -1120,7 +1188,7 @@ if(_needConsultation > 0){
               </Grid>
               <Grid item xs={12} sm={6}>
                 
-              <TextField
+              <TextField sx={{color:'#4b49ac'}}
 
                     margin="dense"
                     autoComplete="given-name"
@@ -1138,7 +1206,7 @@ if(_needConsultation > 0){
               </Grid>
 
             </Grid>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
                   required
@@ -1164,7 +1232,7 @@ if(_needConsultation > 0){
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
                   autoComplete="given-name"
@@ -1181,7 +1249,7 @@ if(_needConsultation > 0){
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
                   required
@@ -1200,7 +1268,7 @@ if(_needConsultation > 0){
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
                   autoComplete="given-name"
@@ -1217,7 +1285,7 @@ if(_needConsultation > 0){
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
                   required
@@ -1234,7 +1302,7 @@ if(_needConsultation > 0){
               </Grid>
 
             </Grid>
-                    <TextField
+                    <TextField sx={{color:'#4b49ac'}}
 
                       margin="dense"
                       autoComplete="given-name"
@@ -1250,9 +1318,11 @@ if(_needConsultation > 0){
                       autoFocus
                       />
 
-            {helperText? <span style={{color:'red'}}>* {helperText}</span>:''}
-            {loading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained"> Creating.... <i class="fa fa-spinner fa-spin"></i> </Button>:
-            <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" onClick={handleModalSubmit}>Create Strategy</Button>}</>}
+            {helperText? <Alert severity='error' >* {helperText}</Alert>:''}
+            {loading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained">
+               Creating.... <i class="fa fa-spinner fa-spin"></i> </Button>:
+            <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" 
+            onClick={handleModalSubmit}>Create Strategy</Button>}</>
         </Box>
       </Modal>
       
@@ -1302,9 +1372,10 @@ if(_needConsultation > 0){
             <TableCell sx={{ color: 'white', fontSize: '16px' ,fontWeight: 'bold', backgroundColor: '#4b49ac'}}>Client Id</TableCell>
             <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px' , backgroundColor: '#4b49ac'}}>Date</TableCell>
             <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Amount</TableCell>
-            <TableCell align='center' sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Balance</TableCell>
-            <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px', backgroundColor: '#4b49ac' }}>Time Period</TableCell>
-            <TableCell align='center' sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Type</TableCell>
+            <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Balance</TableCell>
+            <TableCell  sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px', backgroundColor: '#4b49ac' }}>Time Period</TableCell>
+            <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Type</TableCell>
+            <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Status</TableCell>
             <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}></TableCell>
 
           </TableRow>
@@ -1331,10 +1402,20 @@ if(_needConsultation > 0){
                 <TableCell align='center'>{row.investmentAmount}</TableCell>
                 <TableCell>{row.remainingAmount}</TableCell>
                 <TableCell align='center'>{row.timePeriod}</TableCell>
-                <TableCell><Button class={row.investmentType}  sx={{cursor:'default'}} >{row.investmentType}</Button></TableCell>
-                {/* <TableCell><Button  >{row.investmentType}</Button></TableCell> */}
+                {/* <TableCell><Button class={row.investmentType}  sx={{cursor:'default'}} >
+                  {row.investmentType}</Button></TableCell> */}
+                  <TableCell align='center' sx={{padding:"0px"}}>
+                  {row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'><img className='table-img' src={lowRisk}/></Tooltip>
+                  :(row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'><img className='table-img' src={highRisk}/></Tooltip>
+                  :(row.investmentType==='Medium Risk'?<Tooltip title='Medium Risk' placement='right-end'><img className='table-img' src={mediumRisk}/></Tooltip>
+                  :<Tooltip title='Need Consultation' placement='right-end'><HelpIcon className='table-img' sx={{color:'green'}}></HelpIcon></Tooltip>)
+                   )}</TableCell>
+                <TableCell align='center' className={row.status} sx={{padding:'0px',width:'108px'}}>{row.status}</TableCell>
                 <TableCell align='center'>
-                <Button onClick={()=>handleOpen(row)}><i style={{marginRight :'4px' }}class="fa fa-plus" aria-hidden="true"></i>Strategy</Button>
+               <Tooltip title='Create Strategy' placement='right-end'> <Button onClick={()=>handleOpen(row)}>
+                
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </Button></Tooltip>
                 </TableCell>
               </TableRow>
             </React.Fragment>
@@ -1352,7 +1433,185 @@ if(_needConsultation > 0){
   );
 }
 
-function SettingsContent({ advisorId }) {
+function PastInvestments({ advisorId ,setDashboardLoading }) {
+  const [listOfApprovedInv,setListOfApprovedInv]=useState([])
+  const [actionArray,setActionArray]=useState([])
+  const [snackOpen, setSnackOpen] = React.useState(false);
+  const [actionLoading,setActionLoading]=useState(false)
+  const [newLoading,setNewLoading]=useState(false)
+  const [length,setLength]=useState(0)
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+
+  const handleSnackClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackOpen(false);
+  };
+
+  const handleChange=(investmentId,status)=>{
+        
+    const actionObj ={
+      investmentId:investmentId,
+     status:status
+    }
+    setActionArray([...actionArray,actionObj])
+ 
+
+}
+const handleSave=()=>{
+  setActionLoading(true)
+  axios({
+    method:'put',
+    url:`https://localhost:7136/api/investments/update-status?api-version=1`,
+    data:actionArray
+  }).then((response)=>{
+  
+  console.log(response)
+  setActionLoading(false)
+  setSnackOpen(true)
+  handleFundedCall()
+
+  },(error)=>{
+  console.log(error)
+  setActionLoading(false)
+
+  })
+}
+const handleFundedCall=()=>{
+  axios({
+    method:'get',
+    url:`https://localhost:7136/api/investments/approved/${advisorId}?api-version=1`
+  }).then((response)=>{
+    console.log(response.data)
+    const list = response.data
+    setNewLoading(false)
+    setListOfApprovedInv(list)
+    setLength(list.length)
+    setDashboardLoading(false)
+    
+  },(error)=>{
+    setNewLoading(false)
+    setDashboardLoading(false)
+    setLength(0)
+  })
+}
+
+  useEffect(()=>{
+  setNewLoading(true)
+  setDashboardLoading(true)
+  handleFundedCall();
+    // axios({
+    //   method:'get',
+    //   url:`https://localhost:7136/api/investments/approved/${advisorId}?api-version=1`
+    // }).then((response)=>{
+    //   console.log(response.data)
+    //   setNewLoading(false)
+    //   setListOfApprovedInv(response.data)
+    //   setDashboardLoading(false)
+      
+    // },(error)=>{
+    //   setNewLoading(false)
+    //   setDashboardLoading(false)
+    // })
+  },[])
+
+  return  (
+  <>
+  
+  {newLoading ? <div className='rectangle-div'>
+  <Skeleton variant="rectangular" sx={{ width: '100%' }} height={50} />
+        <br />
+        <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
+  </div>
+  
+  :<>
+  <div className="rectangle-div">
+    <TableContainer component={Paper}>
+          <Table size='small' aria-label="simple table" id="AdvisorClientTable">
+            <TableHead>
+              <TableRow >
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Client Id</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width: '184px' }}>Investment Amount</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width:'140px' }}></TableCell>
+
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {length === 0 ? 
+            <React.Fragment >
+              <TableRow>
+                <TableCell
+                sx={{ textAlign: "center"}} 
+                 colSpan={4}>No Recent Approved Investment</TableCell>
+              </TableRow>
+            </React.Fragment> :
+              
+              listOfApprovedInv?.map((row) =>
+                <React.Fragment>
+                  <TableRow>
+                    <TableCell>
+                      {row.investmentID}
+                    </TableCell>
+                    <TableCell>{row.clientId}</TableCell>
+                    <TableCell>{row.investmentAmount}</TableCell>
+                    <TableCell><FormControl required fullWidth>
+            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+            <Select
+              size="small"
+              margin="normal"
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              label="Status"
+              // value={Status}
+            
+              onChange={e=>{handleChange(row.investmentID,e.target.value)}}
+            >
+               <MenuItem value={''}>No Change</MenuItem>
+              <MenuItem value={'Funded'}>Funded</MenuItem>
+             
+
+
+            </Select>
+          </FormControl></TableCell>
+
+                  </TableRow></React.Fragment>
+
+              )}
+
+
+            </TableBody></Table></TableContainer>
+    </div>
+
+        {listOfApprovedInv.length === 0? "":<>{ actionLoading?<Button className='save' sx={{backgroundColor:'#1BCFB4'
+          }} variant="contained" >Submitting... 
+          <i class="fa fa-spinner fa-spin"></i>
+          </Button>
+          :
+          <Button className='save' sx={{backgroundColor:'#1BCFB4'
+          }} variant="contained" onClick={()=>handleSave()}>Save Changes</Button>}
+
+      </>}  </> }  
+    <Snackbar 
+    anchorOrigin={{  vertical: 'bottom',
+    horizontal: 'right', }}
+    open={snackOpen} 
+    autoHideDuration={6000} onClose={handleSnackClose}>
+      <Alert onClose={handleSnackClose} severity="success" sx={{ width: '100%' }}>
+        Changes Updated Successfully!
+      </Alert>
+    </Snackbar>
+    
+    </>
+    )
+
+}
+
+function SettingsContent({ advisorId , setDashboardLoading }) {
 
   // const [firstName, setFirstName] = useState('')
   // const [lastName, setLastName] = useState('')
@@ -1360,6 +1619,7 @@ function SettingsContent({ advisorId }) {
   // const [phone, setPhone] = useState('')
   // const [city, setCity] = useState('')
   // const [State, setState] = useState('')
+  // dashboardLoading=true
   const [address, setAddress] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
@@ -1373,6 +1633,7 @@ function SettingsContent({ advisorId }) {
   const [addressError, setAddressError] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
   const [loading,setLoading]=useState(false)
+
   const [settingsLoading,setSettingsLoading]=useState(true)
   const [advisorData,setAdvisorData]=useState({})
   const [updatedAdvisorData,setUpdatedAdvisorData]=useState({})
@@ -1421,14 +1682,16 @@ function SettingsContent({ advisorId }) {
 
   useEffect(() => {
     // Inside the useEffect, you can make the axios request
+    setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
     })
       .then((response) => {
         setAdvisorData(response.data.advisor)
         setUpdatedAdvisorData(response.data.advisor)
         console.log(advisorData)
+        // dashboardLoading=false
         // setFirstName(advisorData.firstName);
         // setLastName(advisorData.lastName);
         // setEmail(advisorData.email);
@@ -1437,11 +1700,13 @@ function SettingsContent({ advisorId }) {
         // setCity(advisorData.city);
         // setState(advisorData.state);
         // setPassword(advisorData.confirmPassword);
+        setDashboardLoading(false)
         setSettingsLoading(false)
       })
       .catch((error) => {
         console.log(error);
         setLoading(false)
+        setDashboardLoading(false)
       });
   }, []);
   const [disabled, setDisabled] = useState(true)
@@ -1514,7 +1779,7 @@ function SettingsContent({ advisorId }) {
     setBackVisible(false)
       axios({
         method: 'put',
-        url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
+        url: `https://localhost:7136/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
         data: updatedAdvisorData
       }).then((response) => {
         console.log(response)
@@ -1558,7 +1823,7 @@ function SettingsContent({ advisorId }) {
       <div>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               autoComplete="given-name"
@@ -1580,7 +1845,7 @@ function SettingsContent({ advisorId }) {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               required
@@ -1602,7 +1867,7 @@ function SettingsContent({ advisorId }) {
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               autoComplete="given-name"
@@ -1622,7 +1887,7 @@ function SettingsContent({ advisorId }) {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               required
@@ -1643,7 +1908,7 @@ function SettingsContent({ advisorId }) {
 
         </Grid>
 
-        <TextField
+        <TextField sx={{color:'#4b49ac'}}
           size="small"
           margin="dense"
           autoComplete="given-name"
@@ -1666,7 +1931,7 @@ function SettingsContent({ advisorId }) {
 
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               autoComplete="given-name"
@@ -1686,7 +1951,7 @@ function SettingsContent({ advisorId }) {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               required
@@ -1706,7 +1971,7 @@ function SettingsContent({ advisorId }) {
           </Grid>
 
         </Grid>
-        {/* <TextField
+        {/* <TextField sx={{color:'#4b49ac'}}
           size="small"
           margin="dense"
           required
@@ -1725,14 +1990,14 @@ function SettingsContent({ advisorId }) {
           autoComplete="family-name"
         /> */}
       </div>
-      <span style={{color:'green'}}>{message}</span>
+      {message?<Alert severity='success'>{message}</Alert>:''}
       <Modal
         open={modalOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
-          <CloseIcon color="primary" onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
+          <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Advisor information updated successfully.
           </Typography>
