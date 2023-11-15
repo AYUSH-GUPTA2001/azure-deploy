@@ -936,6 +936,7 @@ setLoading(true)
   }).then((response) => {
     console.log(response)
     setMessage(response.data.message)
+    handleInvestmentCall()
     setSnackOpen(true)
     setLoading(false)
     handleClose()
@@ -950,7 +951,7 @@ setLoading(true)
       setAmount('')
       setExpectedAmount('')
       setInvestmentAmount('')
-      handleInvestmentCall()
+      
 
     }
   }, (error) => {
@@ -974,7 +975,7 @@ setLoading(true)
   const [totalConsultationRequest,setTotalConsultationRequest]=useState(0)
   let flag=[]
   // const initialized = React.useRef(false);
-
+  const [Length,setLength]=useState(0)
   const handleInvestmentCall = () => {
     setDashboardLoading(true)
     axios({
@@ -986,6 +987,7 @@ setLoading(true)
       setRequestLoading(false)
       setDashboardLoading(false)
       let list = response.data
+      setLength(list.length)
       setTotalRequests(list.length)
       let _highRisk = list.filter(x=>x.investmentType==="High Risk").length;
       let _lowRisk = list.filter(x=>x.investmentType==="Low Risk").length;
@@ -1086,9 +1088,17 @@ if(_needConsultation > 0){
       console.log(response.data)
 
     }, (error) => {
-      // consol.
+      if(error.response.data.title==='Not Found'){
+        setLength(0)
+        setTotalRequests(0)
+        setTotalHighRiskRequest(0)
+      setTotalLowRiskRequest(0)
+      setTotalMediumRiskRequest(0)
+      setTotalConsultationRequest(0)
+      }
       setDashboardLoading(false)
       setRequestLoading(false)
+      
  })
 
   }
@@ -1382,7 +1392,7 @@ if(_needConsultation > 0){
         </TableHead>
         <TableBody>
           {
-          reportListOfRequests.length == 0 ? 
+          Length === 0 ? 
             <React.Fragment >
               <TableRow>
                 <TableCell
