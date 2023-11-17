@@ -110,6 +110,7 @@ toggle.addEventListener("click", () => {
   }, [])
 
   const handleLogout=()=>{
+    localStorage.removeItem('advisorUser')
     navigate('/advisor')
   }
   const handleOptionClick = (option) => {
@@ -1450,6 +1451,7 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
   const [actionLoading,setActionLoading]=useState(false)
   const [newLoading,setNewLoading]=useState(false)
   const [length,setLength]=useState(0)
+  const [visible,setVisible]=useState(false)
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
@@ -1463,16 +1465,22 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
   };
 
   const handleChange=(investmentId,status)=>{
-        
+  if(status==='Funded'){
+    setVisible(true)
+  }
     const actionObj ={
       investmentId:investmentId,
      status:status
     }
     setActionArray([...actionArray,actionObj])
- 
+    
+    
 
 }
 const handleSave=()=>{
+  if(actionArray.length===0){
+    return
+  }
   setActionLoading(true)
   axios({
     method:'put',
@@ -1482,13 +1490,16 @@ const handleSave=()=>{
   
   console.log(response)
   setActionLoading(false)
-  setSnackOpen(true)
+  if(response.data.message==="Investment statuses updated successfully."){
+  setSnackOpen(true)}
+  setActionArray([])
+  setVisible(false)
   handleFundedCall()
 
   },(error)=>{
   console.log(error)
   setActionLoading(false)
-
+setVisible(false)
   })
 }
 const handleFundedCall=()=>{
@@ -1502,11 +1513,13 @@ const handleFundedCall=()=>{
     setListOfApprovedInv(list)
     setLength(list.length)
     setDashboardLoading(false)
+    setVisible(false)
     
   },(error)=>{
     setNewLoading(false)
     setDashboardLoading(false)
     setLength(0)
+    setVisible(false)
   })
 }
 
@@ -1597,7 +1610,7 @@ const handleFundedCall=()=>{
             </TableBody></Table></TableContainer>
     </div>
 
-        {listOfApprovedInv.length === 0? "":<>{ actionLoading?<Button className='save' sx={{backgroundColor:'#1BCFB4'
+       {visible?<>{length === 0? "":<>{ actionLoading?<Button className='save' sx={{backgroundColor:'#1BCFB4'
           }} variant="contained" >Submitting... 
           <i class="fa fa-spinner fa-spin"></i>
           </Button>
@@ -1605,7 +1618,7 @@ const handleFundedCall=()=>{
           <Button className='save' sx={{backgroundColor:'#1BCFB4'
           }} variant="contained" onClick={()=>handleSave()}>Save Changes</Button>}
 
-      </>}  </> }  
+      </>} </>:''} </> }   
     <Snackbar 
     anchorOrigin={{  vertical: 'bottom',
     horizontal: 'right', }}
@@ -1631,7 +1644,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
   // const [State, setState] = useState('')
   // dashboardLoading=true
   const [address, setAddress] = useState('')
-  const [password, setPassword] = useState('')
+  // const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
 
   const [firstNameError, setFirstNameError] = useState(false)
@@ -1641,7 +1654,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
   const [cityError, setCityError] = useState(false)
   const [stateError, setStateError] = useState(false)
   const [addressError, setAddressError] = useState(false)
-  const [passwordError, setPasswordError] = useState(false)
+  // const [passwordError, setPasswordError] = useState(false)
   const [loading,setLoading]=useState(false)
 
   const [settingsLoading,setSettingsLoading]=useState(true)
@@ -1655,11 +1668,12 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
   }
 
   const handleChange = (el) => {
+    debugger
     let inputName = el.target.name;
     let inputValue = el.target.value;
     let statusCopy = Object.assign({}, updatedAdvisorData);
     statusCopy[inputName] = inputValue;
-
+   
     setUpdatedAdvisorData(statusCopy);
   }
 
@@ -1735,7 +1749,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setAddressError(false)
     setCityError(false)
     setStateError(false)
-    setPasswordError(false)
+    // setPasswordError(false)
     let count = 0;
     if (updatedAdvisorData.firstName === '') {
       setFirstNameError(true)
@@ -1765,10 +1779,10 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
       setStateError(true)
       count++
     }
-    if (updatedAdvisorData.confirmPassword === '') {
-      setPasswordError(true)
-      count++
-    }
+    // if (updatedAdvisorData.confirmPassword === '') {
+    //   setPasswordError(true)
+    //   count++
+    // }
     if (count > 0) {
       return
     }
@@ -1795,7 +1809,8 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
         console.log(response)
         setLoading(false)
         if (response.data.message === "Advisor information updated successfully.") {
-         
+          console.log(updatedAdvisorData)
+          debugger
           setAdvisorData(updatedAdvisorData)
           setDisabled(true)
           setEditVisible(true)

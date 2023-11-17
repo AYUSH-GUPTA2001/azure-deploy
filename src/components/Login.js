@@ -28,7 +28,20 @@ import { Alert } from '@mui/lab';
 
 export default function Login(){
 
-  const navigate=useNavigate()
+  const navigate = useNavigate()
+  React.useEffect(()=>{
+   var storedUser = localStorage.getItem('advisorUser');
+   if (storedUser) {
+     var advisorUser = JSON.parse(storedUser);
+     var timeoutId = setTimeout(()=>{localStorage.removeItem('advisorUser')}, 1 * 60 * 1000)
+    
+  
+     navigate(`/advisor/dashboard/${advisorUser.advisorId}`)
+     
+ 
+   
+     // Do something with the user information, e.g., display a welcome message
+ }},[] )
   const [message,setMessage]=useState("")
   const [forgotMessage,setForgotMessage]=useState("")
   const [loginEmail, setLoginEmail] = useState("")
@@ -420,6 +433,13 @@ setResetLoading(true)
         
           const advisorId= response.data.advisor.advisorId
           const firstName= response.data.advisor.firstName
+          var advisorUser = {
+            advisorId: advisorId,
+            // other user information...
+          };
+          
+          // Store user information in local storage
+          localStorage.setItem('advisorUser', JSON.stringify(advisorUser));
           navigate(`/advisor/dashboard/${advisorId}`)
         }
        

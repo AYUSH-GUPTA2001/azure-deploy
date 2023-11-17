@@ -46,6 +46,8 @@ import Card from "../Card/Card";
 
 
 function Dashboard() {
+
+  
   const [dashboardLoading,setDashboardLoading]=useState(true)
   const { clientId } = useParams()
   const navigate = useNavigate()
@@ -107,7 +109,9 @@ function Dashboard() {
   };
   const [selectedOption, setSelectedOption] = useState('Portfolio');
   const handleLogout = () => {
+    localStorage.removeItem('user');
     navigate('/investor')
+
   }
   return (<>
    {dashboardLoading? <Box sx={{ width: '100%' }}>
@@ -614,7 +618,7 @@ function InvestmentContent({ clientId , setDashboardLoading }) {
   const [advisorId, setAdvisorId] = useState("")
   const [snackOpen, setSnackOpen] = React.useState(false);
   const [snackInvOpen, setSnackInvOpen] = React.useState(false);
- 
+  const [visible,setVisible]=useState(false)
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
@@ -634,7 +638,7 @@ function InvestmentContent({ clientId , setDashboardLoading }) {
     setSnackOpen(false);
   };
   const handleChange=(strategyId,status)=>{
-        
+        setVisible(true)
          const actionObj ={
           strategyId:strategyId,
           status:status,
@@ -702,10 +706,13 @@ axios({
 console.log(response)
 setActionLoading(false)
 setSnackOpen(true)
+setVisible(false)
 handleRecommendationsClose()
 },(error)=>{
 console.log(error)
+setVisible(false)
 setActionLoading(false)
+
 })
 
 }
@@ -1136,7 +1143,7 @@ setActionLoading(true)
                     </TableBody></Table>
                     
                     </TableContainer></React.Fragment> )}
-                   {listOfStratgies.length===0?'':<> {actionLoading?<Button sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
+             { visible? <>    {listOfStratgies.length===0?'':<> {actionLoading?<Button sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
           left: '975px',}} 
                     variant="contained" > 
                     Submitting... 
@@ -1144,7 +1151,7 @@ setActionLoading(true)
           :
           <Button  sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
           left: '975px',
-          }} variant="contained" onClick={()=>handleSave()}>Save Changes</Button>}</>}
+          }} variant="contained" onClick={()=>handleSave()}>Save Changes</Button>}</>}</>:''}
           
     
               </Box>

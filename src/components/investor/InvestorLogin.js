@@ -34,6 +34,23 @@ import { Alert } from '@mui/lab';
 
 
 export default function Login(){
+  debugger
+  const navigate = useNavigate()
+ React.useEffect(()=>{
+  var storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    var user = JSON.parse(storedUser);
+    var timeoutId = setTimeout(()=>localStorage.removeItem('user'), 60000)
+   
+ 
+    navigate(`/investor/dashboard/${user.userId}`)
+    
+
+  
+    // Do something with the user information, e.g., display a welcome message
+}},[] )
+    // User is not logged in, redirect to login page or show login form
+  
     const [message,setMessage]=useState("")
     const [forgotMessage,setForgotMessage]=useState("")
     const [loading,setLoading]=useState(false)
@@ -42,7 +59,7 @@ export default function Login(){
     const [loginPassword, setLoginPassword] = useState("")
     const [loginEmailError, setLoginEmailError] = useState(false)
     const [loginPasswordError, setLoginPasswordError] = useState(false)
-    const navigate = useNavigate()
+
 
     const [address,setAddress]=useState("")
     const [phone, setPhone] = useState('');
@@ -551,6 +568,13 @@ if (!panNumber.match(panPattern)) {
           if(response.data.message==="Login successful!" || response.data.message==="Profile is not complete. Please provide the missing information."){
             const clientId=response.data.client.clientId
             navigate(`/investor/dashboard/${clientId}`)
+            var user = {
+              userId: clientId,
+              // other user information...
+            };
+            
+            // Store user information in local storage
+            localStorage.setItem('user', JSON.stringify(user));
           }
         
        
@@ -1170,4 +1194,6 @@ if (!panNumber.match(panPattern)) {
     </>
   )
 
+
         }
+      

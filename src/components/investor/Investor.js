@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import InvestorLogin from './InvestorLogin';
 
 import image5 from "../../assets/first.png"
-
+import { useNavigate } from 'react-router-dom';
 import { useState,useEffect } from 'react';
 // function Copyright(props) {
 //   return (
