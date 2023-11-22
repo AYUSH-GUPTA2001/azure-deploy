@@ -138,7 +138,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
        method:'post',
-       url:'  https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
+       url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
@@ -198,7 +198,7 @@ if (resetPassword !== confirmResetPassword) {
  setResetLoading(true)
  axios({
     method:'post',
-    url:'  https://investmentportal.azurewebsites.net/api/ClientSignUp/reset-password?api-version=1',
+    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -385,7 +385,7 @@ const handleOTPSubmit=(e)=>{
   setOTPLoading(true)
   axios({
     method:'post',
-    url:'  https://investmentportal.azurewebsites.net/api/ClientSignUp/verify-otp?api-version=1',
+    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/verify-otp?api-version=1',
     data:otpData
   }).then((response)=>{
     setOTPLoading(false)
@@ -502,7 +502,7 @@ if (!panNumber.match(panPattern)) {
       setLoading(true)
       axios({
         method:"post",
-        url:"  https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
+        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -567,7 +567,7 @@ if (!panNumber.match(panPattern)) {
   setLoading(true)
       axios({
         method:"post",
-        url:"  https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
+        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)

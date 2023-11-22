@@ -207,7 +207,7 @@ toggle.addEventListener("click", () => {
     
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
       // //debugger
       let advisor=response.data.advisor
@@ -401,7 +401,7 @@ function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
 setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
     }).then(function (response) {
       const list = response.data.strategies
       setTotalInvAmount(list.map(x=> x.investmentAmount).reduce(function(a, b){
@@ -700,7 +700,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
 //debugger
 
@@ -1032,7 +1032,7 @@ const handleSnackClose = (event, reason) => {
     setTimePeriod(row.timePeriod)
     axios({
       method:'get',
-      url:`  https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
+      url:`https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
     }).then(
       (response)=>{
         debugger
@@ -1099,7 +1099,7 @@ const handleSnackClose = (event, reason) => {
 const handleReturns=(strategyName)=>{
   axios({
     method:'get',
-    url:`  https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
+    url:`https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
     }).then((response)=>{
      let data = response.data[0]
      setSixMonReturns(data.returnPercentageAfter6months)
@@ -1227,7 +1227,7 @@ const handleCalculations=(investmentAmount)=>{
 setLoading(true)
   axios({
     method: 'post',
-    url: '  https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
+    url: 'https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
     data: strategyData
   }).then((response) => {
     console.log(response)
@@ -1277,7 +1277,7 @@ setLoading(true)
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
       debugger
       // dashboardLoading=false
@@ -1884,7 +1884,7 @@ const handleSave=()=>{
   setActionLoading(true)
   axios({
     method:'put',
-    url:`  https://investmentportal.azurewebsites.net/api/investments/update-status?api-version=1`,
+    url:`https://investmentportal.azurewebsites.net/api/investments/update-status?api-version=1`,
     data:actionArray
   }).then((response)=>{
   
@@ -1905,7 +1905,7 @@ setVisible(false)
 const handleFundedCall=()=>{
   axios({
     method:'get',
-    url:`  https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
+    url:`https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
   }).then((response)=>{
     console.log(response.data)
     const list = response.data
@@ -2170,7 +2170,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     })
       .then((response) => {
         setAdvisorData(response.data.advisor)
@@ -2264,7 +2264,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setBackVisible(false)
       axios({
         method: 'put',
-        url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
+        url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
         data: updatedAdvisorData
       }).then((response) => {
         console.log(response)

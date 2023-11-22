@@ -231,7 +231,7 @@ const handleSessionNo=()=>{
 
   axios({
     method: 'get',
-    url: `  https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
+    url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
   }).then((response) => {
     setFirstName(response.data.client.firstName)
     setLastName(response.data.client.lastName)
@@ -392,7 +392,7 @@ function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
     }).then(function (response) {
       // 
       setDashboardLoading(false)
@@ -598,7 +598,7 @@ const handleInvestmentCall = () => {
   setDashboardLoading(true)
   axios({
     method: 'get',
-    url: `  https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
+    url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
   }).then(function (response) {
     
     let list = response.data
@@ -984,7 +984,7 @@ const handleSave=()=>{
 setActionLoading(true)
 axios({
   method:'put',
-  url:`  https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Client?api-version=1`,
+  url:`https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Client?api-version=1`,
   data:actionArray
 }).then((response)=>{
 console.log(response)
@@ -1009,7 +1009,7 @@ const [newLoading,setNewLoading]=useState(false)
     setNewLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
     }).then((response) => {
       setDashboardLoading(false)
       setNewLoading(false)
@@ -1073,7 +1073,7 @@ const [newLoading,setNewLoading]=useState(false)
     setLoading(true)
     axios({
       method: 'post',
-      url: `  https://investmentportal.azurewebsites.net/api/investments/New Investment?api-version=1`,
+      url: `https://investmentportal.azurewebsites.net/api/investments/New Investment?api-version=1`,
       data: investmentData
     }).then((response) => {
       console.log(response)
@@ -1133,7 +1133,7 @@ const [newLoading,setNewLoading]=useState(false)
 setActionLoading(true)
       axios({
         method: 'put',
-        url: `  https://investmentportal.azurewebsites.net/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
+        url: `https://investmentportal.azurewebsites.net/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
         data: investmentData
       }).then((response) => {
         console.log(response)
@@ -1217,7 +1217,7 @@ setActionLoading(true)
   
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
     }).then((response) => {
       let data = response.data.strategies
       let list= data.filter(x=> x.status== 'Pending');
@@ -1625,7 +1625,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `  https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
     })
       .then((response) => {
         console.log(response.data.client)
@@ -1744,7 +1744,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setLoading(true)
       axios({
         method: 'put',
-        url: `  https://investmentportal.azurewebsites.net/api/ClientSignUp/update/${clientId}?api-version=1`,
+        url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/update/${clientId}?api-version=1`,
         data:updatedClientData
       }).then((response) => {
         console.log(response)
