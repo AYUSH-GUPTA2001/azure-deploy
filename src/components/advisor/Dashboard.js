@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useEffect, useState } from "react";
 import './AdvisorDashboard.css'
+import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -44,22 +45,134 @@ import { ListAltRounded, LocationCitySharp } from '@mui/icons-material';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import { Alert, Skeleton } from '@mui/lab';
 import Card from '../Card/Card';
+import { DataGrid } from '@mui/x-data-grid';
 
 
 // const [loading,setLoading]=useState(true)
 
 function Dashboard() {
+
+  debugger
+  // #region StartTimer
+  let countdown;
+  let leftTime,expirationTime,timeInSeconds;
+  debugger
+  let splitarray = window.location.pathname.split('/');
+  let _advieorID= splitarray[splitarray.length-1];
+  let storage = JSON.parse(localStorage.getItem(_advieorID));
+  const navigate = useNavigate()
+  const handleLogout=()=>{
+    // stopTimer()
+    localStorage.removeItem(_advieorID)
+    navigate('/advisor')
+  }
+  
+  function startTimer() {
+    updateTimer();
+    countdown = setInterval(updateTimer, 1000);
+  }
+  
+  function stopTimer() {
+      clearInterval(countdown);
+  }
+
+  function updateTimer() {
+    // debugger
+    if(!localStorage.getItem(_advieorID))
+    {
+       stopTimer();
+       navigate('/advisor')
+    }
+    else
+    {
+      const minutes = Math.floor(timeInSeconds / 60);
+      const seconds = timeInSeconds % 60;
+      if(timeInSeconds>0) {
+      const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('timer').innerText = formattedTime;
+    }
+     
+    
+      if(timeInSeconds===0){
+        stopTimer()
+        setTimerModalOpen(true)
+        // handleLogout()
+      }
+      else {
+          // setTimeInSeconds(timeInSeconds--);
+          storage.TimeLeft = --timeInSeconds;
+          localStorage.setItem(_advieorID,JSON.stringify(storage));
+      }
+    }
+    
+}
+
+// const handleStillYes=()=> {
+//   debugger
+//   if(!timeInSeconds)
+//      timeInSeconds = storage.TimeLeft;
+
+//   timeInSeconds +=600
+//   setTimerModalOpen(false)
+//   storage.TimeLeft += timeInSeconds;
+//   localStorage.setItem(_advieorID,JSON.stringify(storage));
+//   stopTimer()
+//   // Add sceleton and add settimeout function for start timer
+//   startTimer()
+// }
+  // #endregion
+   
   // //debugger
   console.log("tester")
   const { advisorId } = useParams()
   // global [dashboardLoading,setDashboardLoading] = useState(true) 
  let [dashboardLoading,setDashboardLoading]=useState(true)
-  const navigate = useNavigate()
+ const [timerModalOpen,setTimerModalOpen]=useState(false)
+  
   const [firstName, setFirstName] = useState('')
   const [lastName,setLastName] = useState('')
   const [loading,setLoading]=useState(true)
+  const handleTimerModalClose = (event,reason) => {
+    if (reason !== 'backdropClick') {
+      setTimerModalOpen(false)
+    }
+   };
+ 
+
+const timerModalStyle = {
+  position: 'absolute',
+  top: '40%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 580,
+  bgcolor: '#e4f1ff',
+  borderRadius:'2px',
+  boxShadow: 24,
+  p: 4,
+};
  
   useEffect(() => {
+    // debugger
+    if(!storage){
+      // Add popup and with settimeout will natigate to advisor path
+      navigate('/advisor')
+    }
+    else{
+       leftTime = storage.TimeLeft;
+       expirationTime = storage.Expirationtimestamp;
+      if(!leftTime // Or current time is greater then Expirationtimestamp or storage is null or empty
+      )
+      {
+        // Logout if left time is empty
+      }
+      // let [timeInSeconds,setTimeInSeconds]=useState(leftTime)
+       timeInSeconds = leftTime;
+       startTimer()
+    }
+
+    
+    
+     
 // debugger
     const body = document.querySelector("body");
 const sidebar = body.querySelector(".sidebar");
@@ -94,7 +207,7 @@ toggle.addEventListener("click", () => {
     
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
       // //debugger
       let advisor=response.data.advisor
@@ -109,10 +222,21 @@ toggle.addEventListener("click", () => {
     })
   }, [])
 
-  const handleLogout=()=>{
-    localStorage.removeItem('advisorUser')
-    navigate('/advisor')
-  }
+  // const handleNo=()=>{
+  //   timeInSeconds=4
+  //   startTimer()
+
+  //   setTimerModalOpen(false)
+  // }
+  // const handleYes=()=>{
+  //   debugger
+  //   timeInSeconds=20
+  //   setTimerModalOpen(false)
+  //   startTimer()
+  // }
+
+   
+ 
   const handleOptionClick = (option) => {
      //debugger
     setSelectedOption(option);
@@ -132,6 +256,23 @@ toggle.addEventListener("click", () => {
 
         <div class="image-text">
           <div class="img bg-wrap text-center py-4 bg1" >
+          <p id='time'>Session Time: <span id='timer'></span></p>
+          <Modal
+           
+        open={timerModalOpen}
+        onClose={handleTimerModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      ><Box sx={timerModalStyle} >
+          
+          <Typography  color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
+          Your Session has Expired. Please Re-Login to Continue.
+          </Typography>
+          <div className='modaldiv'>
+           <Button onClick={()=>{handleLogout()}} className='flexend SixthCard' variant='contained' >Go to LoginPage</Button>
+           </div>
+        </Box>
+      </Modal>
           <div class="user-logo">
           <div class="img bg2" ></div>
           {loading?<div class="text header-text">
@@ -238,7 +379,20 @@ function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
   const [totalApproved,setTotalApproved]=useState(0)
   const [totalRejected,setTotalRejected]=useState(0)
   const [totalPending,setTotalPending]=useState(0)
+  const [totalFunded,setTotalFunded]=useState(0)
+  const [page, setPage] = React.useState(0);
+ 
+  const [rowsPerPage, setRowsPerPage] = React.useState(1);
   // const [flag,setFlag]=useState('')
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 1));
+    setPage(0);
+  };
   let flag = [];
   // const [data,setData]=useState([]);
   const [listOfStratgies, setListOfStrategies] = useState([])
@@ -247,23 +401,25 @@ function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
 setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
     }).then(function (response) {
       const list = response.data.strategies
-      setTotalInvAmount(list.map(x=> x.status === "Approved" ? x.investmentAmount : 0).reduce(function(a, b){
+      setTotalInvAmount(list.map(x=> x.investmentAmount).reduce(function(a, b){
         return a + b;
       }));
-      setTotalExpAmount(list.map(x=> x.status==="Approved"? x.expectedAmount:0).reduce(function(a, b){
+      setTotalExpAmount(list.map(x=> x.expectedAmount).reduce(function(a, b){
         return a + b;
       }));
       debugger
       const _approved  = list.filter(x=> x.status== 'Approved').length
       const _rejected = list.filter(x=> x.status== 'Rejected').length
       const _pending = list.filter(x=> x.status== 'Pending').length
+      const _funded= list.filter(x=>x.status=='Funded').length
       setTotalStrategies(list.length)
       setTotalApproved(_approved)
       setTotalRejected(_rejected)
       setTotalPending(_pending)
+      setTotalFunded(_funded)
      setLoading(false)
    
     setDashboardLoading(false)
@@ -289,6 +445,28 @@ setDashboardLoading(true)
         }
     }))
   }
+
+  if(_funded>0){
+
+    const _seventhCard = document.querySelector('.seventhCard');
+    !!_seventhCard && (_seventhCard.classList.add('addPointer') ||
+    _seventhCard.addEventListener('click',function() {
+      
+      _seventhCard.classList.toggle("addBorder");
+      if(!flag.includes("Funded")){
+        
+        flag.push("Funded");
+        setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+      }
+      else{
+        flag = flag.filter(item => item !== "Funded");
+        if(flag.length === 0)
+          setListOfStrategies(list)
+        else
+          setListOfStrategies(list.filter(x=> flag.includes(x.status)))
+      }
+  }))
+}
    
   if(_rejected>0){
   const _fourthCard = document.querySelector('.fourthCard');
@@ -368,6 +546,8 @@ function collapseRow(the)
                 number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
                 <Card color="fifthCard" heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
                  number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
+                 <Card color="seventhCard"  heading={<Skeleton variant="text" sx={{ fontSize: '2rem' }} />}
+                number={<Skeleton variant="text" sx={{ fontSize: '1rem' }} />}/>
 
           </div>
       
@@ -385,6 +565,7 @@ function collapseRow(the)
                 <Card color="SixthCard" heading="Total Approved Holdings" number={totalApproved}/>
                 <Card color="fourthCard" heading="Total Rejected Holdings" number={totalRejected}/>
                 <Card color="fifthCard" heading="Total Pending Holdings" number={totalPending}/>
+                <Card color="seventhCard"  heading="Total Funded Holdings" number={totalFunded}/>
 
           </div>
       <div className="rectangle-div">
@@ -477,6 +658,15 @@ function collapseRow(the)
           </TableBody>
         </Table>
       </TableContainer>
+      {/* <TablePagination
+          rowsPerPageOptions={[1, 2, 3]}
+          component="div"
+          count={listOfStratgies.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        /> */}
     </div></>)}
 
       
@@ -485,6 +675,21 @@ function collapseRow(the)
 }
 
 function ClientList({ advisorId ,setDashboardLoading }) {
+
+
+  const columns = [
+    { field: 'clientId', headerName: '#',backgroundColor: '#4b49ac',width: 144 ,headerClassName: 'super-app-theme--header', },
+    { field: 'fullname', headerName: 'Client Name',width: 300,headerClassName: 'super-app-theme--header', },
+    { field: 'email', headerName: 'Email Address' ,width: 300,headerClassName: 'super-app-theme--header', },
+    {
+      field: 'phoneNumber',
+      headerName: 'Mobile Number',
+      description: 'This column has a value getter and is not sortable.',
+      headerClassName: 'super-app-theme--header',
+      width: 150 
+      
+    }
+  ];
   //  //debugger
   // dashboardLoading=true
   const [listOfClients, setListOfClients] = useState([])
@@ -495,12 +700,26 @@ function ClientList({ advisorId ,setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
 //debugger
+
+
       let list=response.data
       setTotalClients(list.length)
-      setListOfClients(response.data)
+      debugger
+      list = list.map(obj => {
+        return { ...obj, fullname : `${obj.firstName} ${obj.lastName}` };
+       }
+      //  {}
+    );
+      setListOfClients(list)
+      
+    //   new DataTable('#AdvisorClientTable', {
+    //     scrollCollapse: true,
+    //     scroller: true,
+    //     scrollY: 200
+    // });
       setLoading(false)
       setDashboardLoading(false)
       // dashboardLoading=false
@@ -539,7 +758,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
   //   axios({
   //     method:'get',
-  //     url:`https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}`
+  //     url:`  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}`
   //   }).then((response)=>{
 
 
@@ -557,7 +776,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
   //   listOfClientId.map((e)=>{axios({
   //     method:'get',
-  //     url:`https://localhost:7136/api/investments/client/${e.clientId}`
+  //     url:`  https://investmentportal.azurewebsites.net/api/investments/client/${e.clientId}`
   //   }).then((response)=>{setListofInvestments([...listOfInvestments,response.data])},(error)=>{})
 
 
@@ -567,7 +786,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
   //   useEffect(()=>{
   //     axios({
   //       method:'get',
-  //       url:`https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId`
+  //       url:`  https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId`
   //     }).then(function(response){
   //     const list=response.data.strategies
 
@@ -645,7 +864,34 @@ function ClientList({ advisorId ,setDashboardLoading }) {
                 <Card color="firstCard" heading="Number of Clients" number={totalClients}/>
                 </div>
                 <div className="rectangle-div">
-        <TableContainer component={Paper}>
+                <Box
+                className='tableIcon'
+      sx={{
+        width: '100%',
+        '& .super-app-theme--header': { color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' },
+      }}
+    >
+                <DataGrid
+                disableColumnSelector
+                disableSelectionOnClick
+                slotProps={{
+                  columnsPanel: {
+                    disableHideAllButton: true,
+                    disableShowAllButton: true,
+                  },
+                }}
+                getRowId={(listOfClients) => listOfClients.clientId}
+        rows={listOfClients}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+      />
+      </Box>
+        {/* <TableContainer component={Paper}>
           <Table size='small' aria-label="simple table" id="AdvisorClientTable">
             <TableHead>
               <TableRow >
@@ -681,7 +927,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
               )}
 
 
-            </TableBody></Table></TableContainer>
+            </TableBody></Table></TableContainer> */}
 
       </div></>)
 
@@ -697,6 +943,51 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 function ReportsContent({ advisorId ,setDashboardLoading }) {
   ////debugger
   // dashboardLoading=true
+
+  const columns = [
+    { field: 'investmentID', headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'clientId', width:110 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
+    { field: 'createdDate',width:110 , headerName: 'Date' ,headerClassName: 'super-app-theme--header',
+  renderCell : (params)=> params.row.createdDate.slice(0,10)},
+    {
+      field: 'investmentAmount',
+      width:110 ,
+      headerName: 'Amount',
+     
+      headerClassName: 'super-app-theme--header',
+     
+      
+    },
+    { field: 'remainingAmount', width:110, headerName: 'Balance' ,headerClassName: 'super-app-theme--header', },
+    { field: 'timePeriod', width:110 , headerName: 'Time Period' ,headerClassName: 'super-app-theme--header', },
+  
+    { field: 'status', width:110 , headerName: 'Status' ,headerClassName: 'super-app-theme--header', },
+    {field: 'image',
+    headerName: 'Type',
+    headerClassName: 'super-app-theme--header',
+    disableColumnMenu:true ,
+    sortable: false,
+    width: 80,
+    editable: true,
+    renderCell: (params) =>params.row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'>
+    <img className='table-img' src={lowRisk}/></Tooltip>
+                      :(params.row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'>
+    <img className='table-img' src={highRisk}/></Tooltip>
+                      :(params.row.investmentType==='Medium Risk'?<Tooltip title='Medium Risk' placement='right-end'>
+    <img className='table-img' src={mediumRisk}/></Tooltip>
+                      :<Tooltip title='Need Consultation' placement='right-end'>
+    <HelpIcon className='table-img green' ></HelpIcon></Tooltip>)
+                       )
+    },
+    { disableColumnMenu:true , headerName:'',headerClassName: 'super-app-theme--header',sortable: false, width: 50 , renderCell: (params) => {
+      return (
+        <Tooltip title='Create Strategy' placement='right-end'> <Button className='plusIcon' onClick={()=>handleOpen(params.row)}>
+                
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </Button></Tooltip>
+      );
+    }}
+  ];
  
   const [loading,setLoading]=useState(false)
   const [requestLoading,setRequestLoading]=useState(true)
@@ -741,7 +1032,7 @@ const handleSnackClose = (event, reason) => {
     setTimePeriod(row.timePeriod)
     axios({
       method:'get',
-      url:`https://localhost:7136/api/strategies/bytype/${row.investmentType}?api-version=1`,
+      url:`  https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
     }).then(
       (response)=>{
         debugger
@@ -755,7 +1046,8 @@ const handleSnackClose = (event, reason) => {
     )
     
   }
-  const handleClose = () => {
+  const handleClose = (event,reason) => {
+    if(reason!=='backdropClick'){
     setModalOpen(false)
     setMessage('')
     setStrategyName('')
@@ -775,7 +1067,7 @@ const handleSnackClose = (event, reason) => {
     setHelperText('')
     setThreeYrReturnsError(false)
     setFiveYrReturnsError(false)
-  };
+  }};
   const [strategyName, setStrategyName] = useState('')
   const [investmentId, setInvestmentId] = useState('')
   const [amount, setAmount] = useState('')
@@ -807,7 +1099,7 @@ const handleSnackClose = (event, reason) => {
 const handleReturns=(strategyName)=>{
   axios({
     method:'get',
-    url:`https://localhost:7136/api/strategies/byname/${strategyName}?api-version=1`
+    url:`  https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
     }).then((response)=>{
      let data = response.data[0]
      setSixMonReturns(data.returnPercentageAfter6months)
@@ -842,6 +1134,9 @@ const handleCalculations=(investmentAmount)=>{
                       // (Math.pow((1 + rate / 100), time)))
 }
   const handleModalSubmit = (event) => {
+
+
+
 
     event.preventDefault();
     setStrategyNameError(false)
@@ -932,13 +1227,14 @@ const handleCalculations=(investmentAmount)=>{
 setLoading(true)
   axios({
     method: 'post',
-    url: 'https://localhost:7136/api/strategies/Add?api-version=1',
+    url: '  https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
     data: strategyData
   }).then((response) => {
     console.log(response)
     setMessage(response.data.message)
     handleInvestmentCall()
     setSnackOpen(true)
+    setTimeout(handleSnackClose,2000)
     setLoading(false)
     handleClose()
     if (response.data.message = "Strategy added successfully.") {
@@ -981,7 +1277,7 @@ setLoading(true)
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/investments/advisor/${advisorId}?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
       debugger
       // dashboardLoading=false
@@ -1124,6 +1420,7 @@ if(_needConsultation > 0){
         </Alert>
       </Snackbar>
       <Modal
+       
         open={modalOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
@@ -1375,7 +1672,60 @@ if(_needConsultation > 0){
 
           </div>
       <div className="rectangle-div">
-      <TableContainer component={Paper}>
+{Length===0?<TableContainer component={Paper}>
+      <Table size='small' aria-label="simple table">
+        <TableHead>
+          <TableRow >
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px' ,fontWeight: 'bold', backgroundColor: '#4b49ac'}}>Client Id</TableCell>
+            <TableCell align='center' sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px' , backgroundColor: '#4b49ac'}}>Date</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Amount</TableCell>
+            <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Balance</TableCell>
+            <TableCell  sx={{ color: 'white',fontWeight: 'bold', fontSize: '16px', backgroundColor: '#4b49ac' }}>Time Period</TableCell>
+            <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Type</TableCell>
+            <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Status</TableCell>
+            <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}></TableCell>
+
+          </TableRow>
+        </TableHead>
+        <TableBody>
+ 
+            <React.Fragment >
+              <TableRow>
+                <TableCell
+                sx={{ textAlign: "center"}} 
+                 colSpan={7}>No Investment Requests</TableCell>
+              </TableRow>
+            </React.Fragment></TableBody></Table></TableContainer>:
+      <Box
+                className='tableIcon'
+      sx={{
+        width: '100%',
+        '& .super-app-theme--header': { 
+          
+          color: 'white', fontSize: '16px',
+          fontWeight: 'bold',
+           backgroundColor: '#4b49ac'
+         },
+      }}
+    >
+                <DataGrid
+                 disableRowSelectionOnClick
+                 disableColumnSelector
+                getRowId={(reportListOfRequests) => reportListOfRequests.investmentID}
+        rows={reportListOfRequests}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+      />
+      </Box>
+}
+
+      {/* <TableContainer component={Paper}>
       <Table size='small' aria-label="simple table">
         <TableHead>
           <TableRow >
@@ -1413,8 +1763,7 @@ if(_needConsultation > 0){
                 <TableCell align='center'>{row.investmentAmount}</TableCell>
                 <TableCell>{row.remainingAmount}</TableCell>
                 <TableCell align='center'>{row.timePeriod}</TableCell>
-                {/* <TableCell><Button class={row.investmentType}  sx={{cursor:'default'}} >
-                  {row.investmentType}</Button></TableCell> */}
+               
                   <TableCell align='center' sx={{padding:"0px"}}>
                   {row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'><img className='table-img' src={lowRisk}/></Tooltip>
                   :(row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'><img className='table-img' src={highRisk}/></Tooltip>
@@ -1434,7 +1783,9 @@ if(_needConsultation > 0){
           )
 
           }
-        </TableBody></Table></TableContainer>
+        </TableBody></Table></TableContainer> */}
+    
+       
         </div></>)
       
       }
@@ -1445,6 +1796,56 @@ if(_needConsultation > 0){
 }
 
 function PastInvestments({ advisorId ,setDashboardLoading }) {
+
+  const columns = [
+    { field: 'investmentID', width:230, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'clientId', width:230 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount', width:230, headerName: 'Amount',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    {field: 'image',
+    headerName: 'Type',
+    headerClassName: 'super-app-theme--header',
+    disableColumnMenu:true ,
+    sortable: false,
+    width: 80,
+    editable: true,
+    renderCell: (params) =>params.row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'>
+    <img className='table-img' src={lowRisk}/></Tooltip>
+                      :(params.row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'>
+    <img className='table-img' src={highRisk}/></Tooltip>
+                      :(params.row.investmentType==='Medium Risk'?<Tooltip title='Medium Risk' placement='right-end'>
+    <img className='table-img' src={mediumRisk}/></Tooltip>
+                      :<Tooltip title='Need Consultation' placement='right-end'>
+    <HelpIcon className='table-img green' ></HelpIcon></Tooltip>)
+                       )
+    },
+    {field: 'action',
+    headerName: 'Action',
+    headerClassName: 'super-app-theme--header',
+    disableColumnMenu:true ,
+    sortable: false,
+    width: 131,
+    editable: true,
+    renderCell: (params) =><FormControl required fullWidth>
+    <InputLabel id="demo-simple-select-label">Status</InputLabel>
+    <Select
+      size="small"
+      margin="normal"
+      labelId="demo-simple-select-label"
+      id="demo-simple-select"
+      label="Status"
+      // value={Status}
+    
+      onChange={e=>{handleChange(params.row.investmentID,e.target.value)}}
+    >
+       <MenuItem value={''}>No Change</MenuItem>
+      <MenuItem value={'Funded'}>Funded</MenuItem>
+     
+
+
+    </Select>
+  </FormControl>
+    }
+  ]
   const [listOfApprovedInv,setListOfApprovedInv]=useState([])
   const [actionArray,setActionArray]=useState([])
   const [snackOpen, setSnackOpen] = React.useState(false);
@@ -1465,9 +1866,8 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
   };
 
   const handleChange=(investmentId,status)=>{
-  if(status==='Funded'){
-    setVisible(true)
-  }
+    status==='Funded'?setVisible(true):setVisible(false)
+  
     const actionObj ={
       investmentId:investmentId,
      status:status
@@ -1484,7 +1884,7 @@ const handleSave=()=>{
   setActionLoading(true)
   axios({
     method:'put',
-    url:`https://localhost:7136/api/investments/update-status?api-version=1`,
+    url:`  https://investmentportal.azurewebsites.net/api/investments/update-status?api-version=1`,
     data:actionArray
   }).then((response)=>{
   
@@ -1505,7 +1905,7 @@ setVisible(false)
 const handleFundedCall=()=>{
   axios({
     method:'get',
-    url:`https://localhost:7136/api/investments/approved/${advisorId}?api-version=1`
+    url:`  https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
   }).then((response)=>{
     console.log(response.data)
     const list = response.data
@@ -1529,7 +1929,7 @@ const handleFundedCall=()=>{
   handleFundedCall();
     // axios({
     //   method:'get',
-    //   url:`https://localhost:7136/api/investments/approved/${advisorId}?api-version=1`
+    //   url:`  https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
     // }).then((response)=>{
     //   console.log(response.data)
     //   setNewLoading(false)
@@ -1553,13 +1953,68 @@ const handleFundedCall=()=>{
   
   :<>
   <div className="rectangle-div">
-    <TableContainer component={Paper}>
+
+    {length===0?
+     <TableContainer component={Paper}>
+     <Table size='small' aria-label="simple table" id="AdvisorClientTable">
+       <TableHead>
+         <TableRow >
+           <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
+           <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Client Id</TableCell>
+           <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width: '184px' }}>Amount</TableCell>
+           <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' ,padding:'0px' }}>Type</TableCell>
+
+           <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width:'140px' }}></TableCell>
+
+         </TableRow>
+       </TableHead>
+       <TableBody>
+        
+       <React.Fragment >
+         <TableRow>
+           <TableCell
+           sx={{ textAlign: "center"}} 
+            colSpan={4}>No Recent Approved Investment</TableCell>
+         </TableRow>
+       </React.Fragment></TableBody></Table></TableContainer>
+    :
+  <Box
+                className='tableIcon'
+      sx={{
+        width: '100%',
+        '& .super-app-theme--header': { 
+       
+          color: 'white', fontSize: '16px',
+          fontWeight: 'bold',
+           backgroundColor: '#4b49ac'
+         },
+      }}
+    >
+                <DataGrid
+                disableColumnMenu
+                disableColumnSelector
+                disableRowSelectionOnClick
+                getRowId={(listOfApprovedInv) => listOfApprovedInv.investmentID}
+        rows={listOfApprovedInv}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5,10]}
+      />
+      </Box>}
+
+    {/* <TableContainer component={Paper}>
           <Table size='small' aria-label="simple table" id="AdvisorClientTable">
             <TableHead>
               <TableRow >
                 <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
                 <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Client Id</TableCell>
-                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width: '184px' }}>Investment Amount</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width: '184px' }}>Amount</TableCell>
+                <TableCell  sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' ,padding:'0px' }}>Type</TableCell>
+
                 <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac',width:'140px' }}></TableCell>
 
               </TableRow>
@@ -1582,6 +2037,12 @@ const handleFundedCall=()=>{
                     </TableCell>
                     <TableCell>{row.clientId}</TableCell>
                     <TableCell>{row.investmentAmount}</TableCell>
+                    <TableCell sx={{padding:"0px"}}>
+                  {row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'><img className='table-img' src={lowRisk}/></Tooltip>
+                  :(row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'><img className='table-img' src={highRisk}/></Tooltip>
+                  :(row.investmentType==='Medium Risk'?<Tooltip title='Medium Risk' placement='right-end'><img className='table-img' src={mediumRisk}/></Tooltip>
+                  :<Tooltip title='Need Consultation' placement='right-end'><HelpIcon className='table-img' sx={{color:'green'}}></HelpIcon></Tooltip>)
+                   )}</TableCell>
                     <TableCell><FormControl required fullWidth>
             <InputLabel id="demo-simple-select-label">Status</InputLabel>
             <Select
@@ -1607,7 +2068,7 @@ const handleFundedCall=()=>{
               )}
 
 
-            </TableBody></Table></TableContainer>
+            </TableBody></Table></TableContainer> */}
     </div>
 
        {visible?<>{length === 0? "":<>{ actionLoading?<Button className='save' sx={{backgroundColor:'#1BCFB4'
@@ -1709,7 +2170,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     })
       .then((response) => {
         setAdvisorData(response.data.advisor)
@@ -1803,7 +2264,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setBackVisible(false)
       axios({
         method: 'put',
-        url: `https://localhost:7136/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
+        url: `  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
         data: updatedAdvisorData
       }).then((response) => {
         console.log(response)
@@ -2017,6 +2478,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
       </div>
       {message?<Alert severity='success'>{message}</Alert>:''}
       <Modal
+       
         open={modalOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"

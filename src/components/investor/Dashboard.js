@@ -16,7 +16,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import image2 from '../../assets/animation.gif'
 import image3 from '../../assets/seconds.gif'
 import Tooltip from '@mui/material/Tooltip';
-
+import { DataGrid } from "@mui/x-data-grid";
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import image from '../../assets/download.png'
@@ -47,15 +47,160 @@ import Card from "../Card/Card";
 
 function Dashboard() {
 
+  const [sessionModalOpen,setSessionModalOpen]=useState(false)
+  const handleSessionModalClose = (event,reason) => {
+    if (reason !== 'backdropClick') {
+      setSessionModalOpen(false)
+    }
+   };
+   const [timerModalOpen,setTimerModalOpen]=useState(false)
+   const handleTimerModalClose = (event,reason) => {
+    if (reason !== 'backdropClick') {
+      setTimerModalOpen(false)
+    }
+   };
+   let countdown;
+   let leftTime,expirationTime,timeInSeconds;
+   
+   let splitarray = window.location.pathname.split('/');
+   let _clientID= splitarray[splitarray.length-1];
+   let storage = JSON.parse(localStorage.getItem(_clientID));
+
+   function startTimer() {
+    updateTimer();
+    countdown = setInterval(updateTimer, 1000);
+  }
   
+  function stopTimer() {
+      clearInterval(countdown);
+  }
+
+  function updateTimer() {
+    // debugger
+    if(!localStorage.getItem(_clientID))
+    {
+       stopTimer();
+       navigate('/investor')
+    }
+    else
+    {
+      const minutes = Math.floor(timeInSeconds / 60);
+      const seconds = timeInSeconds % 60;
+      if(timeInSeconds>0) {
+      const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('timer').innerText = formattedTime;
+    }
+     
+    
+      if(timeInSeconds===0){
+        stopTimer()
+        setTimerModalOpen(true)
+        // handleLogout()
+      }
+      else {
+          // setTimeInSeconds(timeInSeconds--);
+          storage.TimeLeft = --timeInSeconds;
+          localStorage.setItem(_clientID,JSON.stringify(storage));
+      }
+    }
+    
+}
+
+ 
   const [dashboardLoading,setDashboardLoading]=useState(true)
   const { clientId } = useParams()
   const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
   const [lastName,setLastName]=useState('')
   const [loading,setLoading]=useState(true)
+//   const [timerModalOpen,setTimerModalOpen]=useState(false)
+//   const handleTimerModalClose = (event,reason) =>{ 
+//      if (reason !== 'backdropClick') {
+//       setTimerModalOpen(false)
+//     }
+// };
+//   let countdown;
+//   let [timeInSeconds,setTimeInSeconds]=useState(10)
+
+//   function startTimer() {
+//       countdown = setInterval(updateTimer, 1000);
+//   }
+
+//   function stopTimer() {
+//       clearInterval(countdown);
+//   }
+
+//   function updateTimer() {
+     
+//     const minutes = Math.floor(timeInSeconds / 60);
+//     const seconds = timeInSeconds % 60;
+//     if(timeInSeconds>0){
+//     const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+//     document.getElementById('timer').innerText = formattedTime;
+//   }
+
+//     if (timeInSeconds === 5) {
+//         // stopTimer();
+//         // alert('Time is up!');
+//         stopTimer()
+//         // setTimerModalOpen(true)
+//         return
+//     } 
+//     if(timeInSeconds===0){
+//       stopTimer()
+//       handleLogout()
+      
+//     }
+//     else {
+//         setTimeInSeconds(timeInSeconds--);
+//     }
+// }
+
+const timerModalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: '#e4f1ff',
+  borderRadius: '20px',
+  boxShadow: 24,
+  p: 4,
+};
+const handleSessionYes=()=>{
+  var user={
+    userId:clientId,
+    timestamp:new Date().getTime()
+  }
+  localStorage.setItem('user', JSON.stringify(user));
+  // timeInSeconds=1800
+  setSessionModalOpen(false)
+
+}
+const handleSessionNo=()=>{
+    setSessionModalOpen(false)
+}
   
   useEffect(()=>{
+    // startTimer()
+
+    if(!storage){
+      // Add popup and with settimeout will natigate to advisor path
+      navigate('/investor')
+    }
+    else{
+       leftTime = storage.TimeLeft;
+       expirationTime = storage.Expirationtimestamp;
+      if(!leftTime // Or current time is greater then Expirationtimestamp or storage is null or empty
+      )
+      {
+        // Logout if left time is empty
+      }
+      // let [timeInSeconds,setTimeInSeconds]=useState(leftTime)
+       timeInSeconds = leftTime;
+       startTimer()
+    }
+
 
     const body = document.querySelector("body");
     const sidebar = body.querySelector(".sidebar");
@@ -65,7 +210,7 @@ function Dashboard() {
     const materialicons = body.querySelectorAll(".Customicons");
     const navLinks = document.querySelectorAll('.nav-link a span')
     // const modeText = body.querySelector(".mode-text");
-    //debugger
+    // 
     
     
     toggle.addEventListener("click", () => {
@@ -86,7 +231,7 @@ function Dashboard() {
 
   axios({
     method: 'get',
-    url: `https://localhost:7136/api/ClientSignUp/${clientId}?api-version=1`
+    url: `  https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
   }).then((response) => {
     setFirstName(response.data.client.firstName)
     setLastName(response.data.client.lastName)
@@ -108,8 +253,22 @@ function Dashboard() {
     setIsDropdownOpen(!isDropdownOpen);
   };
   const [selectedOption, setSelectedOption] = useState('Portfolio');
+  // const handleNo=()=>{
+  //   timeInSeconds=4
+  //   startTimer()
+
+  //   setTimerModalOpen(false)
+  // }
+  // const handleYes=()=>{
+     
+  //   timeInSeconds=20
+  //   setTimerModalOpen(false)
+  //   startTimer()
+  // }
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    // stopTimer()
+    localStorage.removeItem(_clientID)
+  
     navigate('/investor')
 
   }
@@ -118,14 +277,30 @@ function Dashboard() {
       <LinearProgress color='error' />
     </Box>:''}
     <div className="investorDashboard">
-     
-      
+    
       
 <div class="div-sidebar">
 <nav class="sidebar">
     <header>
     <div class="image-text">
           <div class="img bg-wrap text-center py-4 bg1" >
+          <p id='time'>Session Time: <span id='timer'></span></p>
+          <Modal
+           
+        open={timerModalOpen}
+        onClose={handleTimerModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      ><Box sx={timerModalStyle} >
+          
+          <Typography  color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
+          Your Session has Expired. Please Re-Login to Continue.
+          </Typography>
+          <div className='modaldiv'>
+           <Button onClick={()=>{handleLogout()}} className='flexend SixthCard' variant='contained' >Go to LoginPage</Button>
+           </div>
+        </Box>
+      </Modal>
           <div class="user-logo">
           <div class="img bg2" ></div>
           {loading?<div class="text header-text">
@@ -187,20 +362,20 @@ function Dashboard() {
 
       <div className="content inc-m-l">
         {selectedOption === 'Portfolio' && <PortfolioContent clientId={clientId}
-         setDashboardLoading={setDashboardLoading}  />}
+         setDashboardLoading={setDashboardLoading} setSessionModalOpen={setSessionModalOpen} />}
         {selectedOption === 'pastRequests' && <PastRequestsContent clientId={clientId} 
-         setDashboardLoading={setDashboardLoading} />}
+         setDashboardLoading={setDashboardLoading} setSessionModalOpen={setSessionModalOpen}/>}
         {selectedOption === 'New Investment' && <InvestmentContent clientId={clientId} 
-         setDashboardLoading={setDashboardLoading} />}
+         setDashboardLoading={setDashboardLoading} setSessionModalOpen={setSessionModalOpen}/>}
         {selectedOption === 'Settings' && <SettingsContent clientId={clientId}
-         setDashboardLoading={setDashboardLoading}  />}
+         setDashboardLoading={setDashboardLoading} setSessionModalOpen={setSessionModalOpen} />}
       </div>
     </div>
   </>
   );
 }
 
-function PortfolioContent({ clientId ,setDashboardLoading }) {
+function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}) {
 
   
   const [open, setOpen] = useState(false);
@@ -208,24 +383,25 @@ function PortfolioContent({ clientId ,setDashboardLoading }) {
   const [TotalInv, setTotalInv] = useState(0);
   const [TotalinvAmount, SetTotalInvAmount] = useState(0);
   const [TotalExeAmount, SetTotalExeAmount] = useState(0);
-
+  const navigate = useNavigate()
 
   const [loading,setLoading]=useState(true)
-debugger
+ 
   useEffect(() => {
+   
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
     }).then(function (response) {
-      //debugger
+      // 
       setDashboardLoading(false)
       const list = response.data.strategies;
-      setTotalInv(list.filter(x=>x.status==="Approved").length);
-      SetTotalInvAmount(list.map(x=>x.status==="Approved"? x.investmentAmount:0).reduce(function(a, b){
+      setTotalInv(list.filter(x=>x.status==="Funded").length);
+      SetTotalInvAmount(list.map(x=>x.status==="Funded"? x.investmentAmount:0).reduce(function(a, b){
         return a + b;
       }));
-      SetTotalExeAmount(list.map(x=>x.status==="Approved"?x.expectedAmount:0 ).reduce(function(a, b){
+      SetTotalExeAmount(list.map(x=>x.status==="Funded"?x.expectedAmount:0 ).reduce(function(a, b){
         return a + b;
       }));
       setLoading(false)
@@ -245,7 +421,7 @@ debugger
   const [coll,setColl]=useState('')
   function collapseRow(the)
   {
-    //debugger;
+    // ;
     let _strategyId = the.row.strategyId;
     //setOpen(!open);
     if(coll === _strategyId)
@@ -374,7 +550,40 @@ debugger
   );
 }
 
-function PastRequestsContent({ clientId , setDashboardLoading }) {
+function PastRequestsContent({ clientId , setDashboardLoading ,setSessionModalOpen }) {
+  const navigate = useNavigate()
+  const columns = [
+    { field: 'investmentID', headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'date', width:170 , headerName: 'Created Date',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount',width:170 , headerName: 'Amount(Rs.)' ,headerClassName: 'super-app-theme--header', },
+    {
+      field: 'timePeriod',
+      width:170 ,
+      headerName: 'Time Period',
+     
+      headerClassName: 'super-app-theme--header',
+     
+      
+    },
+    {field: 'image',
+    headerName: 'Type',
+    headerClassName: 'super-app-theme--header',
+    disableColumnMenu:true ,
+    sortable: false,
+    width: 80,
+    editable: true,
+    renderCell: (params) =>params.row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'>
+    <img className='table-img' src={lowRisk}/></Tooltip>
+                      :(params.row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'>
+    <img className='table-img' src={highRisk}/></Tooltip>
+                      :(params.row.investmentType==='Medium Risk'?<Tooltip title='Medium Risk' placement='right-end'>
+    <img className='table-img' src={mediumRisk}/></Tooltip>
+                      :<Tooltip title='Need Consultation' placement='right-end'>
+    <HelpIcon className='table-img green' ></HelpIcon></Tooltip>)
+                       )
+    },
+    { field: 'status', width:200 , headerName: 'Status' ,headerClassName: 'super-app-theme--header', },
+  ];
   const [listOfPastRequests, setListOfPastRequests] = useState([])
   const [totalRequest,setTotalRequest]=useState(0)
   const [totalHighRiskRequest,setTotalHighRiskRequest]=useState(0)
@@ -389,11 +598,17 @@ const handleInvestmentCall = () => {
   setDashboardLoading(true)
   axios({
     method: 'get',
-    url: `https://localhost:7136/api/investments/client/${clientId}?api-version=1`
+    url: `  https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
   }).then(function (response) {
-    setListOfPastRequests(response.data)
-    const list = response.data
+    
+    let list = response.data
+    list = list.map(obj => {
+      return { ...obj, date : `${obj.createdDate.slice(0,10)}` };
+     }
+    //  {}
+  );
     console.log(list)
+    setListOfPastRequests(list)
     let _highRisk = list.filter(x=>x.investmentType==="High Risk").length;
     let _lowRisk = list.filter(x=>x.investmentType==="Low Risk").length;
     let _mediumRisk = list.filter(x=>x.investmentType==="Medium Risk").length;
@@ -508,7 +723,8 @@ const handleInvestmentCall = () => {
 
 
     useEffect(() => {
-      // //debugger
+      
+      // // 
       handleInvestmentCall()
     }, [])    
 
@@ -547,7 +763,34 @@ const handleInvestmentCall = () => {
  </div>
                 
                 <div className="rectangle-div">
-        <TableContainer component={Paper}>
+
+                <Box
+                className='tableIcon'
+      sx={{
+        width: '100%',
+        '& .super-app-theme--header': { 
+          
+          color: 'white', fontSize: '16px',
+          fontWeight: 'bold',
+           backgroundColor: '#4b49ac'
+         },
+      }}
+    >
+                <DataGrid
+                disableColumnSelector
+                disableRowSelectionOnClick
+                getRowId={(listOfPastRequests) => listOfPastRequests.investmentID}
+        rows={listOfPastRequests}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+      />
+      </Box>
+        {/* <TableContainer component={Paper}>
           <Table size="small" aria-label="simple table">
             <TableHead>
               <TableRow >
@@ -596,18 +839,56 @@ const handleInvestmentCall = () => {
               }
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
       </div></>)}
     </div>
   );
 }
 
-function InvestmentContent({ clientId , setDashboardLoading }) {
+function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen}) {
+
+  const columns = [
+    { field: 'strategyId', width:80, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'investmentName', width:145 , headerName: 'Strategy Name',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount',width:130 , headerName: 'Amount(Rs)' ,headerClassName: 'super-app-theme--header', },
+    { field: 'expectedAmount',width:205, headerName: 'Expected Amount(Rs)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter6months', width:132 , headerName: '6M Return(%)',headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter1year',width:130 , headerName: '1Y Return(%)' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter3year',width:130, headerName: '3Y Return(%)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter5year', width:130 , headerName: '5Y Return(%)',headerClassName: 'super-app-theme--header', },
+    {field: 'image',
+    headerName: 'Action',
+    headerClassName: 'super-app-theme--header',
+    disableColumnMenu:true ,
+    sortable: false,
+    width: 131,
+    editable: true,
+    renderCell: (params) =><FormControl required fullWidth>
+    <InputLabel id="demo-simple-select-label">Status</InputLabel>
+    <Select
+      size="small"
+      margin="normal"
+      labelId="demo-simple-select-label"
+      id="demo-simple-select"
+      label="Status"
+      // value={Status}
+    
+      onChange={e=>{handleChange(params.row.strategyId,e.target.value)}}
+    >
+      <MenuItem value={'Approved'}>Approve</MenuItem>
+      <MenuItem value={'Rejected'}>Reject</MenuItem>
+
+
+    </Select>
+  </FormControl>
+    },
+  ]
+
   const [strategyLoading,setStrategyLoading]=useState(true)
   const [investmentAmount, setInvestmentAmount] = useState("")
   const [investmentType, setInvestmentType] = useState("")
   const [timePeriod, setTimePeriod] = useState("")
- 
+  const navigate = useNavigate()
   const [Status, setStatus] = useState('')
   const [investmentAmountError, setInvestmentAmountError] = useState(false)
   const [investmentTypeError, setInvestmentTypeError] = useState(false)
@@ -661,11 +942,11 @@ function InvestmentContent({ clientId , setDashboardLoading }) {
   };
   const recommendationStyle = {
     position: 'absolute',
-    top: '30%',
+    top: '45%',
     left: '50%',
     overflow: 'auto',
     transform: 'translate(-50%, -50%)',
-    width: '1200px',
+    width: '1280px',
     bgcolor: '#e4f1ff',
     borderRadius: '20px',
     boxShadow: 24,
@@ -673,7 +954,8 @@ function InvestmentContent({ clientId , setDashboardLoading }) {
   };
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
+  const handleClose = (event,reason) => {
+    if(reason!=='backdropClick'){
     setOpen(false)
     setMessage("")
     setInvestmentAmount('')
@@ -682,7 +964,7 @@ function InvestmentContent({ clientId , setDashboardLoading }) {
     setInvestmentAmountError(false)
     setInvestmentTypeError(false)
     setTimePeriodError(false)
-
+    }
   };
 
 
@@ -690,22 +972,25 @@ function InvestmentContent({ clientId , setDashboardLoading }) {
 
   const [recommendationsOpen, setRecommendationsOpen] = useState(false);
   const handleRecommendationsOpen = () => setRecommendationsOpen(true);
-  const handleRecommendationsClose = () => {setRecommendationsOpen(false)
+  const handleRecommendationsClose = (event,reason) => {
+    if(reason!=='backdropClick'){
+    setRecommendationsOpen(false)
       setListOfStrategies([])
       setStatus("")
       setActionArray([])
-      
+    }
   };
 const handleSave=()=>{
 setActionLoading(true)
 axios({
   method:'put',
-  url:`https://localhost:7136/api/strategies/Update-Multiple-by-Client?api-version=1`,
+  url:`  https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Client?api-version=1`,
   data:actionArray
 }).then((response)=>{
 console.log(response)
 setActionLoading(false)
 setSnackOpen(true)
+setTimeout(handleSnackClose,5000)
 setVisible(false)
 handleRecommendationsClose()
 },(error)=>{
@@ -719,11 +1004,12 @@ setActionLoading(false)
 const [newLoading,setNewLoading]=useState(false)
 
   useEffect(() => {
+   
     setDashboardLoading(true)
     setNewLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/investments/client/${clientId}?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
     }).then((response) => {
       setDashboardLoading(false)
       setNewLoading(false)
@@ -787,13 +1073,13 @@ const [newLoading,setNewLoading]=useState(false)
     setLoading(true)
     axios({
       method: 'post',
-      url: `https://localhost:7136/api/investments/New Investment?api-version=1`,
+      url: `  https://investmentportal.azurewebsites.net/api/investments/New Investment?api-version=1`,
       data: investmentData
     }).then((response) => {
       console.log(response)
       setLoading(false)
       setSnackInvOpen(true)
-
+      setTimeout(handleSnackInvClose,5000)
       if (response.data.message === "Investment Successfully Generated") {
         setAdvisorId(response.data.investment.advisorId)
         // setMessage("Investment Request Created.Soon Advisor Will Create Strategy For You.")
@@ -823,7 +1109,9 @@ const [newLoading,setNewLoading]=useState(false)
     const [action,setAction]=useState(false)
     const [childOpen, setChildOpen] = useState(false)
     const handleChildOpen = () => setChildOpen(true);
-    const handleChildClose = () => setChildOpen(false);
+    const handleChildClose = (event,reason) =>{
+      if(reason!=='backdropClick'){
+      setChildOpen(false)}};
 
     const handleApprove = (strategyId) => {
       handleChildOpen()
@@ -845,7 +1133,7 @@ const [newLoading,setNewLoading]=useState(false)
 setActionLoading(true)
       axios({
         method: 'put',
-        url: `https://localhost:7136/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
+        url: `  https://investmentportal.azurewebsites.net/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
         data: investmentData
       }).then((response) => {
         console.log(response)
@@ -929,7 +1217,7 @@ setActionLoading(true)
   
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
     }).then((response) => {
       let data = response.data.strategies
       let list= data.filter(x=> x.status== 'Pending');
@@ -1070,14 +1358,71 @@ setActionLoading(true)
         <br />
         <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
                 </div>:(
-                <React.Fragment><TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
+                <React.Fragment>
+                {listOfStratgies.length===0?   <TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
+
+<Table size="small" aria-label="simple table">
+  <TableHead>
+    <TableRow size='small' >
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Strategy Name</TableCell>
+     
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Amount(Rs.)</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Expected Amount(Rs.)</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>6 Months Return(%)</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>1 year Return(%)</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>3 year Return(%)</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>5 year Return(%)</TableCell>
+      <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Approve/Reject</TableCell>
+     
+    </TableRow>
+  </TableHead>
+  <TableBody>
+  
+      <React.Fragment >
+      <TableRow>
+        <TableCell
+        sx={{ textAlign: "center"}} 
+         colSpan={9}>No Pending Strategy Available</TableCell>
+      </TableRow>
+    </React.Fragment> </TableBody></Table></TableContainer>:
+    
+                <Box
+                className='tableIcon'
+      sx={{
+        width: '100%',
+        '& .super-app-theme--header': { 
+       
+          color: 'white', fontSize: '16px',
+          fontWeight: 'bold',
+           backgroundColor: '#4b49ac'
+         },
+      }}
+    >
+                <DataGrid
+                disableColumnMenu
+                disableColumnSelector
+                disableRowSelectionOnClick
+                getRowId={(listOfStratgies) => listOfStratgies.strategyId}
+        rows={listOfStratgies}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5]}
+      />
+      </Box>}
+
+                  {/* <TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
 
                   <Table size="small" aria-label="simple table">
                     <TableHead>
                       <TableRow size='small' >
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Strategy Name</TableCell>
-                        {/* <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Original Amount(Rs.)</TableCell> */}
+                       
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Amount(Rs.)</TableCell>
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Expected Amount(Rs.)</TableCell>
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>6 Months Return(%)</TableCell>
@@ -1085,7 +1430,7 @@ setActionLoading(true)
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>3 year Return(%)</TableCell>
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>5 year Return(%)</TableCell>
                         <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Approve/Reject</TableCell>
-                        {/* <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#0000ff' }}>Status</TableCell> */}
+                       
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -1106,7 +1451,7 @@ setActionLoading(true)
                               <TableRow>
                                 <TableCell>{row.strategyId}</TableCell>
                                 <TableCell>{row.investmentName}</TableCell>
-                                {/* <TableCell>{.amount}</TableCell> */}
+                              
                                 <TableCell>{row.investmentAmount}</TableCell>
                                 <TableCell>{row.expectedAmount}</TableCell>
                                 <TableCell>{row.returnPercentageAfter6months}</TableCell>
@@ -1131,8 +1476,8 @@ setActionLoading(true)
 
             </Select>
           </FormControl></TableCell>                                
-          {/* <TableCell><ChildModal strategyId={row.strategyId} /></TableCell> */}
-                                {/* <TableCell><Button sx={{ width: '100px', borderRadius: '20px' }} variant="contained" color={row.status === 'Pending' ? 'primary' : 'error'}>{row.status}</Button></TableCell> */}
+           <TableCell><ChildModal strategyId={row.strategyId} /></TableCell> 
+<TableCell><Button sx={{ width: '100px', borderRadius: '20px' }} variant="contained" color={row.status === 'Pending' ? 'primary' : 'error'}>{row.status}</Button></TableCell> 
                               </TableRow>
                             </React.Fragment>
                           );
@@ -1142,7 +1487,8 @@ setActionLoading(true)
                       
                     </TableBody></Table>
                     
-                    </TableContainer></React.Fragment> )}
+                    </TableContainer> */}
+                    </React.Fragment> )}
              { visible? <>    {listOfStratgies.length===0?'':<> {actionLoading?<Button sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
           left: '975px',}} 
                     variant="contained" > 
@@ -1183,8 +1529,8 @@ setActionLoading(true)
   );
 }
 
-function SettingsContent({clientId, setDashboardLoading}) {
-
+function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) {
+  const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -1228,7 +1574,7 @@ function SettingsContent({clientId, setDashboardLoading}) {
 
   const handleMessage=()=>{
     setMessage("User Information Updated Successfully.")
-     setTimeout(setMessage,2000,"")
+     setTimeout(setMessage,5000,"")
   }
   const handleChange = (el) => {
     let inputName = el.target.name;
@@ -1267,14 +1613,19 @@ function SettingsContent({clientId, setDashboardLoading}) {
   const handleOpen = () => {
     setModalOpen(true)
   };
-  const handleClose = () => setModalOpen(false);
+  const handleClose = (event,reason) =>{ 
+    if(reason!=='backdropClick'){
+    setModalOpen(false)
+  }
+};
 
   useEffect(() => {
+   
     // Inside the useEffect, you can make the axios request
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/ClientSignUp/${clientId}?api-version=1`
+      url: `  https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
     })
       .then((response) => {
         console.log(response.data.client)
@@ -1393,7 +1744,7 @@ function SettingsContent({clientId, setDashboardLoading}) {
     setLoading(true)
       axios({
         method: 'put',
-        url: `https://localhost:7136/api/ClientSignUp/update/${clientId}?api-version=1`,
+        url: `  https://investmentportal.azurewebsites.net/api/ClientSignUp/update/${clientId}?api-version=1`,
         data:updatedClientData
       }).then((response) => {
         console.log(response)

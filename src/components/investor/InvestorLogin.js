@@ -34,7 +34,7 @@ import { Alert } from '@mui/lab';
 
 
 export default function Login(){
-  debugger
+   
   const navigate = useNavigate()
  React.useEffect(()=>{
   var storedUser = localStorage.getItem('user');
@@ -138,7 +138,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
        method:'post',
-       url:'https://localhost:7136/api/ClientSignUp/forgot-password?api-version=1',
+       url:'  https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
@@ -198,7 +198,7 @@ if (resetPassword !== confirmResetPassword) {
  setResetLoading(true)
  axios({
     method:'post',
-    url:'https://localhost:7136/api/ClientSignUp/reset-password?api-version=1',
+    url:'  https://investmentportal.azurewebsites.net/api/ClientSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -230,15 +230,19 @@ if (resetPassword !== confirmResetPassword) {
     };   
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
+  const handleClose = (event,reason) => {
+    if(reason!=='backdropClick'){
     setMessage("")
     setLoginMessage('')
-    setOpen(false)};
+    setOpen(false)
+  }
+};
 
 
     const [forgotOpen, setForgotOpen] = useState(false);
     const handleForgotOpen = () => setForgotOpen(true);
-    const handleForgotClose = () => {
+    const handleForgotClose = (event,reason) => {
+      if(reason!=='backdropClick'){
       setForgotMessage('')
       setForgotOpen(false)
       setForgotEmail('')
@@ -253,7 +257,7 @@ if (resetPassword !== confirmResetPassword) {
       setForgotEmailHelperText('')
       setResetPasswordHelperText('')
       setCResetPasswordHelperText('')
-    }; 
+    }}; 
 
     // const dashboard="/advisor/dashboard"
     // const hash="#"
@@ -353,9 +357,12 @@ let count=0;
         }
         const [verifyOpen, setVerifyOpen] = React.useState(false);
   const handleVerifyOpen = () => setVerifyOpen(true);
-  const handleVerifyClose = () => {
+  const handleVerifyClose = (event,reason) => {
+    if(reason!=='backdropClick'){
     setMessage("")
-    setVerifyOpen(false)};
+    setVerifyOpen(false)
+  }
+};
 
     const handleVerify=(e)=>{
     handleVerifyOpen()
@@ -378,7 +385,7 @@ const handleOTPSubmit=(e)=>{
   setOTPLoading(true)
   axios({
     method:'post',
-    url:'https://localhost:7136/api/ClientSignUp/verify-otp?api-version=1',
+    url:'  https://investmentportal.azurewebsites.net/api/ClientSignUp/verify-otp?api-version=1',
     data:otpData
   }).then((response)=>{
     setOTPLoading(false)
@@ -495,7 +502,7 @@ if (!panNumber.match(panPattern)) {
       setLoading(true)
       axios({
         method:"post",
-        url:"https://localhost:7136/api/ClientSignUp/signup?api-version=1",
+        url:"  https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -560,7 +567,7 @@ if (!panNumber.match(panPattern)) {
   setLoading(true)
       axios({
         method:"post",
-        url:"https://localhost:7136/api/ClientSignUp/login?api-version=1",
+        url:"  https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -569,12 +576,12 @@ if (!panNumber.match(panPattern)) {
             const clientId=response.data.client.clientId
             navigate(`/investor/dashboard/${clientId}`)
             var user = {
-              userId: clientId,
-              // other user information...
+              Expirationtimestamp: new Date().getTime() + 30 * 60000,
+              TimeLeft : 30 * 60
             };
             
             // Store user information in local storage
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem(clientId, JSON.stringify(user));
           }
         
        

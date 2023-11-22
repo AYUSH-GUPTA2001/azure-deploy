@@ -109,14 +109,16 @@ export default function Login(){
     };   
     const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
+  const handleClose = (event,reason) => {
+    if(reason!=='backdropClick'){
     setMessage('')
     setLoginMessage('')
-    setOpen(false)};
+    setOpen(false)}};
 
     const [forgotOpen, setForgotOpen] = useState(false);
     const handleForgotOpen = () => setForgotOpen(true);
-    const handleForgotClose = () => {
+    const handleForgotClose = (event,reason) => {
+      if(reason!=='backdropClick'){
       setForgotMessage('')
       setForgotOpen(false)
       setForgotEmail('')
@@ -131,7 +133,7 @@ export default function Login(){
       setForgotEmailHelperText('')
       setResetPasswordHelperText('')
       setCResetPasswordHelperText('')
-    };  
+    }};  
       
       
     
@@ -158,7 +160,7 @@ export default function Login(){
            setOTPLoading(true)
            axios({
             method:'post',
-            url:'https://localhost:7136/api/AdvisorSignUp/forgot-password?api-version=1',
+            url:'  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/forgot-password?api-version=1',
             data:{email:forgotEmail}
            }).then((response)=>{
             console.log(response)
@@ -188,7 +190,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
         method:'post',
-        url:'https://localhost:7136/api/AdvisorSignUp/verify-otp?api-version=1',
+        url:'  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp?api-version=1',
         data:otpData
       }).then((response)=>{
         setOTPLoading(false)
@@ -312,7 +314,7 @@ export default function Login(){
     setLoading(true)
     axios({
                 method:"post",
-                url:"https://localhost:7136/api/AdvisorSignUp/signup?api-version=1",
+                url:"  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/signup?api-version=1",
                 data:advisorData
             }).then(function(response){
               setLoading(false)
@@ -380,7 +382,7 @@ if (resetPassword !== confirmResetPassword) {
 setResetLoading(true)
  axios({
     method:'post',
-    url:'https://localhost:7136/api/AdvisorSignUp/reset-password?api-version=1',
+    url:'  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -423,7 +425,7 @@ setResetLoading(true)
   setLoading(true)
       axios({
         method:"post",
-        url:"https://localhost:7136/api/AdvisorSignUp/login?api-version=1",
+        url:"  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/login?api-version=1",
         data:advisorData
     }).then(function(response){
       setLoading(false)
@@ -434,12 +436,12 @@ setResetLoading(true)
           const advisorId= response.data.advisor.advisorId
           const firstName= response.data.advisor.firstName
           var advisorUser = {
-            advisorId: advisorId,
-            // other user information...
+            Expirationtimestamp: new Date().getTime() + 30 * 60000,
+            TimeLeft : 30 * 60
           };
           
-          // Store user information in local storage
-          localStorage.setItem('advisorUser', JSON.stringify(advisorUser));
+        
+          localStorage.setItem(advisorId, JSON.stringify(advisorUser));
           navigate(`/advisor/dashboard/${advisorId}`)
         }
        

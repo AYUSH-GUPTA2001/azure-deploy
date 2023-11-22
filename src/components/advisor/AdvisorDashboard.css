@@ -200,6 +200,17 @@
       background-color: #1BCFB4!important;
     
     }
+    .seventhCard{
+      background-color: #5e7cb3!important;
+    }
+    .modaldiv{
+      display: flex;
+    }
+    .flexend{
+      top: 10px;
+      /* justify-content: flex-end; */
+      left: 336px;
+    }
     .Approved,.Rejected,.Pending{
       
       cursor: default!important;
@@ -229,7 +240,7 @@
       width: 100px;
       height: 100px;
       border-radius: 50%;
-      margin: 46px auto;
+      margin: 10px auto;
       margin-bottom: 10px;
   }
   .bg1{
@@ -248,6 +259,15 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+}
+#time{
+  color: #fff;
+  background-color: rgb(39 203 67);
+}
+.green{
+  
+ color: green!important;;
+  
 }
 .save{
   margin-top: 10px!important;
@@ -639,8 +659,16 @@ button {
   align-self: flex-end;
 }
 
+.MuiDataGrid-virtualScrollerContent,.MuiDataGrid-footerContainer {
+  background: #fdfdfe;
+}
 
-
+.tableIcon .MuiSvgIcon-root {
+  color: #a7a0a0;
+}
+.plusIcon{
+  margin: -23px!important;
+}
 
 
 
