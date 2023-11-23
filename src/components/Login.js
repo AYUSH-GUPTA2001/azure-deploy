@@ -98,6 +98,7 @@ export default function Login(){
   const [loginMessage,setLoginMessage]=useState("")
   const [buttonVisible, setButtonVisible] = useState(true);
   const [emailVisible,setEmailVisible]=useState(true)
+  const [verifyText,setVerifyText]=useState(false)
 
     const style = {
       position: 'absolute',
@@ -147,6 +148,15 @@ export default function Login(){
     const handleChange = (event, newValue) => {
       setValue(newValue);
       setEmail('')
+      setFirstName('')
+      setLastName('')
+      setCompany('')
+      setAddress('')
+      setCity('')
+      setState('')
+      setConfirmPassword('')
+      setPassword('')
+      setPhone('')
       setLoginPassword('')
       setLoginMessage('')
       setMessage('')
@@ -199,9 +209,12 @@ export default function Login(){
         setOTPLoading(false)
         console.log(response)
            setMessage(response.data.message)
-          //  setLoginMessage(response.data.message)
+           setLoginMessage(response.data.message)
            setOTP('')
            setFirstName('')
+           setVerifyText(false)
+           setLoginEmail('')
+       setLoginPassword('')
                 setLastName('')
                 setEmail('')
                 setPassword('')
@@ -211,8 +224,7 @@ export default function Login(){
                 setCity('')
                 setState('')
                 setAddress('')
-                setShow(false)
-                setSignShow(false)
+              
                 
       },(error)=>{
         setOTPLoading(false)
@@ -412,7 +424,7 @@ setResetLoading(true)
     const handleLoginSubmit = (event) => {
       event.preventDefault();
       setLoginMessage('');
-      
+      setVerifyText(false)
   
       setLoginEmailError(false)
       setLoginPasswordError(false)
@@ -463,9 +475,10 @@ setResetLoading(true)
        // handleOpen()
         return
       }
-      if(error.response.data.message==="User is not verified."){
-         setLoginMessage(error.response.data.message)
-      // handleOpen()
+      if(error.response.data.message==="Account not verified. A new OTP has been sent to your email. Please provide the OTP to complete the verification."){
+        //  setLoginMessage(error.response.data.message)
+      setVerifyText(true)  
+      handleOpen()
       return
       }
       
@@ -708,9 +721,11 @@ setResetLoading(true)
         <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{ cursor:'pointer',position: "absolute", top: "10px", right: "10px" }} />
       {message?<Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
         {message}
-      </Typography>:<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
-        Enter OTP sent to the Email
-      </Typography><TextField sx={{color:'#4b49ac'}}
+      </Typography>:<>
+
+        {true?<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
+          You are not Verified.Enter OTP sent to the Email</Typography></>:<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">Enter OTP sent to the Email</Typography></>}
+      <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required

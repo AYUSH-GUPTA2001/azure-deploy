@@ -278,12 +278,12 @@ padding-top: 1.5rem!important;
 }
 
 .css-ag7rrr-MuiTypography-root {
-  font-weight: 700;
+  font-weight: 700!important;
 }
 
 .css-1jgmn5n-MuiTypography-root{
-  font-weight: 800;
-color: white;
+  font-weight: 800!important;
+color: white!important;
 }
 
 
@@ -739,6 +739,8 @@ button {
   background: #4b49ac;
 }
 
-
+.addDisabled{
+  cursor:not-allowed!important;
+}
 
 

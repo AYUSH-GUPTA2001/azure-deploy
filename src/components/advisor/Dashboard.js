@@ -2289,12 +2289,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     //debugger
     let inputName = el.target.name;
     let inputValue = el.target.value;
-    if(inputName==='phoneNumber'){
-      if(!inputValue.match(phoneNumberPattern)){
-        setphoneHelperText('Invalid Mobile Number')
-        return
-      }
-    }
+   
     let statusCopy = Object.assign({}, updatedAdvisorData);
     statusCopy[inputName] = inputValue;
    
@@ -2411,6 +2406,13 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     if (count > 0) {
       return
     }
+
+  
+      if(!updatedAdvisorData.phoneNumber.match(phoneNumberPattern)){
+        setphoneHelperText('Invalid Mobile Number')
+        return
+      }
+    
     console.log(2)
     // const updateData = {
     //   "firstName": firstName,
@@ -2549,7 +2551,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
               id="phone"
               InputProps={{
 
-                disabled: disabled
+                disabled: true
               }}
               helperText={phoneHelperText}
               label="Phone Number"

@@ -270,6 +270,15 @@ if (resetPassword !== confirmResetPassword) {
     const handleChange = (event, newValue) => {
       setValue(newValue);
       setEmail('')
+      setFirstName('')
+      setLastName('')
+      setDateOfBirth('')
+      setPhone('+91')
+      setCity('')
+      setState('')
+      setAddress('')
+      setPassword('')
+      setConfirmPassword('')
       setLoginPassword('')
       setLoginMessage('')
       setMessage('')
@@ -405,11 +414,13 @@ const handleOTPSubmit=(e)=>{
        setMessage(response.data.message)
        setLoginMessage(response.data.message)
        setOTP('')
+       setLoginEmail('')
+       setLoginPassword('')
        setFirstName("")
               setLastName("")
               setDateOfBirth("")
               setEmail("")
-              setPhone("")
+              setPhone("+91")
               setCity("")
               setState("")
               setAddress("")
@@ -420,8 +431,7 @@ const handleOTPSubmit=(e)=>{
             
               setPassword("")
               setConfirmPassword("")
-              setShow(false)
-              setSignShow(false)
+             
           
             
   },(error)=>{
@@ -596,16 +606,18 @@ if (!panNumber.match(panPattern)) {
        
      } , function(error){
       setLoading(false)
-      setLoginMessage(error.response.data.message)
+      // setLoginMessage(error.response.data.message)
       // if(.response.data.message==='Invalid email or password.'){
       //   .response.data.message)
       //   ()
       //   return
       // }
-      // if(.response.data.message==="User is not verified."){
-      // ()
-      // return
-      // }
+      if(error.response.data.message==="Account not verified. A new OTP has been sent to your email. Please provide the OTP to complete the verification."){
+        //  setLoginMessage(error.response.data.message)
+    
+      handleOpen()
+      return
+      }
       // (.response.data.message)
       // 
       // ()

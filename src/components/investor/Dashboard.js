@@ -1138,11 +1138,13 @@ setActionLoading(false)
 
 }
 const [newLoading,setNewLoading]=useState(false)
-
+const [value,setValue]=useState(false)
   useEffect(() => {
    
     setDashboardLoading(true)
     setNewLoading(true)
+    handleStrategyCall()
+    
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
@@ -1155,6 +1157,14 @@ const [newLoading,setNewLoading]=useState(false)
       setDashboardLoading(false)
       setNewLoading(false)
     })
+
+
+  
+      setValue(listOfStratgies.length===0)
+     
+    
+    
+
   },[])
 
 
@@ -1350,7 +1360,12 @@ setActionLoading(true)
     handleRecommendationsOpen()
     console.log("advisorId:" + advisorId)
     setStrategyLoading(true)
-  
+  handleStrategyCall()
+    
+
+
+  }
+  const handleStrategyCall=()=>{
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
@@ -1367,8 +1382,6 @@ setActionLoading(true)
       setStrategyLoading(false)
       
     })
-
-
   }
   return (
     <div className="InvestmentContent">
@@ -1480,7 +1493,7 @@ setActionLoading(true)
               />} */}
           </Modal>
 
-          <Tooltip title="Click here to see investment strategies from advisor" > <button class="my-button" onClick={handleRecommendations} >Strategies</button></Tooltip>
+          <Tooltip title={value?"No Pending Strategy Available.Create Investment Request to get Customized Strategies by Financial Experts.":"Click here to see investment strategies from advisor"} > <button disabled={value} class={value?'addDisabled my-button':'my-button'} onClick={handleRecommendations} >Strategies</button></Tooltip>
           <Modal
             open={recommendationsOpen}
             onClose={handleRecommendationsClose}
@@ -1717,12 +1730,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
   const handleChange = (el) => {
     let inputName = el.target.name;
     let inputValue = el.target.value;
-    if(inputName==='phoneNumber'){
-      if(!inputValue.match(phoneNumberPattern)){
-        setphoneHelperText('Invalid Mobile Number')
-        return
-      }
-    }
+   
     let statusCopy = Object.assign({}, updatedClientData);
     statusCopy[inputName] = inputValue;
    
@@ -1859,6 +1867,13 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     if (count > 0) {
       return
     }
+
+
+      if(!updatedClientData.phoneNumber.match(phoneNumberPattern)){
+        setphoneHelperText('Invalid Mobile Number')
+        return
+      }
+    
     
     if (!updatedClientData.bankName.match(bankPattern)) {
       setBankNameError(true)
@@ -2005,7 +2020,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
               id="phone"
               InputProps={{
 
-                disabled: disabled
+                disabled: true
               }}
               helperText={phoneHelperText}
               label="Phone Number"
