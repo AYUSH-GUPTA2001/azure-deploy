@@ -108,7 +108,7 @@ export default function Login(){
     const [confirmResetPasswordError,setConfirmResetPasswordError]=useState(false)
     const [passwordHelperText,setPasswordHelperText]=useState('')
     const [cPasswordHelperText,setCPasswordHelperText]=useState('')
-  
+    const [verifyText,setVerifyText]=useState(false)
     const [OTPError,setOTPError]=useState(false)
     const [buttonVisible, setButtonVisible] = useState(true);
     const [emailVisible,setEmailVisible]=useState(true)
@@ -128,7 +128,7 @@ export default function Login(){
     const [ifscCodeError,setIfscCodeError]=useState(false)
     const [phoneMessage,setPhoneMessage]=useState('')
     const [loginMessage,setLoginMessage]=useState("")
-
+    const [verifyMessage,setVerifyMessage]=useState('')
 
     const handleForgotPassword=()=>{
       handleForgotOpen()
@@ -238,6 +238,7 @@ if (resetPassword !== confirmResetPassword) {
     if(reason!=='backdropClick'){
     setMessage("")
     setLoginMessage('')
+    setVerifyMessage('')
     setOpen(false)
   }
 };
@@ -412,13 +413,15 @@ const handleOTPSubmit=(e)=>{
     setOTPLoading(false)
     console.log(response)
        setMessage(response.data.message)
-       setLoginMessage(response.data.message)
+      //  setLoginMessage(response.data.message)
+       setVerifyMessage(response.data.message)
        setOTP('')
        setLoginEmail('')
        setLoginPassword('')
        setFirstName("")
               setLastName("")
               setDateOfBirth("")
+              setVerifyText(false)
               setEmail("")
               setPhone("+91")
               setCity("")
@@ -564,7 +567,7 @@ if (!panNumber.match(panPattern)) {
 }    
     const handleLoginSubmit = (event) => {
       event.preventDefault();
-      
+      setVerifyText(false)
       setLoginMessage('')
       setLoginEmailError(false)
       setLoginPasswordError(false)
@@ -606,18 +609,18 @@ if (!panNumber.match(panPattern)) {
        
      } , function(error){
       setLoading(false)
-      // setLoginMessage(error.response.data.message)
-      // if(.response.data.message==='Invalid email or password.'){
-      //   .response.data.message)
-      //   ()
-      //   return
-      // }
+      
+      if(error.response.data.message==='Invalid email or password.'){
+        setLoginMessage(error.response.data.message)
+        return
+      }
       if(error.response.data.message==="Account not verified. A new OTP has been sent to your email. Please provide the OTP to complete the verification."){
         //  setLoginMessage(error.response.data.message)
-    
+        setVerifyText(true)  
       handleOpen()
       return
       }
+      setLoginMessage(error.response.data.message)
       // (.response.data.message)
       // 
       // ()
@@ -1044,8 +1047,8 @@ if (!panNumber.match(panPattern)) {
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
         <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
-      {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
-        {loginMessage}
+      {verifyMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
+        {verifyMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Enter OTP sent For Email Verification
       </Typography><TextField sx={{color:'#4b49ac'}}

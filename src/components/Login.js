@@ -79,7 +79,7 @@ export default function Login(){
   const [show,setShow]=useState(false)
   const [signShow,setSignShow]=useState(false)
 
-
+  const [verifyMessage,setVerifyMessage]=useState('')
   const [forgotEmailError,setForgotEmailError]=useState(false)
   const [resetOTPError,setResetOTPError]=useState(false)
   const [resetPasswordError,setResetPasswordError]=useState(false)
@@ -117,6 +117,7 @@ export default function Login(){
     if(reason!=='backdropClick'){
     setMessage('')
     setLoginMessage('')
+    setVerifyMessage('')
     setOpen(false)}};
 
     const [forgotOpen, setForgotOpen] = useState(false);
@@ -209,7 +210,8 @@ export default function Login(){
         setOTPLoading(false)
         console.log(response)
            setMessage(response.data.message)
-           setLoginMessage(response.data.message)
+          //  setLoginMessage(response.data.message)
+          setVerifyMessage(response.data.message)
            setOTP('')
            setFirstName('')
            setVerifyText(false)
@@ -470,6 +472,7 @@ setResetLoading(true)
        
      } , function(error){
       setLoading(false)
+      
       if(error.response.data.message==='Invalid email or password.'){
         setLoginMessage(error.response.data.message)
        // handleOpen()
@@ -477,6 +480,7 @@ setResetLoading(true)
       }
       if(error.response.data.message==="Account not verified. A new OTP has been sent to your email. Please provide the OTP to complete the verification."){
         //  setLoginMessage(error.response.data.message)
+      
       setVerifyText(true)  
       handleOpen()
       return
@@ -723,7 +727,7 @@ setResetLoading(true)
         {message}
       </Typography>:<>
 
-        {true?<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
+        {verifyText?<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
           You are not Verified.Enter OTP sent to the Email</Typography></>:<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">Enter OTP sent to the Email</Typography></>}
       <TextField sx={{color:'#4b49ac'}}
                 size="small"
@@ -816,8 +820,8 @@ setResetLoading(true)
         aria-describedby="modal-modal-description"
       ><Box sx={style} >
         <CloseIcon sx={{color:'#4b49ac'}} onClick={handleClose} style={{ cursor: 'pointer',position: "absolute", top: "10px", right: "10px" }} />
-      {loginMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
-        {loginMessage}
+      {verifyMessage?<Typography id="modal-modal-title" variant="h6" component="h2">
+        {verifyMessage}
       </Typography>:<><Typography id="modal-modal-title" variant="h6" component="h2">
         Enter OTP sent For Email Verification
       </Typography><TextField sx={{color:'#4b49ac'}}
