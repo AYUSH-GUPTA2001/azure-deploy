@@ -5,7 +5,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-
+import "./Card.css"
 const bull = (
   <Box
     component="span"
@@ -23,7 +23,7 @@ export default function BasicCard(props) {
         <Typography variant="h6" component="div">
           {props.heading}
         </Typography>
-        <Typography variant="h6" color="text.secondary">
+        <Typography  className='number' variant="h6" color="text.secondary">
           {props.number}
         </Typography>
       
