@@ -1678,6 +1678,8 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
   const [bankName,setBankName]=useState('')
   const [accountNumber,setAccountNumber]=useState('')
   const [ifscCode,setIfscCode]=useState('')
+  const [phoneHelperText,setphoneHelperText]=useState('')
+  const phoneNumberPattern = /^\+[0-9](?:[0-9] ?|-){11,13}[0-9]$/;
   const [panNumber,setPanNumber]=useState('')
   const [message, setMessage] = useState('')
   const [backVisible,setBackVisible]=useState(true)
@@ -1715,7 +1717,12 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
   const handleChange = (el) => {
     let inputName = el.target.name;
     let inputValue = el.target.value;
-   
+    if(inputName==='phoneNumber'){
+      if(!inputValue.match(phoneNumberPattern)){
+        setphoneHelperText('Invalid Mobile Number')
+        return
+      }
+    }
     let statusCopy = Object.assign({}, updatedClientData);
     statusCopy[inputName] = inputValue;
    
@@ -1798,6 +1805,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setAccountNumberError(false)
     setIfscCodeError(false)
     setPanNumberError(false)
+    setphoneHelperText('')
     setBankHelperText('')
     setAccountNumberHelperText('')
     setIfscHelperText('')
@@ -1999,6 +2007,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
 
                 disabled: disabled
               }}
+              helperText={phoneHelperText}
               label="Phone Number"
               name="phoneNumber"
               value={updatedClientData.phoneNumber}

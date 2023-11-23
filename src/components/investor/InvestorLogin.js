@@ -88,6 +88,10 @@ export default function Login(){
     const ifscPattern= /^[A-Z]{4}[0-9]{7}$/;
     const panPattern=/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     const accountNumberPattern=/^[0-9]{14}$/;
+    const phoneNumberPattern = /^\+[0-9](?:[0-9] ?|-){11,13}[0-9]$/;
+
+
+
     const [bankHelperText,setBankHelperText]=useState('')
     const [panHelperText,setPanHelperText]=useState('')
     const [ifscHelperText,setIfscHelperText]=useState('')
@@ -122,7 +126,7 @@ export default function Login(){
     const [accountNumberError,setAccountNumberError]=useState(false)
     const [panNumberError,setPanNumberError]=useState(false)
     const [ifscCodeError,setIfscCodeError]=useState(false)
-
+    const [phoneMessage,setPhoneMessage]=useState('')
     const [loginMessage,setLoginMessage]=useState("")
 
 
@@ -336,6 +340,13 @@ let count=0;
     if(count>=1){
       return
     }
+    if(!phone.match(phoneNumberPattern)){
+      setPhoneMessage("Enter Valid Mobile Number")
+      setTimeout(() => {
+        setPhoneMessage('');
+      }, 4000);
+      return
+    }
     if (!password.match(passwordPattern)) {
       setPasswordError(true)
       setPasswordHelperText("Password must contain at least 8 characters, 1 digit, 1 lowercase letter,1 uppercase letter");
@@ -485,7 +496,7 @@ if (!panNumber.match(panPattern)) {
         "email":     email,
         "password":  password,
         "confirmPassword": confirmPassword,
-        "phoneNumber":  phone.replace(/[()\s+\-]/g, '').slice(-10),
+        "phoneNumber":  phone.replace(/[()\s+\-]/g, ''),
         "address":address,
         "city": city,
         "state":  state,
@@ -795,8 +806,9 @@ if (!panNumber.match(panPattern)) {
                 id="confirmPassword"
               
               />
-             
+              {phoneMessage? <Alert severity='error' >*{phoneMessage}</Alert>:''}
              <input onClick={()=>setSignShow(!signShow)} type="checkbox" id="showPassword" />
+            
                 <label  for="showPassword"> Show Password</label><br/>
               <Button
                 

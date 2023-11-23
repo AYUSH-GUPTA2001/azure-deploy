@@ -274,7 +274,7 @@ padding-top: 1.5rem!important;
 }
 .MuiCard-root{
   /* background: #c5d2de; */
-    color: white;
+    color: white!important;
 }
 
 .css-ag7rrr-MuiTypography-root {
@@ -735,7 +735,9 @@ button {
 .editUpdate{
   align-self: flex-end;
 }
-
+.MuiDataGrid-columnHeaders {
+  background: #4b49ac;
+}
 
 
 

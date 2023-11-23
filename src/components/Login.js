@@ -43,6 +43,7 @@ export default function Login(){
      // Do something with the user information, e.g., display a welcome message
  }},[] )
   const [message,setMessage]=useState("")
+  const [phoneMessage,setPhoneMessage]=useState('')
   const [forgotMessage,setForgotMessage]=useState("")
   const [loginEmail, setLoginEmail] = useState("")
   const [loginPassword, setLoginPassword] = useState("")
@@ -63,6 +64,8 @@ export default function Login(){
   const [city, setCity] = useState("")
   const [state, setState] = useState("")
   const [OTP,setOTP]=useState("")
+  const phoneNumberPattern = /^\+[0-9](?:[0-9] ?|-){11,13}[0-9]$/;
+  
   const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
   const [passwordHelperText,setPasswordHelperText]=useState('')
   const [resetPasswordHelperText,setResetPasswordHelperText]=useState('')
@@ -281,6 +284,13 @@ export default function Login(){
     }
     if(count>=1){
        return
+    }
+    if(!phone.match(phoneNumberPattern)){
+      setPhoneMessage("Enter Valid Mobile Number")
+      setTimeout(() => {
+        setPhoneMessage('');
+      }, 4000);
+      return
     }
     if (!password.match(passwordPattern)) {
       setPasswordError(true)
@@ -671,7 +681,7 @@ setResetLoading(true)
                 id="confirmPassword"
               
               />
-             
+             {phoneMessage? <Alert severity='error' >*{phoneMessage}</Alert>:''}
              <input onClick={()=>setSignShow(!signShow)} type="checkbox" id="showPassword" />
                 <label  for="showPassword"> Show Password</label><br/>
              {loading?<Button

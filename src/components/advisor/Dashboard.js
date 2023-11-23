@@ -509,7 +509,7 @@ setDashboardLoading(true)
       const _SixthCard = document.querySelector('.SixthCard');
       !!_SixthCard && (_SixthCard.classList.add('addPointer') ||
        _SixthCard.addEventListener('click',function() {
-        
+        document.querySelector('.rectangle-div').scrollIntoView()
         _SixthCard.classList.toggle("addBorder");
         if(!flag.includes("Approved")){
           
@@ -531,7 +531,7 @@ setDashboardLoading(true)
     const _seventhCard = document.querySelector('.seventhCard');
     !!_seventhCard && (_seventhCard.classList.add('addPointer') ||
     _seventhCard.addEventListener('click',function() {
-      
+      document.querySelector('.rectangle-div').scrollIntoView()
       _seventhCard.classList.toggle("addBorder");
       if(!flag.includes("Funded")){
         
@@ -552,6 +552,7 @@ setDashboardLoading(true)
   const _fourthCard = document.querySelector('.fourthCard');
   !!_fourthCard && (_fourthCard.classList.add('addPointer') 
   || _fourthCard.addEventListener('click',function() {
+    document.querySelector('.rectangle-div').scrollIntoView()
       _fourthCard.classList.toggle("addBorder");
       if(!flag.includes("Rejected")){
           flag.push("Rejected");
@@ -571,6 +572,8 @@ setDashboardLoading(true)
   const _fifthCard = document.querySelector('.fifthCard');
 
   !!_fifthCard && (_fifthCard.classList.add('addPointer')||_fifthCard.addEventListener('click',function() {
+ 
+    document.querySelector('.rectangle-div').scrollIntoView()
     _fifthCard.classList.toggle("addBorder");
     if(!flag.includes("Pending")){
       flag.push("Pending");
@@ -1834,6 +1837,7 @@ if(_needConsultation > 0){
       }}
     >
                 <DataGrid
+                sx={{width: '100%',margin: '0'}}
                  disableRowSelectionOnClick
                  disableColumnSelector
                 getRowId={(reportListOfRequests) => reportListOfRequests.investmentID}
@@ -1928,26 +1932,10 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
   };
 
   const columns = [
-    { field: 'investmentID', width:180, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'strategyId', width:180, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     { field: 'clientId', width:180 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
     { field: 'investmentAmount', width:180, headerName: 'Amount',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    {field: 'image',
-    headerName: 'Type',
-    headerClassName: 'super-app-theme--header',
-    disableColumnMenu:true ,
-    sortable: false,
-    width: 80,
-    editable: true,
-    renderCell: (params) =>params.row.investmentType==='Low Risk'?<Tooltip title='Low Risk' placement='right-end'>
-    <img className='table-img' src={lowRisk}/></Tooltip>
-                      :(params.row.investmentType==='High Risk'?<Tooltip title='High Risk' placement='right-end'>
-    <img className='table-img' src={highRisk}/></Tooltip>
-                      :(params.row.investmentType==='Medium Risk'?<Tooltip title='Medium Risk' placement='right-end'>
-    <img className='table-img' src={mediumRisk}/></Tooltip>
-                      :<Tooltip title='Need Consultation' placement='right-end'>
-    <HelpIcon className='table-img green' ></HelpIcon></Tooltip>)
-                       )
-    },
+    
     { field: 'status', width:200, headerName: 'Status',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     {field: 'action',
     headerName: 'Action',
@@ -1967,7 +1955,7 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
         label="Status"
         // value={Status}
       
-        onChange={e=>{handleChange(params.row.investmentID,e.target.value)}}
+        onChange={e=>{handleChange(params.row.strategyId,e.target.value)}}
       >
          
         <MenuItem value={'Funded'}>Funded</MenuItem>
@@ -2027,8 +2015,9 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
     status==='Funded'?setVisible(true):setVisible(false)
    
     const actionObj ={
-      investmentId:investmentId,
-     status:status
+      strategyId:investmentId,
+     status:status,
+     remarks: "string"
     }
     if(status===''){
       let updatedArray = actionArray.filter(item=>item!==actionObj)
@@ -2051,13 +2040,13 @@ const handleSave=()=>{
   setActionLoading(true)
   axios({
     method:'put',
-    url:`https://investmentportal.azurewebsites.net/api/investments/update-status?api-version=1`,
+    url:`https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Advisor?api-version=1`,
     data:actionArray
   }).then((response)=>{
   
   console.log(response)
   setActionLoading(false)
-  if(response.data.message==="Investment statuses updated successfully."){
+  if(response.data.message==="Multiple strategies updated successfully."){
   setSnackOpen(true)}
   setActionArray([])
   setVisible(false)
@@ -2070,18 +2059,18 @@ setVisible(false)
   })
 }
 const handleFundedCall=()=>{
+  setDashboardLoading(true)
   axios({
     method:'get',
-    url:`https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
+    url:`https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/approved-strategies?api-version=1`
   }).then((response)=>{
     console.log(response.data)
-    const list = response.data
-    setNewLoading(false)
+    const list = response.data.approvedStrategies
     setListOfApprovedInv(list)
     setLength(list.length)
     setDashboardLoading(false)
     setVisible(false)
-    
+    setNewLoading(false)
   },(error)=>{
     setNewLoading(false)
     setDashboardLoading(false)
@@ -2161,7 +2150,7 @@ const handleFundedCall=()=>{
                 disableColumnMenu
                 disableColumnSelector
                 disableRowSelectionOnClick
-                getRowId={(listOfApprovedInv) => listOfApprovedInv.investmentID}
+                getRowId={(listOfApprovedInv) => listOfApprovedInv.strategyId}
         rows={listOfApprovedInv}
         columns={columns}
         initialState={{
@@ -2284,7 +2273,8 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
   const [addressError, setAddressError] = useState(false)
   // const [passwordError, setPasswordError] = useState(false)
   const [loading,setLoading]=useState(false)
-
+  const [phoneHelperText,setphoneHelperText]=useState('')
+  const phoneNumberPattern = /^\+[0-9](?:[0-9] ?|-){11,13}[0-9]$/;
   const [settingsLoading,setSettingsLoading]=useState(true)
   const [advisorData,setAdvisorData]=useState({})
   const [updatedAdvisorData,setUpdatedAdvisorData]=useState({})
@@ -2299,6 +2289,12 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     //debugger
     let inputName = el.target.name;
     let inputValue = el.target.value;
+    if(inputName==='phoneNumber'){
+      if(!inputValue.match(phoneNumberPattern)){
+        setphoneHelperText('Invalid Mobile Number')
+        return
+      }
+    }
     let statusCopy = Object.assign({}, updatedAdvisorData);
     statusCopy[inputName] = inputValue;
    
@@ -2377,6 +2373,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setAddressError(false)
     setCityError(false)
     setStateError(false)
+    setphoneHelperText('')
     // setPasswordError(false)
     let count = 0;
     if (updatedAdvisorData.firstName === '') {
@@ -2429,6 +2426,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     //updatedAdvisorData.pinCode = "123456";
     setLoading(true)
     setBackVisible(false)
+    setDashboardLoading(true)
       axios({
         method: 'put',
         url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
@@ -2443,14 +2441,17 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
           setDisabled(true)
           setEditVisible(true)
           setBackVisible(true)
+          setDashboardLoading(false)
           handleMessage()
+          setphoneHelperText('')
+
         }
   
   
       }, (error) => {
        setLoading(false)
        setBackVisible(true)
-  
+  setDashboardLoading(false)
       })
 
     
@@ -2550,6 +2551,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
 
                 disabled: disabled
               }}
+              helperText={phoneHelperText}
               label="Phone Number"
               name="phoneNumber"
               value={updatedAdvisorData.phoneNumber}
