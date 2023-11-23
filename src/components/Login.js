@@ -208,7 +208,8 @@ export default function Login(){
                 setCity('')
                 setState('')
                 setAddress('')
-              
+                setShow(false)
+                setSignShow(false)
                 
       },(error)=>{
         setOTPLoading(false)

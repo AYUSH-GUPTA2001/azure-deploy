@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import './Dashboard.css'
+import PropTypes from 'prop-types';
+import { useTheme } from '@mui/material/styles';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import TableFooter from '@mui/material/TableFooter';
+import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import Collapse from '@mui/material/Collapse';
 import Snackbar from '@mui/material/Snackbar';
@@ -44,6 +52,67 @@ import { Alert, Skeleton } from "@mui/lab";
 import Card from "../Card/Card";
 
 
+function TablePaginationActions(props) {
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onPageChange } = props;
+
+  const handleFirstPageButtonClick = (event) => {
+    onPageChange(event, 0);
+  };
+
+  const handleBackButtonClick = (event) => {
+    onPageChange(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event) => {
+    onPageChange(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event) => {
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        onClick={handleBackButtonClick}
+        disabled={page === 0}
+        aria-label="previous page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </Box>
+  );
+}
+
+TablePaginationActions.propTypes = {
+  count: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+};
+
 
 function Dashboard() {
 
@@ -76,7 +145,7 @@ function Dashboard() {
   }
 
   function updateTimer() {
-    // debugger
+    // //debugger
     if(!localStorage.getItem(_clientID))
     {
        stopTimer();
@@ -158,12 +227,12 @@ function Dashboard() {
 
 const timerModalStyle = {
   position: 'absolute',
-  top: '50%',
+  top: '40%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 580,
   bgcolor: '#e4f1ff',
-  borderRadius: '20px',
+  borderRadius:'2px',
   boxShadow: 24,
   p: 4,
 };
@@ -377,18 +446,42 @@ const handleSessionNo=()=>{
 
 function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}) {
 
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  // Avoid a layout jump when reaching the last page with empty rows.
   
-  const [open, setOpen] = useState(false);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
   const [listOfStratgies, setListOfStrategies] = useState([])
+  // Avoid a layout jump when reaching the last page with empty rows.
+  const emptyRows =
+  page > 0 ? Math.max(0, (1 + page) * rowsPerPage - listOfStratgies.length) : 0;
+const [loading,setLoading]=useState(true)
+
+
+  const [open, setOpen] = useState(false);
+  
   const [TotalInv, setTotalInv] = useState(0);
   const [TotalinvAmount, SetTotalInvAmount] = useState(0);
   const [TotalExeAmount, SetTotalExeAmount] = useState(0);
   const navigate = useNavigate()
 
-  const [loading,setLoading]=useState(true)
+ 
  
   useEffect(() => {
    
+  
+
+ 
     setDashboardLoading(true)
     axios({
       method: 'get',
@@ -451,7 +544,7 @@ function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}
         <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
                 </div> </>:(<>
                   <div className='card-container'>
-                    <Card  color="fourthCard" heading="Number of Investments" number={TotalInv}/>
+                    <Card  color="fourthCard" heading="Number of Holdings" number={TotalInv}/>
                     <Card   color="fifthCard" heading="Total Invested Amount" number={TotalinvAmount}/>
                     <Card  color="SixthCard" heading="Total Expected Amount" number={TotalExeAmount.toFixed(2)}/>
                   </div>
@@ -470,7 +563,9 @@ function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {listOfStratgies.length===0?
+                {
+                listOfStratgies.length===0
+                ?
                 <React.Fragment >
                 <TableRow>
                   <TableCell
@@ -478,7 +573,10 @@ function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}
                    colSpan={6}>No Investment Created</TableCell>
                 </TableRow>
               </React.Fragment> 
-                :listOfStratgies?.map((row) => 
+                : (rowsPerPage > 0
+                  ? listOfStratgies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : listOfStratgies
+                )?.map((row) => 
                   
                       <React.Fragment >
                         <TableRow>
@@ -502,15 +600,7 @@ function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}
                           <TableCell style={{ paddingRight: 10, paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                             <Collapse in={coll == row.strategyId }     style={{ marginLeft : '120px'}} timeout="auto" unmountOnExit>
                               <Box sx={{ margin: 0 }}>
-                                {/*                       
-         <BarChart
-          
-  dataset={data}
-  yAxis={[{ scaleType: 'band', data: ["Invested" , "Expected"] }]}
-  series={[{ dataKey: 'amount',   }]}
-  layout="horizontal"
-  {...chartSetting}
-/> */}
+                        
                                 <BarChart
                                   xAxis={[
                                     {
@@ -537,10 +627,33 @@ function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}
                             </Collapse>
                           </TableCell>
                         </TableRow>
+                        
                       </React.Fragment>
                   // Exclude rows with status other than "pending"
                 )}
-              </TableBody></Table></TableContainer>
+              </TableBody>
+            { listOfStratgies.length!==0 ?<><TableFooter>
+          
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+              colSpan={6}
+              count={listOfStratgies.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              SelectProps={{
+                inputProps: {
+                  'aria-label': 'rows per page',
+                },
+                native: true,
+              }}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter></>:''}
+              </Table></TableContainer>
 
         </div></>)
       }
@@ -763,7 +876,30 @@ const handleInvestmentCall = () => {
  </div>
                 
                 <div className="rectangle-div">
+{listOfPastRequests.length===0?<TableContainer component={Paper}>
+          <Table size="small" aria-label="simple table">
+            <TableHead>
+              <TableRow >
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
 
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Created Date</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Amount(Rs.)</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Time Period</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Investment Type</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Status</TableCell>
+
+              </TableRow>
+            </TableHead>
+            <TableBody>
+             
+                      <React.Fragment >
+                        <TableRow>
+                          <TableCell
+                          sx={{ textAlign: "center"}} 
+                           colSpan={5}>No Request Created</TableCell>
+                        </TableRow>
+                      </React.Fragment> </TableBody></Table></TableContainer>
+                      :
                 <Box
                 className='tableIcon'
       sx={{
@@ -789,7 +925,7 @@ const handleInvestmentCall = () => {
         }}
         pageSizeOptions={[5, 10]}
       />
-      </Box>
+      </Box>}
         {/* <TableContainer component={Paper}>
           <Table size="small" aria-label="simple table">
             <TableHead>
@@ -849,19 +985,19 @@ function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen
 
   const columns = [
     { field: 'strategyId', width:80, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'investmentName', width:145 , headerName: 'Strategy Name',headerClassName: 'super-app-theme--header', },
-    { field: 'investmentAmount',width:130 , headerName: 'Amount(Rs)' ,headerClassName: 'super-app-theme--header', },
-    { field: 'expectedAmount',width:205, headerName: 'Expected Amount(Rs)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter6months', width:132 , headerName: '6M Return(%)',headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter1year',width:130 , headerName: '1Y Return(%)' ,headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter3year',width:130, headerName: '3Y Return(%)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter5year', width:130 , headerName: '5Y Return(%)',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentName', width:144 , headerName: 'Strategy Name',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount',width:129 , headerName: 'Amount(Rs)' ,headerClassName: 'super-app-theme--header', },
+    { field: 'expectedAmount',width:204, headerName: 'Expected Amount(Rs)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter6months', width:131 , headerName: '6M Return(%)',headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter1year',width:129 , headerName: '1Y Return(%)' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter3year',width:129, headerName: '3Y Return(%)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter5year', width:129 , headerName: '5Y Return(%)',headerClassName: 'super-app-theme--header', },
     {field: 'image',
     headerName: 'Action',
     headerClassName: 'super-app-theme--header',
     disableColumnMenu:true ,
     sortable: false,
-    width: 131,
+    width: 127,
     editable: true,
     renderCell: (params) =><FormControl required fullWidth>
     <InputLabel id="demo-simple-select-label">Status</InputLabel>
@@ -946,7 +1082,7 @@ function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen
     left: '50%',
     overflow: 'auto',
     transform: 'translate(-50%, -50%)',
-    width: '1280px',
+    width: '1267px',
     bgcolor: '#e4f1ff',
     borderRadius: '20px',
     boxShadow: 24,
@@ -1383,7 +1519,7 @@ setActionLoading(true)
       <TableRow>
         <TableCell
         sx={{ textAlign: "center"}} 
-         colSpan={9}>No Pending Strategy Available</TableCell>
+         colSpan={9}>No Pending Strategy Available.Create Investment Request to get Customized Strategies by Finacial Experts.</TableCell>
       </TableRow>
     </React.Fragment> </TableBody></Table></TableContainer>:
     
@@ -1490,13 +1626,13 @@ setActionLoading(true)
                     </TableContainer> */}
                     </React.Fragment> )}
              { visible? <>    {listOfStratgies.length===0?'':<> {actionLoading?<Button sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
-          left: '975px',}} 
+          left: '1058px',}} 
                     variant="contained" > 
                     Submitting... 
           <i class="fa fa-spinner fa-spin"></i></Button>
           :
           <Button  sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
-          left: '975px',
+          left: '1058px',
           }} variant="contained" onClick={()=>handleSave()}>Save Changes</Button>}</>}</>:''}
           
     
@@ -1842,7 +1978,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
               fullWidth
               InputProps={{
 
-                disabled: disabled
+                disabled: true
               }}
               value={updatedClientData.email}
               error={emailError}

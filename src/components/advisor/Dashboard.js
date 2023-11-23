@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { useEffect, useState } from "react";
 import './AdvisorDashboard.css'
+import PropTypes from 'prop-types';
+import { useTheme } from '@mui/material/styles';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import TableFooter from '@mui/material/TableFooter';
 import TablePagination from '@mui/material/TablePagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import InputLabel from '@mui/material/InputLabel';
@@ -39,10 +46,6 @@ import image from '../../assets/download.png'
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 // import '../sidebar.js'
-
-import Navbar from '../Navbar/Navbar';
-import { ListAltRounded, LocationCitySharp } from '@mui/icons-material';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import { Alert, Skeleton } from '@mui/lab';
 import Card from '../Card/Card';
 import { DataGrid } from '@mui/x-data-grid';
@@ -50,13 +53,75 @@ import { DataGrid } from '@mui/x-data-grid';
 
 // const [loading,setLoading]=useState(true)
 
+function TablePaginationActions(props) {
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onPageChange } = props;
+
+  const handleFirstPageButtonClick = (event) => {
+    onPageChange(event, 0);
+  };
+
+  const handleBackButtonClick = (event) => {
+    onPageChange(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event) => {
+    onPageChange(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event) => {
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        onClick={handleBackButtonClick}
+        disabled={page === 0}
+        aria-label="previous page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </Box>
+  );
+}
+
+TablePaginationActions.propTypes = {
+  count: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+};
+
+
 function Dashboard() {
 
-  debugger
+  //debugger
   // #region StartTimer
   let countdown;
   let leftTime,expirationTime,timeInSeconds;
-  debugger
+  //debugger
   let splitarray = window.location.pathname.split('/');
   let _advieorID= splitarray[splitarray.length-1];
   let storage = JSON.parse(localStorage.getItem(_advieorID));
@@ -77,7 +142,7 @@ function Dashboard() {
   }
 
   function updateTimer() {
-    // debugger
+    // //debugger
     if(!localStorage.getItem(_advieorID))
     {
        stopTimer();
@@ -108,7 +173,7 @@ function Dashboard() {
 }
 
 // const handleStillYes=()=> {
-//   debugger
+//   //debugger
 //   if(!timeInSeconds)
 //      timeInSeconds = storage.TimeLeft;
 
@@ -122,7 +187,7 @@ function Dashboard() {
 // }
   // #endregion
    
-  // //debugger
+  // ////debugger
   console.log("tester")
   const { advisorId } = useParams()
   // global [dashboardLoading,setDashboardLoading] = useState(true) 
@@ -152,7 +217,7 @@ const timerModalStyle = {
 };
  
   useEffect(() => {
-    // debugger
+    // //debugger
     if(!storage){
       // Add popup and with settimeout will natigate to advisor path
       navigate('/advisor')
@@ -173,7 +238,7 @@ const timerModalStyle = {
     
     
      
-// debugger
+// //debugger
     const body = document.querySelector("body");
 const sidebar = body.querySelector(".sidebar");
 const toggle = body.querySelector(".toggle");
@@ -182,7 +247,7 @@ const content = body.querySelector(".content");
 const materialicons = body.querySelectorAll(".Customicons");
 const navLinks = document.querySelectorAll('.nav-link a span')
 // const modeText = body.querySelector(".mode-text");
-// debugger
+// //debugger
 
 
 toggle.addEventListener("click", () => {
@@ -209,7 +274,7 @@ toggle.addEventListener("click", () => {
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
-      // //debugger
+      // ////debugger
       let advisor=response.data.advisor
       setFirstName(advisor.firstName)
       setLastName(advisor.lastName)
@@ -229,7 +294,7 @@ toggle.addEventListener("click", () => {
   //   setTimerModalOpen(false)
   // }
   // const handleYes=()=>{
-  //   debugger
+  //   //debugger
   //   timeInSeconds=20
   //   setTimerModalOpen(false)
   //   startTimer()
@@ -238,7 +303,7 @@ toggle.addEventListener("click", () => {
    
  
   const handleOptionClick = (option) => {
-     //debugger
+     ////debugger
     setSelectedOption(option);
   };
 
@@ -367,7 +432,28 @@ toggle.addEventListener("click", () => {
 }
 
 function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
-  // //debugger
+  // ////debugger
+
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  // Avoid a layout jump when reaching the last page with empty rows.
+  
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  const [listOfStratgies, setListOfStrategies] = useState([])
+  // Avoid a layout jump when reaching the last page with empty rows.
+  const emptyRows =
+  page > 0 ? Math.max(0, (1 + page) * rowsPerPage - listOfStratgies.length) : 0;
+
   //handle modal
 
   const [open, setOpen] = useState(false);
@@ -380,22 +466,16 @@ function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
   const [totalRejected,setTotalRejected]=useState(0)
   const [totalPending,setTotalPending]=useState(0)
   const [totalFunded,setTotalFunded]=useState(0)
-  const [page, setPage] = React.useState(0);
+
  
-  const [rowsPerPage, setRowsPerPage] = React.useState(1);
+
   // const [flag,setFlag]=useState('')
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 1));
-    setPage(0);
-  };
+
   let flag = [];
   // const [data,setData]=useState([]);
-  const [listOfStratgies, setListOfStrategies] = useState([])
+  
   useEffect(() => {
     
 setDashboardLoading(true)
@@ -410,7 +490,7 @@ setDashboardLoading(true)
       setTotalExpAmount(list.map(x=> x.expectedAmount).reduce(function(a, b){
         return a + b;
       }));
-      debugger
+      //debugger
       const _approved  = list.filter(x=> x.status== 'Approved').length
       const _rejected = list.filter(x=> x.status== 'Rejected').length
       const _pending = list.filter(x=> x.status== 'Pending').length
@@ -516,7 +596,7 @@ setDashboardLoading(true)
 
 function collapseRow(the)
 {
-  //debugger;
+  ////debugger;
   let _strategyId = the.row.strategyId;
   //setOpen(!open);
   if(coll === _strategyId)
@@ -598,7 +678,10 @@ function collapseRow(the)
           </React.Fragment>
             
             :
-            listOfStratgies?.map((row) => (
+            (rowsPerPage > 0
+              ? listOfStratgies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : listOfStratgies
+            )?.map((row) => (
               <React.Fragment>
                 <TableRow>
                   <TableCell>
@@ -656,6 +739,27 @@ function collapseRow(the)
               </React.Fragment>
             ))}
           </TableBody>
+          { listOfStratgies.length!==0 ?<><TableFooter>
+          
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+              colSpan={7}
+              count={listOfStratgies.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              SelectProps={{
+                inputProps: {
+                  'aria-label': 'rows per page',
+                },
+                native: true,
+              }}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter></>:''}
         </Table>
       </TableContainer>
       {/* <TablePagination
@@ -690,24 +794,24 @@ function ClientList({ advisorId ,setDashboardLoading }) {
       
     }
   ];
-  //  //debugger
+  //  ////debugger
   // dashboardLoading=true
   const [listOfClients, setListOfClients] = useState([])
   const [loading,setLoading]=useState(true)
   const [totalClients,setTotalClients]=useState(0)
   useEffect(() => {
-    // //debugger
+    // ////debugger
     setDashboardLoading(true)
     axios({
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
-//debugger
+////debugger
 
 
       let list=response.data
       setTotalClients(list.length)
-      debugger
+      //debugger
       list = list.map(obj => {
         return { ...obj, fullname : `${obj.firstName} ${obj.lastName}` };
        }
@@ -746,7 +850,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
         console.log(error) })
   }, [])
 
-  // //debugger
+  // ////debugger
 
 
 
@@ -864,6 +968,26 @@ function ClientList({ advisorId ,setDashboardLoading }) {
                 <Card color="firstCard" heading="Number of Clients" number={totalClients}/>
                 </div>
                 <div className="rectangle-div">
+                  {listOfClients.length===0?<TableContainer component={Paper}>
+          <Table size='small' aria-label="simple table" id="AdvisorClientTable">
+            <TableHead>
+              <TableRow >
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>#</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Client Name</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Email Address</TableCell>
+                <TableCell sx={{ color: 'white', fontSize: '16px',fontWeight: 'bold', backgroundColor: '#4b49ac' }}>Mobile Number</TableCell>
+
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            
+            <React.Fragment >
+              <TableRow>
+                <TableCell
+                sx={{ textAlign: "center"}} 
+                 colSpan={4}>No Client Assigned</TableCell>
+              </TableRow>
+            </React.Fragment></TableBody></Table></TableContainer>:
                 <Box
                 className='tableIcon'
       sx={{
@@ -890,7 +1014,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
         }}
         pageSizeOptions={[5, 10]}
       />
-      </Box>
+      </Box>}
         {/* <TableContainer component={Paper}>
           <Table size='small' aria-label="simple table" id="AdvisorClientTable">
             <TableHead>
@@ -941,7 +1065,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
 
 function ReportsContent({ advisorId ,setDashboardLoading }) {
-  ////debugger
+  //////debugger
   // dashboardLoading=true
 
   const columns = [
@@ -1025,7 +1149,7 @@ const handleSnackClose = (event, reason) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [clientId, setClientId] = useState('')
   const handleOpen = (row) => {
-      debugger
+      //debugger
      setClientId(row.clientId);
      setInvestmentId(row.investmentID)
     setRemainingAmount(row.remainingAmount)
@@ -1035,7 +1159,7 @@ const handleSnackClose = (event, reason) => {
       url:`https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
     }).then(
       (response)=>{
-        debugger
+        //debugger
         setData(response.data)
         setModalOpen(true);
         console.log(data)
@@ -1279,7 +1403,7 @@ setLoading(true)
       method: 'get',
       url: `https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
-      debugger
+      //debugger
       // dashboardLoading=false
       setRequestLoading(false)
       setDashboardLoading(false)
@@ -1380,7 +1504,7 @@ if(_needConsultation > 0){
   }
 }))
 }
-      // //debugger;
+      // ////debugger;
       // console.log(reportListOfRequests)
       console.log(response.data)
 
@@ -1400,7 +1524,7 @@ if(_needConsultation > 0){
 
   }
   useEffect(() => {
-    // //debugger
+    // ////debugger
     handleInvestmentCall()
   }, [])
   return (
@@ -1797,10 +1921,16 @@ if(_needConsultation > 0){
 
 function PastInvestments({ advisorId ,setDashboardLoading }) {
 
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+  const handleTextClick = () => {
+    setDropdownVisible(!isDropdownVisible);
+  };
+
   const columns = [
-    { field: 'investmentID', width:230, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'clientId', width:230 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
-    { field: 'investmentAmount', width:230, headerName: 'Amount',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'investmentID', width:180, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'clientId', width:180 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount', width:180, headerName: 'Amount',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     {field: 'image',
     headerName: 'Type',
     headerClassName: 'super-app-theme--header',
@@ -1818,6 +1948,7 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
     <HelpIcon className='table-img green' ></HelpIcon></Tooltip>)
                        )
     },
+    { field: 'status', width:200, headerName: 'Status',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     {field: 'action',
     headerName: 'Action',
     headerClassName: 'super-app-theme--header',
@@ -1825,25 +1956,51 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
     sortable: false,
     width: 131,
     editable: true,
-    renderCell: (params) =><FormControl required fullWidth>
-    <InputLabel id="demo-simple-select-label">Status</InputLabel>
-    <Select
-      size="small"
-      margin="normal"
-      labelId="demo-simple-select-label"
-      id="demo-simple-select"
-      label="Status"
-      // value={Status}
+    renderCell: (params) =>
+    <FormControl required fullWidth>
+              <InputLabel id="demo-simple-select-label">Status</InputLabel>
+            <Select
+        size="small"
+        margin="normal"
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        label="Status"
+        // value={Status}
+      
+        onChange={e=>{handleChange(params.row.investmentID,e.target.value)}}
+      >
+         
+        <MenuItem value={'Funded'}>Funded</MenuItem>
+       
+  
+  
+      </Select>
+     </FormControl>
+  //   <>
+  //  {!isDropdownVisible && <Typography onClick={handleTextClick} style={{ cursor: 'pointer' }}>
+  //   Approved
+  // </Typography>}
+  //  {isDropdownVisible && (
+  //   // <FormControl required fullWidth>
+  //   // <InputLabel id="demo-simple-select-label">Status</InputLabel>
+  //   <Select
+  //     size="small"
+  //     margin="normal"
+  //     labelId="demo-simple-select-label"
+  //     id="demo-simple-select"
+  //     label="Status"
+  //     // value={Status}
     
-      onChange={e=>{handleChange(params.row.investmentID,e.target.value)}}
-    >
-       <MenuItem value={''}>No Change</MenuItem>
-      <MenuItem value={'Funded'}>Funded</MenuItem>
+  //     onChange={e=>{handleChange(params.row.investmentID,e.target.value)}}
+  //   >
+       
+  //     <MenuItem value={'Funded'}>Funded</MenuItem>
      
 
 
-    </Select>
-  </FormControl>
+  //   </Select>
+  // // </FormControl>
+  // )}</>
     }
   ]
   const [listOfApprovedInv,setListOfApprovedInv]=useState([])
@@ -1866,13 +2023,23 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
   };
 
   const handleChange=(investmentId,status)=>{
+    debugger
     status==='Funded'?setVisible(true):setVisible(false)
-  
+   
     const actionObj ={
       investmentId:investmentId,
      status:status
     }
-    setActionArray([...actionArray,actionObj])
+    if(status===''){
+      let updatedArray = actionArray.filter(item=>item!==actionObj)
+      setActionArray([updatedArray])
+      console.log(actionArray)
+    }
+    else{
+      setActionArray([...actionArray,actionObj])
+      console.log(actionArray)
+    }
+    
     
     
 
@@ -2129,7 +2296,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
   }
 
   const handleChange = (el) => {
-    debugger
+    //debugger
     let inputName = el.target.name;
     let inputValue = el.target.value;
     let statusCopy = Object.assign({}, updatedAdvisorData);
@@ -2201,7 +2368,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
   }
 
   const handleUpdate = () => {
-    debugger
+    //debugger
     console.log(1)
     setFirstNameError(false)
     setLastNameError(false)
@@ -2271,7 +2438,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
         setLoading(false)
         if (response.data.message === "Advisor information updated successfully.") {
           console.log(updatedAdvisorData)
-          debugger
+          //debugger
           setAdvisorData(updatedAdvisorData)
           setDisabled(true)
           setEditVisible(true)
@@ -2362,7 +2529,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
               fullWidth
               InputProps={{
 
-                disabled: disabled
+                disabled: true
               }}
               value={updatedAdvisorData.email}
               error={emailError}

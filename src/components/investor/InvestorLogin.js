@@ -77,7 +77,7 @@ export default function Login(){
     const [accountNumber, setAccountNumber] = useState("")
     const [ifscCode,setIfscCode]= useState("")
     const [panNumber,setPanNumber]= useState("")
-    const [riskCapacity,setRiskCapacity]=useState("")
+  
     const [OTP,setOTP]=useState("")
     const [forgotEmail,setForgotEmail]=useState('')
     const [resetOTP,setResetOTP]=useState('')
@@ -122,7 +122,7 @@ export default function Login(){
     const [accountNumberError,setAccountNumberError]=useState(false)
     const [panNumberError,setPanNumberError]=useState(false)
     const [ifscCodeError,setIfscCodeError]=useState(false)
-    const [riskCapacityError,setRiskCapacityError]=useState(false)
+
     const [loginMessage,setLoginMessage]=useState("")
 
 
@@ -272,6 +272,7 @@ if (resetPassword !== confirmResetPassword) {
       setLoginEmail('')
     }; 
     const handleSubmit = (event) => {
+      // handleOpen();
         //  const data = new FormData(event.currentTarget);
         event.preventDefault();
         setFirstNameError(false)
@@ -405,9 +406,11 @@ const handleOTPSubmit=(e)=>{
               setBankName("")
               setIfscCode("")
               setPanNumber("")
-              setRiskCapacity("")
+            
               setPassword("")
               setConfirmPassword("")
+              setShow(false)
+              setSignShow(false)
           
             
   },(error)=>{
@@ -426,7 +429,7 @@ const handleOTPSubmit=(e)=>{
       setAccountNumberError(false)
       setPanNumberError(false)
       setIfscCodeError(false)
-      setRiskCapacityError(false)
+  
       setBankHelperText("")
       setAccountNumberHelperText("")
       setIfscHelperText("")
@@ -448,12 +451,7 @@ const handleOTPSubmit=(e)=>{
         setAccountNumberError(true)
         count++
     }
-    if (riskCapacity === '') {
-      setRiskCapacityError(true)
-      count++
-      return
-  }
-
+ 
   if(count>=1){
 return
   }
@@ -527,7 +525,7 @@ if (!panNumber.match(panPattern)) {
               setBankName("")
               setIfscCode("")
               setPanNumber("")
-              setRiskCapacity("")
+  
               setPassword("")
               setConfirmPassword("")
             
@@ -847,14 +845,16 @@ if (!panNumber.match(panPattern)) {
                   margin="dense"
                   // size='small'
                   required
+                  inputProps={{ maxLength: 14,pattern: '[0-9]*' }}
                   fullWidth
                   id="accountNumber"
                   label="Account Number"
                   name="accountNumber"
+          
                   helperText={accountNumberHelpertext}
                   value={accountNumber}
                   error={accountNumberError}
-                  onChange={e => setAccountNumber(e.target.value)}
+                  onChange={e => setAccountNumber(e.target.value.replace(/[^0-9]/g, ''))}
                   
                 />
               </Grid>
@@ -898,7 +898,7 @@ if (!panNumber.match(panPattern)) {
               </Grid>
               
               </Grid>
-              <Grid  sx={{mt:1,mb:1}}>
+              {/* <Grid  sx={{mt:1,mb:1}}>
               <FormControl required fullWidth>
         <InputLabel id="demo-simple-select-label">Risk Capacity</InputLabel>
         <Select
@@ -916,7 +916,7 @@ if (!panNumber.match(panPattern)) {
           <MenuItem value={'Medium Risk'}>Medium Risk(Mixed of Low and High Risk)</MenuItem>
         </Select>
       </FormControl>
-      </Grid>
+      </Grid> */}
               {loading?<Button variant='contained' > Registering...<i class="fa fa-spinner fa-spin"></i> </Button>
               :<Button variant='contained' onClick={handleModalSubmit}>Register </Button>}</>}
         </Box>
