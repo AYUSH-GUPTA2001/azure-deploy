@@ -1519,7 +1519,7 @@ setActionLoading(true)
       <TableRow>
         <TableCell
         sx={{ textAlign: "center"}} 
-         colSpan={9}>No Pending Strategy Available.Create Investment Request to get Customized Strategies by Finacial Experts.</TableCell>
+         colSpan={9}>No Pending Strategy Available.Create Investment Request to get Customized Strategies by Financial Experts.</TableCell>
       </TableRow>
     </React.Fragment> </TableBody></Table></TableContainer>:
     
