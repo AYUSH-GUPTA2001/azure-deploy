@@ -164,6 +164,11 @@ export default function Login(){
       setLoginEmail('')
     }; 
     const handleForgotPassword=()=>{
+      setLoginEmail('')
+      setLoginPassword('')
+      setLoginMessage('')
+      setMessage('')
+      setVerifyMessage('')
       handleForgotOpen()
     }
     const handleGetOTP=()=>{
@@ -485,8 +490,12 @@ setResetLoading(true)
       handleOpen()
       return
       }
-      
+      if(error.response.data.errors){
+        setLoginMessage('Invalid Email Address')
+        return
+      }
       setLoginMessage(error.response.data.message)
+      
       console.log(error)
       // handleOpen()
     

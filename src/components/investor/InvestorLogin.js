@@ -131,6 +131,11 @@ export default function Login(){
     const [verifyMessage,setVerifyMessage]=useState('')
 
     const handleForgotPassword=()=>{
+      setLoginEmail('')
+      setLoginPassword('')
+      setLoginMessage('')
+      setMessage('')
+      setVerifyMessage('')
       handleForgotOpen()
     }
 
@@ -619,6 +624,10 @@ if (!panNumber.match(panPattern)) {
         setVerifyText(true)  
       handleOpen()
       return
+      }
+      if(error.response.data.errors){
+        setLoginMessage('Invalid Email Address')
+        return
       }
       setLoginMessage(error.response.data.message)
       // (.response.data.message)
