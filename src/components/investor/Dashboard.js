@@ -1160,7 +1160,7 @@ const [value,setValue]=useState(false)
 
 
   
-      setValue(listOfStratgies.length===0)
+      
      
     
     
@@ -1373,12 +1373,13 @@ setActionLoading(true)
       let data = response.data.strategies
       let list= data.filter(x=> x.status== 'Pending');
       setStrategyLoading(false)
-    
       // list.map((e)=>setData([e.investmentAmount,e.expectedAmount,e.amount,e.returnPercentage]))
       setListOfStrategies(list)
+      setValue(listOfStratgies.length===0)
       console.log(list)
 
     }, (error) => { 
+      setValue(listOfStratgies.length===0)
       setStrategyLoading(false)
       
     })
@@ -1728,11 +1729,17 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
      setTimeout(setMessage,5000,"")
   }
   const handleChange = (el) => {
+    debugger
     let inputName = el.target.name;
     let inputValue = el.target.value;
    
     let statusCopy = Object.assign({}, updatedClientData);
     statusCopy[inputName] = inputValue;
+
+    if(inputName==='bankName'){
+      statusCopy.accountNumber = ''
+      statusCopy.ifscCode = ''
+     }
    
     setUpdatedClientData(statusCopy);
   }
@@ -1746,6 +1753,17 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     ProfileBack()
     setEditVisible(true)
     setDisabled(true)
+    setFirstNameError(false)
+    setLastNameError(false)
+    setEmailError(false)
+    setAddressError(false)
+    setCityError(false)
+    setStateError(false)
+    setPhoneError(false)
+    setPanNumberError(false)
+   
+    setIfscCodeError(false)
+    setAccountNumberError(false)
   }
 
 
@@ -1869,10 +1887,10 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     }
 
 
-      if(!updatedClientData.phoneNumber.match(phoneNumberPattern)){
-        setphoneHelperText('Invalid Mobile Number')
-        return
-      }
+      // if(!updatedClientData.phoneNumber.match(phoneNumberPattern)){
+      //   setphoneHelperText('Invalid Mobile Number')
+      //   return
+      // }
     
     
     if (!updatedClientData.bankName.match(bankPattern)) {
@@ -2025,7 +2043,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
               helperText={phoneHelperText}
               label="Phone Number"
               name="phoneNumber"
-              value={updatedClientData.phoneNumber}
+              value={`+${updatedClientData.phoneNumber}`}
               error={phoneError}
               onChange={e => handleChange(e)}
               autoComplete="family-name"
@@ -2099,7 +2117,37 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField sx={{color:'#4b49ac'}}
+          <FormControl required fullWidth>
+                  <InputLabel id="demo-simple-select-label">Bank Name</InputLabel>
+                  <Select
+
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    name="bankName"
+              required
+              disabled= 
+              {
+                disabled
+                
+                }
+              // InputProps=
+                    label="Time Period"
+                    value={updatedClientData.bankName}
+                    error={bankNameError}
+                    helperText={bankHelperText}
+                    onChange={e => handleChange(e)}
+                  >
+                    <MenuItem value={'State Bank Of India'}>State Bank Of India</MenuItem>
+                    <MenuItem value={'HDFC'}>HDFC</MenuItem>
+                    <MenuItem value={'Bank Of India'}>Bank Of India</MenuItem>
+                    <MenuItem value={'Punjab National Bank'}>Punjab National Bank</MenuItem>
+                    <MenuItem value={'Axis Bank'}>Axis Bank</MenuItem>
+                    <MenuItem value={'Canara Bank'}>Canara Bank</MenuItem>
+
+
+                  </Select>
+                </FormControl>
+            {/* <TextField sx={{color:'#4b49ac'}}
               size="small"
               margin="dense"
               autoComplete="given-name"
@@ -2117,7 +2165,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
               id="bank"
               label="Bank Name"
               autoFocus
-            />
+            /> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField sx={{color:'#4b49ac'}}
@@ -2129,10 +2177,11 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
 
                 disabled: disabled
               }}
+              inputProps={{ maxLength: 14,pattern: '[0-9]*' }}
               id="account"
               label="Account Number"
               name="accountNumber"
-              value={updatedClientData.accountNumber}
+              value={updatedClientData.accountNumber.replace(/[^0-9]/g, '')}
               error={accountNumberError}
               helperText={accountNumberHelpertext}
               onChange={e => handleChange(e)}

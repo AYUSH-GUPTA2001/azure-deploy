@@ -2298,6 +2298,14 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
 
   const ProfileBack = (el) => {
     setUpdatedAdvisorData(advisorData);
+    setFirstNameError(false)
+    setLastNameError(false)
+    setEmailError(false)
+    setAddressError(false)
+    setCityError(false)
+    setStateError(false)
+    setPhoneError(false)
+    
     
   }
 
@@ -2408,10 +2416,10 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     }
 
   
-      if(!updatedAdvisorData.phoneNumber.match(phoneNumberPattern)){
-        setphoneHelperText('Invalid Mobile Number')
-        return
-      }
+      // if(!updatedAdvisorData.phoneNumber.match(phoneNumberPattern)){
+      //   setphoneHelperText('Invalid Mobile Number')
+      //   return
+      // }
     
     console.log(2)
     // const updateData = {
@@ -2556,7 +2564,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
               helperText={phoneHelperText}
               label="Phone Number"
               name="phoneNumber"
-              value={updatedAdvisorData.phoneNumber}
+              value={`+${updatedAdvisorData.phoneNumber}`}
               error={phoneError}
               onChange={e => handleChange(e)}
               autoComplete="family-name"
