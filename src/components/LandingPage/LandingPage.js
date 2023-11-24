@@ -236,10 +236,10 @@ return(
         <h3>Our Social Networks</h3>
             <p>For more information check our Social Media handles.</p>
             <ul>
-                <li><a href="#"><FacebookIcon  sx={{color:"#4b49ac"}} /></a></li>
-                <li><a href="#"><TwitterIcon sx={{color:"#4b49ac"}}/></a></li>
-                <li><a href="#"><LinkedInIcon sx={{color:"#4b49ac"}}/></a></li>
-                <li><a href="#"><InstagramIcon sx={{color:"#4b49ac"}}/></a></li>
+                <li><FacebookIcon  sx={{color:"#4b49ac"}} /></li>
+                <li><TwitterIcon sx={{color:"#4b49ac"}}/></li>
+                <li><LinkedInIcon sx={{color:"#4b49ac"}}/></li>
+                <li><InstagramIcon sx={{color:"#4b49ac"}}/></li>
             </ul>
         </div>
     </div>
