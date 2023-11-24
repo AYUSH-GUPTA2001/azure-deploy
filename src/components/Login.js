@@ -333,7 +333,7 @@ export default function Login(){
       "email":     email,
       "password":  password,
       "confirmPassword": confirmPassword,
-      "phoneNumber":  phone.replace(/[()\s+\-]/g, '').slice(-10),
+      "phoneNumber":  phone.replace(/[()\s+\-]/g, ''),
       "address":address,
       "city": city,
       "state":  state,

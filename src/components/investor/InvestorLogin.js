@@ -229,9 +229,9 @@ if (resetPassword !== confirmResetPassword) {
       position: 'absolute',
       top: '50%',
       left: '50%',
-      
+    
       transform: 'translate(-50%, -50%)',
-      width: 400,
+      width: 500,
       bgcolor: '#e4f1ff',
     borderRadius:'20px',
       boxShadow: 24,
@@ -568,6 +568,9 @@ if (!panNumber.match(panPattern)) {
              if(error.response.data.message){
               setMessage(error.response.data.message)
             }
+            else{
+              setMessage("Invalid Email Address")
+            }
     }) 
 }    
     const handleLoginSubmit = (event) => {
@@ -858,7 +861,30 @@ if (!panNumber.match(panPattern)) {
           </Typography>
           <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField sx={{color:'#4b49ac'}}
+              
+                <FormControl required fullWidth>
+                  <InputLabel id="demo-simple-select-label">Bank Name</InputLabel>
+                  <Select
+
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Time Period"
+                    value={bankName}
+                  error={bankNameError}
+                  helperText={bankHelperText}
+                  onChange={e => setBankName(e.target.value)}
+                  >
+                    <MenuItem value={'State Bank Of India'}>State Bank Of India</MenuItem>
+                    <MenuItem value={'HDFC'}>HDFC</MenuItem>
+                    <MenuItem value={'Bank Of India'}>Bank Of India</MenuItem>
+                    <MenuItem value={'Punjab National Bank'}>Punjab National Bank</MenuItem>
+                    <MenuItem value={'Axis Bank'}>Axis Bank</MenuItem>
+                    <MenuItem value={'Canara Bank'}>Canara Bank</MenuItem>
+
+
+                  </Select>
+                </FormControl>
+                {/* <TextField sx={{color:'#4b49ac'}}
                 
                   margin="dense"
                   // size='small'
@@ -873,7 +899,7 @@ if (!panNumber.match(panPattern)) {
                   id="bankName"
                   label="Bank Name"
                   autoFocus
-                />
+                /> */}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField sx={{color:'#4b49ac'}}
@@ -953,8 +979,8 @@ if (!panNumber.match(panPattern)) {
         </Select>
       </FormControl>
       </Grid> */}
-              {loading?<Button variant='contained' > Registering...<i class="fa fa-spinner fa-spin"></i> </Button>
-              :<Button variant='contained' onClick={handleModalSubmit}>Register </Button>}</>}
+              {loading?<Button sx={{float:'right'}} variant='contained' > Registering...<i class="fa fa-spinner fa-spin"></i> </Button>
+              :<Button sx={{float:'right'}} variant='contained' onClick={handleModalSubmit}>Register </Button>}</>}
         </Box>
       </Modal>
       <Modal

@@ -741,6 +741,7 @@ button {
 
 .addDisabled{
   cursor:not-allowed!important;
+  background: #a3a2d4 !important;
 }
 
 
