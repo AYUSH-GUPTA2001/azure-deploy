@@ -1375,7 +1375,7 @@ setActionLoading(true)
       setStrategyLoading(false)
       // list.map((e)=>setData([e.investmentAmount,e.expectedAmount,e.amount,e.returnPercentage]))
       setListOfStrategies(list)
-      setValue(listOfStratgies.length===0)
+      setValue(list.length===0)
       console.log(list)
 
     }, (error) => { 
