@@ -309,7 +309,7 @@ const handleSessionNo=()=>{
 
   axios({
     method: 'get',
-    url: `https://localhost:7136/api/ClientSignUp/${clientId}?api-version=1`
+    url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
   }).then((response) => {
     setFirstName(response.data.client.firstName)
     setLastName(response.data.client.lastName)
@@ -508,8 +508,8 @@ const [loading,setLoading]=useState(true)
     setDashboardLoading(true)
     axios({
       method: 'get',
-      // url: `https://localhost:7136/api/strategies/${clientId}/By-ClientId?api-version=1`
-      url:`https://localhost:7136/api/strategies/${clientId}/All-Strategy?api-version=1`
+      // url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url:`https://investmentportal.azurewebsites.net/api/strategies/${clientId}/All-Strategy?api-version=1`
     }).then(function (response) {
       debugger
       let _lineData=[]
@@ -903,7 +903,7 @@ const handleInvestmentCall = () => {
   setDashboardLoading(true)
   axios({
     method: 'get',
-    url: `https://localhost:7136/api/investments/client/${clientId}?api-version=1`
+    url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
   }).then(function (response) {
     
     let list = response.data
@@ -1569,7 +1569,7 @@ const customize = {
     }
    axios({
     method:'put',
-    url:`https://localhost:7136/api/strategies/${clientId}/Update-InvestmentBundle?api-version=1`,
+    url:`https://investmentportal.azurewebsites.net/api/strategies/${clientId}/Update-InvestmentBundle?api-version=1`,
     data:updatedData
    }).then((response)=>{
     console.log(response.data)
@@ -1585,7 +1585,7 @@ const customize = {
     setActionLoading(true)
     axios({
       method:'put',
-      url:`https://localhost:7136/api/investments/Update-Investment-Status?api-version=1`,
+      url:`https://investmentportal.azurewebsites.net/api/investments/Update-Investment-Status?api-version=1`,
       data:statusArr
     }).then((response)=>{
       debugger
@@ -1623,7 +1623,7 @@ return
       setActionLoading(true)
       axios({
         method:'put',
-        url:`https://localhost:7136/api/investments/Update-Investment-Status?api-version=1`,
+        url:`https://investmentportal.azurewebsites.net/api/investments/Update-Investment-Status?api-version=1`,
         data:statusArr
       }).then((response)=>{
         setSnackOpen(true)
@@ -1700,7 +1700,7 @@ const handleSave=()=>{
 setActionLoading(true)
 axios({
   method:'put',
-  url:`https://localhost:7136/api/strategies/Update-Multiple-by-Client?api-version=1`,
+  url:`https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Client?api-version=1`,
   data:actionArray
 }).then((response)=>{
 console.log(response)
@@ -1728,7 +1728,7 @@ const [value,setValue]=useState(false)
     
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/investments/client/${clientId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
     }).then((response) => {
       setDashboardLoading(false)
       setNewLoading(false)
@@ -1800,7 +1800,7 @@ const [value,setValue]=useState(false)
     setLoading(true)
     axios({
       method: 'post',
-      url: `https://localhost:7136/api/investments/New Investment?api-version=1`,
+      url: `https://investmentportal.azurewebsites.net/api/investments/New Investment?api-version=1`,
       data: investmentData
     }).then((response) => {
       console.log(response)
@@ -1860,7 +1860,7 @@ const [value,setValue]=useState(false)
 setActionLoading(true)
       axios({
         method: 'put',
-        url: `https://localhost:7136/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
+        url: `https://investmentportal.azurewebsites.net/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
         data: investmentData
       }).then((response) => {
         console.log(response)
@@ -1951,8 +1951,8 @@ setActionLoading(true)
   const handleStrategyCall=()=>{
     axios({
       method: 'get',
-      // url: `https://localhost:7136/api/strategies/${clientId}/By-ClientId?api-version=1`
-      url:`https://localhost:7136/api/strategies/${clientId}/Newly-Proposed?api-version=1`
+      // url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url:`https://investmentportal.azurewebsites.net/api/strategies/${clientId}/Newly-Proposed?api-version=1`
     }).then((response) => {
       // let data = response.data.strategies
       let data=response.data.investmentBundles
@@ -2529,7 +2529,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/ClientSignUp/${clientId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
     })
       .then((response) => {
         console.log(response.data.client)
@@ -2656,7 +2656,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setLoading(true)
       axios({
         method: 'put',
-        url: `https://localhost:7136/api/ClientSignUp/update/${clientId}?api-version=1`,
+        url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/update/${clientId}?api-version=1`,
         data:updatedClientData
       }).then((response) => {
         console.log(response)

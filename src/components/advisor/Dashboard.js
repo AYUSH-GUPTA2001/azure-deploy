@@ -277,7 +277,7 @@ toggle.addEventListener("click", () => {
     
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
       // ////debugger
       let advisor=response.data.advisor
@@ -486,7 +486,7 @@ function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
 setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
     }).then(function (response) {
       const list = response.data.strategies
       setTotalInvAmount(list.map(x=> x.investmentAmount).reduce(function(a, b){
@@ -812,7 +812,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
 ////debugger
 
@@ -870,7 +870,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
   //   axios({
   //     method:'get',
-  //     url:`  https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}`
+  //     url:`  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}`
   //   }).then((response)=>{
 
 
@@ -888,7 +888,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
   //   listOfClientId.map((e)=>{axios({
   //     method:'get',
-  //     url:`  https://localhost:7136/api/investments/client/${e.clientId}`
+  //     url:`  https://investmentportal.azurewebsites.net/api/investments/client/${e.clientId}`
   //   }).then((response)=>{setListofInvestments([...listOfInvestments,response.data])},(error)=>{})
 
 
@@ -898,7 +898,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
   //   useEffect(()=>{
   //     axios({
   //       method:'get',
-  //       url:`  https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId`
+  //       url:`  https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId`
   //     }).then(function(response){
   //     const list=response.data.strategies
 
@@ -1193,7 +1193,7 @@ const handleSnackClose = (event, reason) => {
     
     axios({
       method:'get',
-      url:`https://localhost:7136/api/strategies/bytype/${row.investmentType}?api-version=1`,
+      url:`https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
     }).then(
       (response)=>{
         //debugger
@@ -1296,7 +1296,7 @@ const handleReturns=(id,strategyName,timePeriod)=>{
   }
   axios({
     method:'get',
-    url:`https://localhost:7136/api/strategies/byname/${strategyName}?api-version=1`
+    url:`https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
     }).then((response)=>{
      let data = response.data[0]
      if(data){
@@ -1542,7 +1542,7 @@ debugger
 setLoading(true)
   axios({
     method: 'post',
-    url: 'https://localhost:7136/api/strategies/Add?api-version=1',
+    url: 'https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
     data: strategyData
   }).then((response) => {
     console.log(response)
@@ -1596,7 +1596,7 @@ setLoading(true)
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/investments/advisor/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
       //debugger
       // dashboardLoading=false
@@ -2382,7 +2382,7 @@ const handleSave=()=>{
   setActionLoading(true)
   axios({
     method:'put',
-    url:`https://localhost:7136/api/strategies/Update-Multiple-by-Advisor?api-version=1`,
+    url:`https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Advisor?api-version=1`,
     data:actionArray
   }).then((response)=>{
   
@@ -2404,7 +2404,7 @@ const handleFundedCall=()=>{
   setDashboardLoading(true)
   axios({
     method:'get',
-    url:`https://localhost:7136/api/strategies/${advisorId}/approved-strategies?api-version=1`
+    url:`https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/approved-strategies?api-version=1`
   }).then((response)=>{
     console.log(response.data)
     const list = response.data.approvedStrategies
@@ -2427,7 +2427,7 @@ const handleFundedCall=()=>{
   handleFundedCall();
     // axios({
     //   method:'get',
-    //   url:`  https://localhost:7136/api/investments/approved/${advisorId}?api-version=1`
+    //   url:`  https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
     // }).then((response)=>{
     //   console.log(response.data)
     //   setNewLoading(false)
@@ -2680,7 +2680,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
     })
       .then((response) => {
         setAdvisorData(response.data.advisor)
@@ -2783,7 +2783,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setDashboardLoading(true)
       axios({
         method: 'put',
-        url: `https://localhost:7136/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
+        url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
         data: updatedAdvisorData
       }).then((response) => {
         console.log(response)
