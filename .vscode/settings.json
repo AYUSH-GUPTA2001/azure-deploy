@@ -1,4 +1,5 @@
 {
     "appService.defaultWebAppToDeploy": "/subscriptions/2dc6c9a0-eaa3-4d19-9bbd-1d6e0fdb0088/resourceGroups/react-azure-deploy/providers/Microsoft.Web/sites/Incvest",
-    "appService.deploySubpath": "build\\static"
+    "appService.deploySubpath": "build\\static",
+    "liveServer.settings.port": 5501
 }

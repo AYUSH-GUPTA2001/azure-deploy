@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useEffect, useState } from "react";
 import './AdvisorDashboard.css'
+// import DynamicTextFieldForm from './DynamicTextfields';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
@@ -21,8 +24,9 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import FormControl from '@mui/material/FormControl'
 import TextField from '@mui/material/TextField';
-import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+
 import Grid from '@mui/material/Grid'
 import CloseIcon from '@mui/icons-material/Close';
 import Collapse from '@mui/material/Collapse';
@@ -154,7 +158,8 @@ function Dashboard() {
       const seconds = timeInSeconds % 60;
       if(timeInSeconds>0) {
       const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      document.getElementById('timer').innerText = formattedTime;
+      let timer=document.getElementById('timer')
+      if(timer)timer.innerText = formattedTime;
     }
      
     
@@ -272,7 +277,7 @@ toggle.addEventListener("click", () => {
     
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
     }).then((response) => {
       // ////debugger
       let advisor=response.data.advisor
@@ -481,7 +486,7 @@ function InvestmentStrategies({ advisorId ,setDashboardLoading }) {
 setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
+      url: `https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId?api-version=1`
     }).then(function (response) {
       const list = response.data.strategies
       setTotalInvAmount(list.map(x=> x.investmentAmount).reduce(function(a, b){
@@ -643,8 +648,8 @@ function collapseRow(the)
        </> :(<>
          <div className='card-container'>
                 <Card color="firstCard"  heading="Number of Strategies" number={totalStrategies}/>
-                <Card color="secondCard"  heading="Total Invested Amount" number={totalInvAmount}/>
-                <Card color="thirdCard" heading="Total Expected  Amount" number={totalExpAmount.toFixed(2)}/>
+                <Card color="secondCard"  heading="Total Invested Amount" number={`Rs.${totalInvAmount}`}/>
+                <Card color="thirdCard" heading="Total Expected  Amount" number={`Rs.${totalExpAmount.toFixed(2)}`}/>
                 <Card color="SixthCard" heading="Total Approved Holdings" number={totalApproved}/>
                 <Card color="fourthCard" heading="Total Rejected Holdings" number={totalRejected}/>
                 <Card color="fifthCard" heading="Total Pending Holdings" number={totalPending}/>
@@ -807,7 +812,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}?api-version=1`
     }).then((response) => {
 ////debugger
 
@@ -865,7 +870,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
   //   axios({
   //     method:'get',
-  //     url:`  https://investmentportal.azurewebsites.net/api/AdvisorSignUp/clients-by-advisor/${advisorId}`
+  //     url:`  https://localhost:7136/api/AdvisorSignUp/clients-by-advisor/${advisorId}`
   //   }).then((response)=>{
 
 
@@ -883,7 +888,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 
   //   listOfClientId.map((e)=>{axios({
   //     method:'get',
-  //     url:`  https://investmentportal.azurewebsites.net/api/investments/client/${e.clientId}`
+  //     url:`  https://localhost:7136/api/investments/client/${e.clientId}`
   //   }).then((response)=>{setListofInvestments([...listOfInvestments,response.data])},(error)=>{})
 
 
@@ -893,7 +898,7 @@ function ClientList({ advisorId ,setDashboardLoading }) {
   //   useEffect(()=>{
   //     axios({
   //       method:'get',
-  //       url:`  https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/By-AdvisorId`
+  //       url:`  https://localhost:7136/api/strategies/${advisorId}/By-AdvisorId`
   //     }).then(function(response){
   //     const list=response.data.strategies
 
@@ -1070,6 +1075,27 @@ function ClientList({ advisorId ,setDashboardLoading }) {
 function ReportsContent({ advisorId ,setDashboardLoading }) {
   //////debugger
   // dashboardLoading=true
+  const [formFields, setFormFields] = useState([{ id: 1, values: {} }]);
+
+  const addFields = () => {
+    setFormFields([...formFields, { id: formFields.length + 1, values: {} }]);
+  };
+
+  const removeFields = (id) => {
+    if(id===1){
+      return
+    }
+    setFormFields(formFields.filter((field) => field.id !== id));
+  };
+
+  const handleInputChange = (id, fieldName, value) => {
+    setFormFields((prevFields) =>
+      prevFields.map((field) =>
+        field.id === id ? { ...field, values: { ...field.values, [fieldName]: value } } : field
+  
+      )
+    );
+  };
 
   const columns = [
     { field: 'investmentID', headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
@@ -1119,7 +1145,8 @@ function ReportsContent({ advisorId ,setDashboardLoading }) {
   const [loading,setLoading]=useState(false)
   const [requestLoading,setRequestLoading]=useState(true)
   const [remainingAmount,setRemainingAmount]=useState('')
-  // const [_rate,setRate]=useState(0)
+  const [clientAmount,setClientAmount]=useState('')
+    // const [_rate,setRate]=useState(0)
   // const [_time,setTime]=useState(0)
 
   
@@ -1142,28 +1169,36 @@ const handleSnackClose = (event, reason) => {
     position: 'absolute',
     top: '50%',
     left: '50%',
+    overflow:'auto',
+    
     transform: 'translate(-50%, -50%)',
-    width: 480,
+    // width: 450,
+    width: 1200,
+    height:510,
     bgcolor: '#e4f1ff',
-    borderRadius: '20px',
+    // borderRadius: '25px',
+    borderRadius: '5px',
     boxShadow: 24,
-    p: 4,
+    p: 2,
   };
   const [modalOpen, setModalOpen] = React.useState(false);
   const [clientId, setClientId] = useState('')
   const handleOpen = (row) => {
-      //debugger
+      debugger
      setClientId(row.clientId);
      setInvestmentId(row.investmentID)
     setRemainingAmount(row.remainingAmount)
+    setClientAmount(row.investmentAmount)
     setTimePeriod(row.timePeriod)
+    
     axios({
       method:'get',
-      url:`https://investmentportal.azurewebsites.net/api/strategies/bytype/${row.investmentType}?api-version=1`,
+      url:`https://localhost:7136/api/strategies/bytype/${row.investmentType}?api-version=1`,
     }).then(
       (response)=>{
         //debugger
         setData(response.data)
+      
         setModalOpen(true);
         console.log(data)
     //  const data =response.data
@@ -1185,11 +1220,13 @@ const handleSnackClose = (event, reason) => {
     setOneYrReturns('')
     setThreeYrReturns('')
     setFiveYrReturns('')
+    setFormFields([{ id: 1, values: {} }])
     setStrategyNameError(false)
     setInvestmentAmountError(false)
     setExpectedAmountError(false)
     setTimePeriodError(false)
     setSixMonReturnsError(false)
+    setIndustryNameError(false)
     setOneYrReturnsError(false)
     setHelperText('')
     setThreeYrReturnsError(false)
@@ -1216,6 +1253,7 @@ const handleSnackClose = (event, reason) => {
   const [investmentIdError, setInvestmentIdError] = useState(false)
   const [investmentAmountError, setInvestmentAmountError] = useState(false)
   const [expectedAmountError, setExpectedAmountError] = useState(false)
+  const [industryNameError,setIndustryNameError]=useState(false)
   // const [statusError,setStatusError]=useState(false)
   const [sixMonReturnsError, setSixMonReturnsError] = useState(false)
   const [oneYrReturnsError, setOneYrReturnsError] = useState(false)
@@ -1223,47 +1261,107 @@ const handleSnackClose = (event, reason) => {
   const [fiveYrReturnsError, setFiveYrReturnsError] = useState(false)
   const [helperText,setHelperText] =useState('')
   
-const handleReturns=(strategyName)=>{
+const handleReturns=(id,strategyName,timePeriod)=>{
+  // const handleReturns=(strategyName,timePeriod)=>{
+    setHelperText('')
+    let nameArray=[]
+    formFields.map((fields)=>{
+      if(fields.values['textfield1']){
+        nameArray.push(fields.values['textfield1'])
+       }
+    })
+    let uniqueSet = new Set(nameArray);
+    if(nameArray.length !== uniqueSet.size){
+        setHelperText('Duplicate Stocks are not Allowed')
+        nameArray=[]
+        // setStrategyName('')
+        return
+    } 
+
+  if(timePeriod.includes('1'))
+  {
+    document.getElementById('1yr').classList.add("termSelected")
+  }
+  else if(timePeriod.includes('6'))
+  {
+    document.getElementById('6m').classList.add("termSelected")
+  }
+  else if(timePeriod.includes('3'))
+  {
+    document.getElementById('3yr').classList.add("termSelected")
+  }
+  else if(timePeriod.includes('5'))
+  {
+    document.getElementById('5yr').classList.add("termSelected")
+  }
   axios({
     method:'get',
-    url:`https://investmentportal.azurewebsites.net/api/strategies/byname/${strategyName}?api-version=1`
+    url:`https://localhost:7136/api/strategies/byname/${strategyName}?api-version=1`
     }).then((response)=>{
      let data = response.data[0]
-     setSixMonReturns(data.returnPercentageAfter6months)
-     setOneYrReturns(data.returnPercentageAfter1year)
-     setThreeYrReturns(data.returnPercentageAfter3year)
-     setFiveYrReturns(data.returnPercentageAfter5year)
+     if(data){
+      // setSixMonReturns(data.returnPercentageAfter6months)
+      // setOneYrReturns(data.returnPercentageAfter1year)
+      // setThreeYrReturns(data.returnPercentageAfter3year)
+      // setFiveYrReturns(data.returnPercentageAfter5year)
+     formFields.map((fields)=>
+      setFormFields((prevFields) =>
+      prevFields.map((field) =>
+        field.id === id ? { ...field, values: { ...field.values, ['textfield3']: data.returnPercentageAfter6months
+      ,['textfield4']: data.returnPercentageAfter1year,
+      ['textfield5']: data.returnPercentageAfter3year,
+      ['textfield6']: data.returnPercentageAfter5year,
+    ['textfield8']:data.industry }} : field
+  
+      )
+    )
+     )
+  }
+    
     },(error)=>{
-
+        console.log(error)
     })
 }
 
-const handleCalculations=(investmentAmount)=>{
+const handleCalculations=(field,id,investmentAmount)=>{
   let _rate = 0
   let _time = 0
-    if(timePeriod.includes('6')){
-      _rate=  +sixMonReturns
+   if(timePeriod.includes('6')){
+      // document.getElementById('6m').classList.add("termSelected")
+      _rate=  +field.values['textfield3'] 
       _time=  0.5
     }
     if(timePeriod.includes('1')){
-      _rate=  +oneYrReturns
+      // document.getElementById('1yr').classList.add("termSelected")
+      _rate=  +field.values['textfield4'] 
       _time=  1
     }
     if(timePeriod.includes('3')){
-      _rate=  +threeYrReturns
+      // document.getElementById('3yr').classList.add("termSelected")
+      _rate=  +field.values['textfield5'] 
       _time=  3    }
     if(timePeriod.includes('5')){
-      _rate=  +fiveYrReturns
+      // document.getElementById('5yr').classList.add("termSelected")
+      _rate=  +field.values['textfield6'] 
       _time=  5
     }
-    setExpectedAmount((+investmentAmount*(Math.pow((1 + _rate/100),_time))).toFixed(2))
+let expAmount=(+investmentAmount*(Math.pow((1 + _rate/100),_time))).toFixed(2)
+debugger
+    formFields.map((fields)=>
+    setFormFields((prevFields) =>
+    prevFields.map((field) =>
+      field.id === id ? { ...field, values: { ...field.values, ['textfield7']: expAmount }} : field
+
+    )
+  )
+   )
+    // setExpectedAmount((+investmentAmount*(Math.pow((1 + _rate/100),_time))).toFixed(2))
     // console.log(Number(investmentAmount) *
                       // (Math.pow((1 + rate / 100), time)))
 }
   const handleModalSubmit = (event) => {
 
-
-
+   
 
     event.preventDefault();
     setStrategyNameError(false)
@@ -1271,90 +1369,180 @@ const handleCalculations=(investmentAmount)=>{
     setTimePeriodError(false)
     setSixMonReturnsError(false)
     setOneYrReturnsError(false)
+    setIndustryNameError(false)
     setThreeYrReturnsError(false)
     setInvestmentAmountError(false)
     setFiveYrReturnsError(false)
     setHelperText('')
-    let count = 0;
-    if (strategyName === "") {
-      setStrategyNameError(true)
+// debugger
+   let count = 0;
+
+    formFields.map((fields)=>{
+  
+    if(fields.values['textfield1']===undefined){
+        setStrategyNameError(true)
+        count++
+    }
+    if(fields.values['textfield2']===undefined){
+      setInvestmentAmountError(true)
       count++
     }
-    if (clientId === "") {
-      setClientIdError(true)
+    if(fields.values['textfield3']===undefined){
+      setSixMonReturnsError(true)
       count++
     }
-    if (investmentId === "") {
-      setInvestmentIdError(true)
+    if(fields.values['textfield4']===undefined){
+        setOneYrReturnsError(true)
+        count++
+    }
+    if(fields.values['textfield5']===undefined){
+      setThreeYrReturnsError(true)
       count++
     }
+    if(fields.values['textfield6']===undefined){
+      setFiveYrReturnsError(true)
+      count++
+  }
+  
+  if(fields.values['textfield7']===undefined){
+    setExpectedAmountError(true)
+    count++
+  }
+  if(fields.values['textfield8']===undefined){
+    setIndustryNameError(true)
+    count++
+}
+  }
+   )
+    // if (strategyName === "") {
+    //   setStrategyNameError(true)
+    //   count++
+    // }
+    // if (clientId === "") {
+    //   setClientIdError(true)
+    //   count++
+    // }
+    // if (investmentId === "") {
+    //   setInvestmentIdError(true)
+    //   count++
+    // }
     // if(Status===''){
     //   setStatusError(true)
     //   count++
     // }
-    if (investmentAmount === "") {
-      setInvestmentAmountError(true)
-      count++
-    }
-    if (expectedAmount === "") {
-      setExpectedAmountError(true)
-      count++
-    }
-    if (timePeriod === '') {
-      setTimePeriodError(true)
-      count++
-    }
-    if (sixMonReturns === "") {
-      setSixMonReturnsError(true)
-      count++
-    }
-    if (oneYrReturns === "") {
-      setOneYrReturnsError(true)
-      count++
-    }
-    if (threeYrReturns === "") {
-      setThreeYrReturnsError(true)
-      count++
-    }
-    if (fiveYrReturns === "") {
-      setFiveYrReturnsError(true)
-      count++
-    }
+    // if (investmentAmount === "") 
+    // if(formFields.values['textfield1']==='')
+    // {
+    //   setInvestmentAmountError(true)
+    //   count++
+    // }
+    // if (expectedAmount === "") {
+    //   setExpectedAmountError(true)
+    //   count++
+    // }
+    // if (timePeriod === '') {
+    //   setTimePeriodError(true)
+    //   count++
+    // }
+    // if (sixMonReturns === "") {
+    //   setSixMonReturnsError(true)
+    //   count++
+    // }
+    // if (oneYrReturns === "") {
+    //   setOneYrReturnsError(true)
+    //   count++
+    // }
+    // if (threeYrReturns === "") {
+    //   setThreeYrReturnsError(true)
+    //   count++
+    // }
+    // if (fiveYrReturns === "") {
+    //   setFiveYrReturnsError(true)
+    //   count++
+    // }
     if (count > 0) {
       return
     }
-    if(investmentAmount<=100){
-      setHelperText("Investment Amount should be greater than 100")
+    let nameArray=[]
+    formFields.map((fields)=>{
+      if(fields.values['textfield1']){
+        nameArray.push(fields.values['textfield1'])
+       }
+    })
+    let uniqueSet = new Set(nameArray);
+    if(nameArray.length !== uniqueSet.size){
+        setHelperText('Duplicate Stocks are not Allowed')
+        nameArray=[]
+        // setStrategyName('')
+        return
+    } 
+    // if(investmentAmount<=100){
+    //   setHelperText("Investment Amount should be greater than 100")
+    //   return
+    // }
+    let sum=0
+    formFields.map((fields)=>{
+      let value= +fields.values['textfield2']
+      sum+= value
+    })
+    if(sum>clientAmount){
+      setHelperText(`Client Amount(Rs.${clientAmount}) is less than investment Amount.(Rs.${sum})`)
+      setTimeout(setHelperText,5000,'')
       return
     }
-    if(investmentAmount>remainingAmount){
-      setHelperText("Balance is less than investment Amount")
-      return
-    }
-    const strategyData = {
-      "strategyId": "string",
-      "investmentId": investmentId,
-      "investmentAmount": investmentAmount,
-      "expectedAmount": expectedAmount,
-      "investmentName": strategyName,
-      "clientId": clientId,
-      "advisorId": advisorId,
-      "returnPercentage": 10,
-      "returnPercentageAfter6months": sixMonReturns,
-      "returnPercentageAfter1year": oneYrReturns,
-      "returnPercentageAfter3year": threeYrReturns,
-      "returnPercentageAfter5year": fiveYrReturns,
-      "status": "string",
-      "timePeriod": timePeriod,
-      "remarks": "string",
-      "completed": true
-    }
+    let strategyData=[]
+    formFields.map((fields)=>{
+      let object={
+        "strategyId": "string",
+        "investmentId": investmentId,
+        "investmentAmount": fields.values['textfield2'],
+        "expectedAmount": fields.values['textfield7'],
+        "investmentName": fields.values['textfield1'],
+        "clientId": clientId,
+        "advisorId": advisorId,
+        "returnPercentage": 10,
+        "returnPercentageAfter6months": fields.values['textfield3'],
+        "industry": fields.values['textfield8'],
+        "returnPercentageAfter1year": fields.values['textfield4'],
+        "returnPercentageAfter3year": fields.values['textfield5'],
+        "returnPercentageAfter5year":fields.values['textfield6'],
+        "status": "string",
+        "timePeriod": timePeriod,
+        "remarks": "string",
+        "completed": true
+      }
+      strategyData.push(object)
+    })
+   
+    // if(investmentAmount>remainingAmount){
+    //   setHelperText("Balance is less than investment Amount")
+    //   return
+    // }
+
+    // const strategyData = {
+      // "strategyId": "string",
+      // "investmentId": investmentId,
+      // "investmentAmount": investmentAmount,
+      // "expectedAmount": expectedAmount,
+      // "investmentName": strategyName,
+      // "clientId": clientId,
+      // "advisorId": advisorId,
+      // "returnPercentage": 10,
+      // "returnPercentageAfter6months": sixMonReturns,
+      // "returnPercentageAfter1year": oneYrReturns,
+      // "returnPercentageAfter3year": threeYrReturns,
+      // "returnPercentageAfter5year": fiveYrReturns,
+      // "status": "string",
+      // "timePeriod": timePeriod,
+      // "remarks": "string",
+      // "completed": true
+    // }
 
 
 setLoading(true)
   axios({
     method: 'post',
-    url: 'https://investmentportal.azurewebsites.net/api/strategies/Add?api-version=1',
+    url: 'https://localhost:7136/api/strategies/Add?api-version=1',
     data: strategyData
   }).then((response) => {
     console.log(response)
@@ -1381,7 +1569,11 @@ setLoading(true)
   }, (error) => {
     console.log(error)
     setLoading(false)
-   
+   if(error.response.data.message==='Sum of strategy amounts does not match the investment amount.'){
+    setHelperText(`Balance (Rs.${clientAmount-sum}) left for investment `)
+    setTimeout(setHelperText,5000,'')
+    return
+   }
     setMessage(error.response.data.message)
   })
 
@@ -1404,7 +1596,7 @@ setLoading(true)
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/investments/advisor/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/investments/advisor/${advisorId}?api-version=1`
     }).then((response) => {
       //debugger
       // dashboardLoading=false
@@ -1555,11 +1747,31 @@ if(_needConsultation > 0){
       >
         <Box sx={style} >
           <CloseIcon sx={{color:'#4b49ac'}}onClick={handleClose} style={{ cursor: 'pointer', position: "absolute", top: "10px", right: "10px" }} />
-           <><Typography color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
+           <><Typography className='text1' color='#4b49ac' id="modal-modal-title" variant="h6" component="h2">
             Create New Strategy For Client
           </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+            {/* <Grid container spacing={2}>
+             
+
+            </Grid> */}
+           
+            {formFields.map((field) => (
+        <div key={field.id} className='formContainer'> 
+          {/* <TextField
+            label="Textfield 1"
+            variant="outlined"
+            fullWidth
+            value={field.values['textfield1'] || ''}
+            onChange={(e) => handleInputChange(field.id, 'textfield1', e.target.value)}
+          /> */}
+          {field.id!==1?<IconButton className='remove' onClick={() => removeFields(field.id)}>
+            <CloseIcon color="error" />
+          </IconButton>:''}
+           <Grid container spacing={1} >
+           <Grid item xs={2}
+          //  xs={12}
+            // sm={6}
+            >
             <TextField sx={{color:'#4b49ac'}}
 
               margin="dense"
@@ -1576,7 +1788,10 @@ if(_needConsultation > 0){
               autoFocus
               />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              
+              <Grid item xs={2}
+              // xs={12} sm={6}
+              >
                 <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
@@ -1592,22 +1807,26 @@ if(_needConsultation > 0){
 
                 />
               </Grid>
-
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={2}
+              // xs={12} sm={6}
+              >
                 
               <FormControl margin='dense' required fullWidth>
-                  <InputLabel id="demo-simple-select-label">Strategy Name</InputLabel>
+                  <InputLabel id="demo-simple-select-label">Stock Name</InputLabel>
                   <Select
 
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    label="Strategy Name"
-                    value={strategyName}
+                    label="Stock Name"
+                    // value={strategyName}
                     error={strategyNameError}
-                    onChange={e => setStrategyName(e.target.value)}
-                    onBlur={e=>handleReturns(strategyName)}
+                    value={field.values['textfield1'] || ''}
+                    onChange={(e) => {
+            
+                    handleInputChange(field.id, 'textfield1', e.target.value)}}
+                    // onChange={e => setStrategyName(e.target.value)}
+                    onBlur={e=>handleReturns(field.id,field.values['textfield1'] ,timePeriod)}
+                    // onBlur={e=>handleReturns(strategyName,timePeriod)}
                   >
                 
                    { data.map((row)=>
@@ -1621,7 +1840,9 @@ if(_needConsultation > 0){
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={2}
+              // xs={12} sm={6}
+              >
                 
               <TextField sx={{color:'#4b49ac'}}
 
@@ -1631,16 +1852,19 @@ if(_needConsultation > 0){
                     required
                     fullWidth
                     disabled
-                    value={timePeriod}
                     error={timePeriodError}
+                    value={timePeriod}
+               
                     onChange={e => setTimePeriod(e.target.value)}
                     id="timePeriod"
                     label="Time Period"
                     autoFocus
+                    className='termSelected'
                     />
               </Grid>
-
-            </Grid>
+                    
+            
+            <Grid item xs={2}>
             <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
@@ -1650,23 +1874,31 @@ if(_needConsultation > 0){
                   id="investmentAmount"
                   label="Investment Amount"
                   name="investmentAmount"
-                  value={investmentAmount}
+                  // value={investmentAmount}
                   error={investmentAmountError}
-                  onChange={e => {
+                  value={field.values['textfield2'] || ''}
+                  onChange={(e) => {
+          
+                  handleInputChange(field.id, 'textfield2', e.target.value)}}
+                  // onChange={e => {
                 
-                    setInvestmentAmount(e.target.value)
+                  //   setInvestmentAmount(e.target.value)
                     
-                  }}
-                  onBlur={e=>handleCalculations(investmentAmount)}
+                  // }}
+                  onBlur={e=>handleCalculations(field,field.id,field.values['textfield2'] )}
+                  // onBlur={e=>handleCalculations(investmentAmount)}
+
 
                 />
-
+</Grid>
            
 
           
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+            
+              <Grid item xs={2}
+              // xs={12} sm={6}
+              >
                 <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
@@ -1675,15 +1907,21 @@ if(_needConsultation > 0){
                   required
                   fullWidth
                   disabled
-                  value={sixMonReturns}
+                  // value={sixMonReturns}
                   error={sixMonReturnsError}
-                  onChange={e => setSixMonReturns(e.target.value)}
-                  id="6m Returns"
+                  value={field.values['textfield3'] || ''}
+                  // onChange={(e) => {
+          
+                  // handleInputChange(field.id, 'textfield3', e.target.value)}}
+                  // onChange={e => setSixMonReturns(e.target.value)}
+                  id="6m"
                   label="6m Returns(%)"
                   autoFocus
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={2}
+              //  xs={12} sm={6}
+               >
                 <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
@@ -1693,16 +1931,21 @@ if(_needConsultation > 0){
                   disabled
                   label="1yr Returns(%) "
                   name="1yr"
-                  value={oneYrReturns}
+                  // value={oneYrReturns}
+                  value={field.values['textfield4'] || ''}
+                  // onChange={(e) => {
+          
+                  // handleInputChange(field.id, 'textfield4', e.target.value)}}
                   error={oneYrReturnsError}
-                  onChange={e => setOneYrReturns(e.target.value)}
+                  // onChange={e => setOneYrReturns(e.target.value)}
 
                 />
               </Grid>
 
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+          
+              <Grid item xs={2}
+              // xs={12} sm={6}
+              >
                 <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
@@ -1711,15 +1954,21 @@ if(_needConsultation > 0){
                   required
                   fullWidth
                   disabled
-                  value={threeYrReturns}
+                  // value={threeYrReturns}
+                  value={field.values['textfield5'] || ''}
+                  // onChange={(e) => {
+          
+                  // handleInputChange(field.id, 'textfield5', e.target.value)}}
                   error={threeYrReturnsError}
-                  onChange={e => setThreeYrReturns(e.target.value)}
+                  // onChange={e => setThreeYrReturns(e.target.value)}
                   id="3yr"
                   label="3yr Returns(%)"
                   autoFocus
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={2}
+              // xs={12} sm={6}
+              >
                 <TextField sx={{color:'#4b49ac'}}
 
                   margin="dense"
@@ -1729,14 +1978,17 @@ if(_needConsultation > 0){
                   disabled
                   label="5yr Returns(%)"
                   name="5yr"
-                  value={fiveYrReturns}
+                  // value={fiveYrReturns}
                   error={fiveYrReturnsError}
-                  onChange={e => setFiveYrReturns(e.target.value)}
+                  value={field.values['textfield6'] || ''}
+                  // onChange={(e) => {
+          
+                  // handleInputChange(field.id, 'textfield6', e.target.value)}}
+                  // onChange={e => setFiveYrReturns(e.target.value)}
 
                 />
               </Grid>
-
-            </Grid>
+              <Grid item xs={2}>
                     <TextField sx={{color:'#4b49ac'}}
 
                       margin="dense"
@@ -1745,19 +1997,100 @@ if(_needConsultation > 0){
                       required
                       fullWidth
                       disabled
-                      value={expectedAmount}
+                      // value={expectedAmount}
                       error={expectedAmountError}
-                      onChange={e => setExpectedAmount(e.target.value)}
+                      
+                      value={field.values['textfield7'] || ''}
+                      // onChange={e => setExpectedAmount(e.target.value)}
                       id="strategyName"
                       label="Expected Amount"
                       autoFocus
                       />
+</Grid>
+<Grid item xs={2}
+              // xs={12} sm={6}
+              >
+                <TextField sx={{color:'#4b49ac'}}
 
+                  margin="dense"
+                  autoComplete="given-name"
+                  name="industryName"
+                  required
+                  fullWidth
+                  disabled
+                  // value={threeYrReturns}
+                  value={field.values['textfield8'] || ''}
+                  // onChange={(e) => {
+          
+                  // handleInputChange(field.id, 'textfield5', e.target.value)}}
+                  error={industryNameError}
+                  // onChange={e => setThreeYrReturns(e.target.value)}
+                  id="industryName"
+                  label="Industry"
+                  autoFocus
+                />
+              </Grid>
+</Grid>
+          
+          {/* <TextField
+            label="Textfield 2"
+            variant="outlined"
+            fullWidth
+            value={field.values['textfield2'] || ''}
+            onChange={(e) => handleInputChange(field.id, 'textfield2', e.target.value)}
+          />
+          <TextField
+            label="Textfield 3"
+            variant="outlined"
+            fullWidth
+            value={field.values['textfield3'] || ''}
+            onChange={(e) => handleInputChange(field.id, 'textfield3', e.target.value)}
+          />
+          <Select
+            label="Dropdown"
+            variant="outlined"
+            fullWidth
+            value={field.values['dropdown'] || ''}
+            onChange={(e) => handleInputChange(field.id, 'dropdown', e.target.value)}
+          >
+            <MenuItem value="option1">Option 1</MenuItem>
+            <MenuItem value="option2">Option 2</MenuItem>
+        
+          </Select>
+          <TextField
+            label="Textfield 4"
+            variant="outlined"
+            fullWidth
+            value={field.values['textfield4'] || ''}
+            onChange={(e) => handleInputChange(field.id, 'textfield4', e.target.value)}
+          />
+          <TextField
+            label="Textfield 5"
+            variant="outlined"
+            fullWidth
+            value={field.values['textfield5'] || ''}
+            onChange={(e) => handleInputChange(field.id, 'textfield5', e.target.value)}
+          /> */}
+  
+          
+        </div>
+      ))}
+
+     
+
+            {/* <DynamicTextFieldForm/> */}
+  
+        
             {helperText? <Alert severity='error' >* {helperText}</Alert>:''}
-            {loading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained">
+            {loading?<Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px',float:'right' }} variant="contained">
                Creating.... <i class="fa fa-spinner fa-spin"></i> </Button>:
-            <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px'}} variant="contained" 
-            onClick={handleModalSubmit}>Create Strategy</Button>}</>
+            <Button  sx={{backgroundColor:'#4b49ac',marginTop:'5px',float:'right'}} variant="contained" 
+            onClick={handleModalSubmit}>Create Strategy</Button>
+            }
+               {loading?"": <Button variant="contained" sx={{float:'right', backgroundColor:'#4b49ac',marginTop:'5px',marginRight:'2px'}} onClick={addFields}>
+         Add New Field 
+      </Button>}
+            </>
         </Box>
       </Modal>
       
@@ -1925,6 +2258,13 @@ if(_needConsultation > 0){
 
 function PastInvestments({ advisorId ,setDashboardLoading }) {
 
+
+  // const handleEvent = (
+  //   params,  // GridRenderedRowsIntervalChangeParams
+  //   event,   // MuiEvent<{}>
+  //   details, // GridCallbackDetails
+  // ) => {alert('hi')}
+
   const [isDropdownVisible, setDropdownVisible] = useState(false);
 
   const handleTextClick = () => {
@@ -1932,11 +2272,13 @@ function PastInvestments({ advisorId ,setDashboardLoading }) {
   };
 
   const columns = [
-    { field: 'strategyId', width:180, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'clientId', width:180 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
-    { field: 'investmentAmount', width:180, headerName: 'Amount',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'strategyId', width:180, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header',
+    renderCell: (params) =>params.row.strategyId.replace('STR', 'STO') },
+    { field: 'investmentName', width:150 , headerName: 'Stock Name',headerClassName: 'super-app-theme--header', },
+    { field: 'clientId', width:150 , headerName: 'Client Id',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount', width:150, headerName: 'Amount',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     
-    { field: 'status', width:200, headerName: 'Status',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'status', width:170, headerName: 'Status',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     {field: 'action',
     headerName: 'Action',
     headerClassName: 'super-app-theme--header',
@@ -2040,7 +2382,7 @@ const handleSave=()=>{
   setActionLoading(true)
   axios({
     method:'put',
-    url:`https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Advisor?api-version=1`,
+    url:`https://localhost:7136/api/strategies/Update-Multiple-by-Advisor?api-version=1`,
     data:actionArray
   }).then((response)=>{
   
@@ -2062,7 +2404,7 @@ const handleFundedCall=()=>{
   setDashboardLoading(true)
   axios({
     method:'get',
-    url:`https://investmentportal.azurewebsites.net/api/strategies/${advisorId}/approved-strategies?api-version=1`
+    url:`https://localhost:7136/api/strategies/${advisorId}/approved-strategies?api-version=1`
   }).then((response)=>{
     console.log(response.data)
     const list = response.data.approvedStrategies
@@ -2085,7 +2427,7 @@ const handleFundedCall=()=>{
   handleFundedCall();
     // axios({
     //   method:'get',
-    //   url:`  https://investmentportal.azurewebsites.net/api/investments/approved/${advisorId}?api-version=1`
+    //   url:`  https://localhost:7136/api/investments/approved/${advisorId}?api-version=1`
     // }).then((response)=>{
     //   console.log(response.data)
     //   setNewLoading(false)
@@ -2147,6 +2489,8 @@ const handleFundedCall=()=>{
       }}
     >
                 <DataGrid
+                // renderedRowsIntervalChange={()=>handleEvent()}
+
                 disableColumnMenu
                 disableColumnSelector
                 disableRowSelectionOnClick
@@ -2336,7 +2680,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/${advisorId}?api-version=1`
+      url: `https://localhost:7136/api/AdvisorSignUp/${advisorId}?api-version=1`
     })
       .then((response) => {
         setAdvisorData(response.data.advisor)
@@ -2439,7 +2783,7 @@ function SettingsContent({ advisorId , setDashboardLoading }) {
     setDashboardLoading(true)
       axios({
         method: 'put',
-        url: `https://investmentportal.azurewebsites.net/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
+        url: `https://localhost:7136/api/AdvisorSignUp/update/${advisorId}?api-version=1`,
         data: updatedAdvisorData
       }).then((response) => {
         console.log(response)

@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import './Dashboard.css'
+import { axisClasses } from '@mui/x-charts';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import { PieChart } from '@mui/x-charts/PieChart'
+import { ChartsYAxis } from "@mui/x-charts";
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
@@ -24,7 +30,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import image2 from '../../assets/animation.gif'
 import image3 from '../../assets/seconds.gif'
 import Tooltip from '@mui/material/Tooltip';
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridRowEditStopReasons } from "@mui/x-data-grid";
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import image from '../../assets/download.png'
@@ -50,6 +56,8 @@ import Navbar from "../Navbar/Navbar";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import { Alert, Skeleton } from "@mui/lab";
 import Card from "../Card/Card";
+import { LineChart } from '@mui/x-charts/LineChart';
+import { useStaticPicker } from "@mui/x-date-pickers/internals";
 
 
 function TablePaginationActions(props) {
@@ -115,7 +123,7 @@ TablePaginationActions.propTypes = {
 
 
 function Dashboard() {
-
+  // debugger
   const [sessionModalOpen,setSessionModalOpen]=useState(false)
   const handleSessionModalClose = (event,reason) => {
     if (reason !== 'backdropClick') {
@@ -157,7 +165,8 @@ function Dashboard() {
       const seconds = timeInSeconds % 60;
       if(timeInSeconds>0) {
       const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      document.getElementById('timer').innerText = formattedTime;
+      let timer=document.getElementById('timer')
+      if(timer)timer.innerText = formattedTime;
     }
      
     
@@ -300,7 +309,7 @@ const handleSessionNo=()=>{
 
   axios({
     method: 'get',
-    url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
+    url: `https://localhost:7136/api/ClientSignUp/${clientId}?api-version=1`
   }).then((response) => {
     setFirstName(response.data.client.firstName)
     setLastName(response.data.client.lastName)
@@ -445,14 +454,28 @@ const handleSessionNo=()=>{
 }
 
 function PortfolioContent({ clientId ,setDashboardLoading , setSessionModalOpen}) {
-
-
+  // const valueFormatter = (value) => `Rs.${value}`;
+  const [sixNetWorth,setSixNetWorth]=useState(0)
+  const [oneNetWorth,setOneNetWorth]=useState(0)
+  const [threeNetWorth,setThreeNetWorth]=useState(0)
+  const [fiveNetWorth,setFiveNetWorth]=useState(0)
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  
-
+  const chartsParams = {
+    margin: { left: 100},
+    height: 260,
+    width:420,
+    
+  };
+  const xLabels = [
+    '2024',
+    '2025',
+    '2027',
+    '2029'
+   
+  ];
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -469,12 +492,12 @@ const [loading,setLoading]=useState(true)
 
 
   const [open, setOpen] = useState(false);
-  
+  const [pieData,setPieData]=useState([])
   const [TotalInv, setTotalInv] = useState(0);
   const [TotalinvAmount, SetTotalInvAmount] = useState(0);
   const [TotalExeAmount, SetTotalExeAmount] = useState(0);
   const navigate = useNavigate()
-
+  const [lineData,setLineData]=useState([])
  
  
   useEffect(() => {
@@ -485,15 +508,94 @@ const [loading,setLoading]=useState(true)
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
+      // url: `https://localhost:7136/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url:`https://localhost:7136/api/strategies/${clientId}/All-Strategy?api-version=1`
     }).then(function (response) {
-      // 
+      debugger
+      let _lineData=[]
       setDashboardLoading(false)
       const list = response.data.strategies;
+      console.log(list)
+      // setPieData
+      // const demoArray = [
+      //   { strategyId: 'STR0001', investmentId: 'INV0001', investmentAmount: 400, expectedAmount: 342.05, investmentName: 'BMW' },
+      //   { strategyId: 'STR0002', investmentId: 'INV0002', investmentAmount: 400, expectedAmount: 342.05, investmentName: 'DOMS' }
+      // ];
+      
+      // Count occurrences of each investmentName
+      const investNameCount = {};
+      list.forEach(item => {
+        if(item.status==='Funded'){
+        const investName = item.industry;
+        investNameCount[investName] = (investNameCount[investName] || 0) + 1;
+      }
+      });
+      
+      // Create array with 'label' and 'count'
+      const resultArray = Object.keys(investNameCount).map(investName => ({
+        label: investName,
+        value: investNameCount[investName]
+      }));
+      
+      setPieData(resultArray);
+      
       setTotalInv(list.filter(x=>x.status==="Funded").length);
       SetTotalInvAmount(list.map(x=>x.status==="Funded"? x.investmentAmount:0).reduce(function(a, b){
         return a + b;
       }));
+      let _sixNetWorth=list.map(x=>x.status==="Funded"&&x.timePeriod==="6 months"? x.expectedAmount:0).reduce(function(a, b){
+        return a + b;
+      })
+      let _oneNetWorth=list.map(x=>x.status==="Funded"&&x.timePeriod==="1 year"? x.expectedAmount:0).reduce(function(a, b){
+        return a + b;
+      })
+      // setSixNetWorth(list.map(x=>x.status==="Funded"&&x.timePeriod==="6 months"? x.expectedAmount:0).reduce(function(a, b){
+      //   return a + b;
+      // }));
+      // setOneNetWorth(list.map(x=>x.status==="Funded"&&x.timePeriod==="1 year"? x.expectedAmount:0).reduce(function(a, b){
+      //   return a + b;
+      // }));
+      let _threeNetWorth=list.map(x=>x.status==="Funded"&&x.timePeriod==="3 year"? x.expectedAmount:0).reduce(function(a, b){
+        return a + b;
+      })
+      // setThreeNetWorth(list.map(x=>x.status==="Funded"&&x.timePeriod==="3 year"? x.expectedAmount:0).reduce(function(a, b){
+      //   return a + b;
+      // }))
+      let _fiveNetWorth=list.map(x=>x.status==="Funded"&&x.timePeriod==="5 year"? x.expectedAmount:0).reduce(function(a, b){
+        return a + b;
+      })
+     if(_sixNetWorth!==0){
+        _lineData.push(_sixNetWorth.toFixed(2))
+     }
+     else{
+      _lineData.push(0)
+     }
+     if(_oneNetWorth!==0){
+      //  if(sixNetWorth)
+      _lineData.push((_oneNetWorth+_sixNetWorth).toFixed(2))
+   }
+   else{
+    _lineData.push(_sixNetWorth+_sixNetWorth*0.1)
+   }
+   if(_threeNetWorth!==0){
+    _lineData.push((_oneNetWorth+_sixNetWorth+_threeNetWorth).toFixed(2))
+ }
+ else{
+  _lineData.push(_sixNetWorth+_sixNetWorth*0.1+_sixNetWorth*0.15+_oneNetWorth*0.1)
+ }
+ if(_fiveNetWorth!==0){
+  _lineData.push((_oneNetWorth+_sixNetWorth+_threeNetWorth+_fiveNetWorth).toFixed(2))
+}
+else{
+_lineData.push(_sixNetWorth+_sixNetWorth*0.1+_sixNetWorth*0.15+_sixNetWorth*0.20+_oneNetWorth*0.1+
+  _oneNetWorth*0.15+_threeNetWorth*0.20
+  )
+}
+
+setLineData(_lineData)
+      // setFiveNetWorth(list.map(x=>x.status==="Funded"&&x.timePeriod==="5 year"? x.expectedAmount:0).reduce(function(a, b){
+      //   return a + b;
+      // }))
       SetTotalExeAmount(list.map(x=>x.status==="Funded"?x.expectedAmount:0 ).reduce(function(a, b){
         return a + b;
       }));
@@ -506,6 +608,7 @@ const [loading,setLoading]=useState(true)
       function (error) {
         console.log(error)
         setLoading(false)
+        setListOfStrategies([])
         setDashboardLoading(false)
         
       })
@@ -523,6 +626,7 @@ const [loading,setLoading]=useState(true)
   }
 
   const valueFormatter = (value) => `Rs.${value}`;
+  const chartFormatter = (value) => `Rs.${value}`;
   return (
     <div className="portfolio">
 
@@ -545,11 +649,70 @@ const [loading,setLoading]=useState(true)
                 </div> </>:(<>
                   <div className='card-container'>
                     <Card  color="fourthCard" heading="Number of Holdings" number={TotalInv}/>
-                    <Card   color="fifthCard" heading="Total Invested Amount" number={TotalinvAmount}/>
-                    <Card  color="SixthCard" heading="Total Expected Amount" number={TotalExeAmount.toFixed(2)}/>
+                    <Card   color="fifthCard" heading="Total Invested Amount" number={`Rs.${TotalinvAmount}`}/>
+                    {/* <Card  color="SixthCard" heading="Total Expected Amount" number={`Rs.${TotalExeAmount.toFixed(2)}`}/> */}
                   </div>
                   <div className="rectangle-div">
+                    <div className="visContainer">
+                  
+    <div className="LineChart">  
+          <h1 className="netWorth">Total Net Worth</h1>  
+             
+{TotalInv===0?<div className="noChart"><p>No Funded Investment</p></div>:<LineChart
+        {...chartsParams}
+     
+        series={[
+          {
+            data:lineData,
+            
+            id: 'pvId',
+            connectNulls: false,
+            color:'#4b49ac',
+            chartFormatter
+          },
+          
+        ]}
+ 
+        xAxis={[{ scaleType: 'point',data: xLabels , label:'Estimated Total Net Worth by 2029' , fontWeight:'16' ,fontSize:'16' }]}
+        sx={{
+          '.MuiLineElement-root, .MuiMarkElement-root': {
+            strokeWidth: 1,
+          },
+          '.MuiLineElement-series-pvId': {
+            strokeDasharray: '5 5',
+          },
+        
+          '.MuiMarkElement-root:not(.MuiMarkElement-highlighted)': {
+            fill: '#fff',
+          },
+          '& .MuiMarkElement-highlighted': {
+            stroke: 'none',
+          },
+        }}
+      />}
+      </div>
+      <div className="bgWhitePie">
+      <h1 className="netWorth">Industries Wise Allocation</h1> 
+      {TotalInv===0?<div className="noChart"><p>No Funded Investment</p></div>:  <PieChart
+    
+  series={[
+    {
+      data:pieData
+      // data: [
+      //   { value: 10, label: 'Information Technology' },
+      //   {  value: 15, label: 'Industrials' },
+      //   { value: 20, label: 'Automobile' },
+      // ],
+    },
+  ]}
+  // sx={{marginTop:'3px'}}
+  
+  width={500}
+  height={300}
+/>}</div>
+      </div>
           <TableContainer component={Paper}>
+            
             <Table size="small" aria-label="simple table">
               <TableHead>
                 <TableRow >
@@ -598,9 +761,38 @@ const [loading,setLoading]=useState(true)
                         </TableRow>
                         <TableRow>
                           <TableCell style={{ paddingRight: 10, paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                            <Collapse in={coll == row.strategyId }     style={{ marginLeft : '120px'}} timeout="auto" unmountOnExit>
-                              <Box sx={{ margin: 0 }}>
-                        
+                            <Collapse in={coll == row.strategyId }    
+                            //  style={{ marginLeft : '120px'}} 
+                             timeout="auto" unmountOnExit>
+                              <Box  sx={{ margin: 0 ,display:'flex' }}>
+                              {/* <LineChart width={600} height={300} data={[
+  { name: '6m', priceChange: 10 },
+  { name: '1yr', priceChange: 20 },
+  { name: '3yr', priceChange: -5 },
+  { name: '5yr', priceChange: 15 },
+]}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name" />
+      <YAxis />
+      <Tooltip />
+      <Legend />
+      <Line type="monotone" dataKey="priceChange" stroke="#8884d8" />
+    </LineChart> */}
+                        {/* <PieChart
+  series={[
+    {
+      data: [
+        { id: 0, value: 10, label: 'series A' },
+        { id: 1, value: 15, label: 'series B' },
+        { id: 2, value: 20, label: 'series C' },
+      ],
+    },
+  ]}
+  sx={{marginTop:'55px'}}
+  
+  width={400}
+  height={250}
+/> */}
                                 <BarChart
                                   xAxis={[
                                     {
@@ -620,9 +812,9 @@ const [loading,setLoading]=useState(true)
                                       valueFormatter
                                     },
                                   ]}
-                                  width={650}
+                                  width={400}
                                   height={300}
-                                />
+                                /> 
                               </Box>
                             </Collapse>
                           </TableCell>
@@ -711,7 +903,7 @@ const handleInvestmentCall = () => {
   setDashboardLoading(true)
   axios({
     method: 'get',
-    url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
+    url: `https://localhost:7136/api/investments/client/${clientId}?api-version=1`
   }).then(function (response) {
     
     let list = response.data
@@ -982,45 +1174,103 @@ const handleInvestmentCall = () => {
 }
 
 function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen}) {
+  // const handleRowEditCommit = (e)=>{
+  //   debugger
+  //   console.log(e)
+  // }
+  let [arr,setArr]=useState([])
+  const processRowUpdate = (newRow) => {
+    debugger
+    // console.log(fields)
+    if(newRow.investmentAmount===''){
+      handleRecommendationsClose()
+      alert('Amount Field should not be empty')
+      return
+    }
+    setArr([...arr,newRow.investmentAmount])
+    // arr.push(newRow.investmentAmount)
+    console.log(newRow.investmentAmount);
+};
+// const useFakeMutation = () => {
+//   return React.useCallback(
+//     (user) =>
+//       new Promise((resolve, reject) => {
+//         setTimeout(() => {
+//           if (user.name?.trim() === '') {
+//             reject(new Error("Error while saving user: name can't be empty."));
+//           } else {
+//             resolve({ ...user, name: user.name?.toUpperCase() });
+//           }
+//         }, 200);
+//       }),
+//     [],
+//   );
+// }
 
+// const mutateRow = useFakeMutation();
+
+// const [snackbar, setSnackbar] = React.useState(null);
+
+// const handleCloseSnackbar = () => setSnackbar(null);
+
+// const processRowUpdate = React.useCallback(
+//   async (newRow) => {
+//     // Make the HTTP request to save in the backend
+//     const response = await mutateRow(newRow);
+//     setSnackbar({ children: 'User successfully saved', severity: 'success' });
+//     return response;
+//   },
+//   [mutateRow],
+// );
+
+// const handleProcessRowUpdateError = React.useCallback((error) => {
+//   setSnackbar({ children: error.message, severity: 'error' });
+// }, []);
   const columns = [
-    { field: 'strategyId', width:80, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'investmentName', width:144 , headerName: 'Strategy Name',headerClassName: 'super-app-theme--header', },
-    { field: 'investmentAmount',width:129 , headerName: 'Amount(Rs)' ,headerClassName: 'super-app-theme--header', },
-    { field: 'expectedAmount',width:204, headerName: 'Expected Amount(Rs)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter6months', width:131 , headerName: '6M Return(%)',headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter1year',width:129 , headerName: '1Y Return(%)' ,headerClassName: 'super-app-theme--header', },
-    { field: 'returnPercentageAfter3year',width:129, headerName: '3Y Return(%)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'strategyId', width:200, headerName: '#',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header',
+    renderCell: (params) =>params.row.strategyId.replace('STR', 'STO')},
+    { field: 'investmentName', width:160 , headerName: 'Stock Name',headerClassName: 'super-app-theme--header', },
+    { field: 'investmentAmount',width:150 ,editable:true, headerName: 'Amount(Rs)' ,headerClassName: 'super-app-theme--header', },
+    // { field: 'expectedAmount',width:203, headerName: 'Expected Amount(Rs)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter6months', width:150 , headerName: '6M Return(%)',headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter1year',width:140 , headerName: '1Y Return(%)' ,headerClassName: 'super-app-theme--header', },
+    { field: 'returnPercentageAfter3year',width:140, headerName: '3Y Return(%)',backgroundColor: '#4b49ac' ,headerClassName: 'super-app-theme--header', },
     { field: 'returnPercentageAfter5year', width:129 , headerName: '5Y Return(%)',headerClassName: 'super-app-theme--header', },
-    {field: 'image',
-    headerName: 'Action',
-    headerClassName: 'super-app-theme--header',
-    disableColumnMenu:true ,
-    sortable: false,
-    width: 127,
-    editable: true,
-    renderCell: (params) =><FormControl required fullWidth>
-    <InputLabel id="demo-simple-select-label">Status</InputLabel>
-    <Select
-      size="small"
-      margin="normal"
-      labelId="demo-simple-select-label"
-      id="demo-simple-select"
-      label="Status"
-      // value={Status}
+  //   {field: 'image',
+  //   headerName: 'Action',
+  //   headerClassName: 'super-app-theme--header',
+  //   disableColumnMenu:true ,
+  //   sortable: false,
+  //   width: 127,
+  //   editable: true,
+  //   renderCell: (params) =><FormControl required fullWidth>
+  //   <InputLabel id="demo-simple-select-label">Status</InputLabel>
+  //   <Select
+  //     size="small"
+  //     margin="normal"
+  //     labelId="demo-simple-select-label"
+  //     id="demo-simple-select"
+  //     label="Status"
+  //     // value={Status}
     
-      onChange={e=>{handleChange(params.row.strategyId,e.target.value)}}
-    >
-      <MenuItem value={'Approved'}>Approve</MenuItem>
-      <MenuItem value={'Rejected'}>Reject</MenuItem>
+  //     onChange={e=>{handleChange(params.row.strategyId,e.target.value)}}
+  //   >
+  //     <MenuItem value={'Approved'}>Approve</MenuItem>
+  //     <MenuItem value={'Rejected'}>Reject</MenuItem>
 
 
-    </Select>
-  </FormControl>
-    },
+  //   </Select>
+  // </FormControl>
+  //   },
   ]
 
-  const [strategyLoading,setStrategyLoading]=useState(true)
+//   const onCellEditCommit= (cellData) => {
+//     debugger
+//     const { id, field, value } = cellData;
+//     console.log(cellData)
+// }
+
+  const [strategyLoading,setStrategyLoading]=useState(false)
   const [investmentAmount, setInvestmentAmount] = useState("")
   const [investmentType, setInvestmentType] = useState("")
   const [timePeriod, setTimePeriod] = useState("")
@@ -1065,6 +1315,331 @@ function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen
       
     
   }
+
+
+  const worldElectricityProduction =[
+    {
+      "date": "2001",
+      "price": "102.50",
+      "secondField": "103.70",
+      "thirdField": "101.30"
+    },
+    {
+      "date": "2002",
+      "price": "97.16",
+      "secondField": "99.84",
+      "thirdField": "94.95"
+    },
+    {
+      "date": "2003",
+      "price": "101.55",
+      "secondField": "104.45",
+      "thirdField": "97.71"
+    },
+    {
+      "date": "2004",
+      "price": "95.39",
+      "secondField": "97.04",
+      "thirdField": "92.30"
+    },
+    {
+      "date": "2005",
+      "price": "101.73",
+      "secondField": "106.52",
+      "thirdField": "99.48"
+    },
+    {
+      "date": "2006",
+      "price": "98.80",
+      "secondField": "100.62",
+      "thirdField": "95.59"
+    },
+    {
+      "date": "2007",
+      "price": "103.53",
+      "secondField": "105.99",
+      "thirdField": "98.72"
+    },
+    {
+      "date": "2008",
+      "price": "99.78",
+      "secondField": "100.74",
+      "thirdField": "96.05"
+    },
+    {
+      "date": "2009",
+      "price": "103.51",
+      "secondField": "104.54",
+      "thirdField": "100.05"
+    },
+    {
+      "date": "2010",
+      "price": "99.71",
+      "secondField": "104.17",
+      "thirdField": "95.97"
+    },
+    {
+      "date": "2011",
+      "price": "102.93",
+      "secondField": "103.57",
+      "thirdField": "101.15"
+    },
+    {
+      "date": "2012",
+      "price": "95.89",
+      "secondField": "96.38",
+      "thirdField": "93.46"
+    },
+    {
+      "date": "2013",
+      "price": "101.06",
+      "secondField": "101.24",
+      "thirdField": "97.08"
+    },
+    {
+      "date": "2014",
+      "price": "95.36",
+      "secondField": "98.75",
+      "thirdField": "94.39"
+    },
+    {
+      "date": "2015",
+      "price": "103.60",
+      "secondField": "104.24",
+      "thirdField": "102.14"
+    },
+    {
+      "date": "2016",
+      "price": "98.48",
+      "secondField": "102.49",
+      "thirdField": "97.51"
+    },
+    {
+      "date": "2017",
+      "price": "100.07",
+      "secondField": "101.53",
+      "thirdField": "95.91"
+    },
+    {
+      "date": "2018",
+      "price": "98.03",
+      "secondField": "100.14",
+      "thirdField": "93.78"
+    },
+    {
+      "date": "2019",
+      "price": "102.85",
+      "secondField": "106.27",
+      "thirdField": "98.80"
+    },
+    {
+      "date": "2020",
+      "price": "98.76",
+      "secondField": "100.78",
+      "thirdField": "97.38"
+    },
+    {
+      "date": "2021",
+      "price": "102.29",
+      "secondField": "104.64",
+      "thirdField": "98.65"
+    },
+    {
+      "date": "2022",
+      "price": "97.11",
+      "secondField": "97.83",
+      "thirdField": "93.05"
+    },
+    {
+      "date": "2023",
+      "price": "102.34",
+      "secondField": "106.56",
+      "thirdField": "98.09"
+    }
+  ]
+
+const keyToLabel = {
+  price: 'Ambuja Returns(%)',
+  secondField:"BMW Returns(%)",
+  thirdField:"TCS Returns(%)"
+};
+
+const colors = {
+  price: 'lightgray',
+ 
+};
+
+const stackStrategy = {
+  stack: 'total',
+  
+  stackOffset: 'none', // To stack 0 on top of others
+};
+
+const customize = {
+  width:800,
+  height: 300,
+  legend: { hidden: true },
+  margin: { top: 30 ,left:70},
+  stackingOrder: 'descending',
+};
+
+  const [statusId,setStatusId]=useState('')  
+  let [statusArr,setStatusArr]=useState([])
+  // let [strArray,setStrArray]=useState([])
+  // let statusObj=[]
+  const handleStatusData=(investmentId,fields,statusData)=>{
+    // debugger
+    // let id=statusObj[0].investmentId;
+    console.log(fields)
+   setStatusId(investmentId)
+    if(statusArr.length!==0){
+      
+      statusArr.pop()
+     setStatusArr([...statusArr,{
+      'investmentId':investmentId,
+      'status':statusData
+     }]) 
+    }else{
+      setStatusArr([...statusArr,{
+        'investmentId':investmentId,
+        'status':statusData
+       }]) 
+      }
+  }
+  const handleStatusSubmit=(fields)=>{
+    debugger
+    let returner=false
+    let strategies=fields.strategies
+    // list.map(x=>x.status==="Funded"? x.investmentAmount:0).reduce()
+   let sum = strategies.map(e=>e.investmentAmount).reduce(function(a, b){
+      return a + b;
+    })
+    
+    if(arr.length!==0){
+      let arraySum=arr.reduce((accumulator, current) => accumulator +  parseInt(current, 10), 0)
+      // for(i=0;i<arr.length;)
+    
+  if(arr.length!==strategies.length){
+    alert(`sum of investment Amount should be equal to ${sum}`)
+    // setArr([])
+    handleRecommendationsClose()
+    return
+  }
+  if(arraySum!=sum){
+    alert(`sum of investment Amount should be equal to ${sum}`)
+    handleRecommendationsClose()
+    // setArr
+    return
+  }else{
+    let strArray=[];
+    debugger
+    arr.map((ele,index)=>{
+    let _time;
+    let timePeriod= strategies[0].timePeriod
+    let _rate;
+    if(timePeriod.includes('6')){
+      // document.getElementById('6m').classList.add("termSelected")
+      _rate=  +strategies[index].returnPercentageAfter6months 
+      _time=  0.5
+    }
+    if(timePeriod.includes('1')){
+      // document.getElementById('1yr').classList.add("termSelected")
+      _rate=  +strategies[index].returnPercentageAfter1year
+      _time=  1
+    }
+    if(timePeriod.includes('3')){
+      // document.getElementById('3yr').classList.add("termSelected")
+      _rate=  +strategies[index].returnPercentageAfter3year 
+      _time=  3    }
+    if(timePeriod.includes('5')){
+      // document.getElementById('5yr').classList.add("termSelected")
+      _rate=  +strategies[index].returnPercentageAfter5year
+      _time=  5
+    }
+    strArray.push({
+     
+      'strategyId':strategies[index].strategyId,
+      'investmentAmount':ele,
+      'expectedAmount':(+ele*(Math.pow((1 + _rate/100),_time))).toFixed(2)
+    })})
+   const updatedData= {
+      "investmentId": fields.investmentId,
+      "strategies": strArray
+      
+    }
+   axios({
+    method:'put',
+    url:`https://localhost:7136/api/strategies/${clientId}/Update-InvestmentBundle?api-version=1`,
+    data:updatedData
+   }).then((response)=>{
+    console.log(response.data)
+  //  alert('everything is fine')
+   if(statusArr.length===0){
+    // setStatusMessage
+    return
+   }
+  //  if(returner){
+  //   return
+  //  }
+   if(statusArr[0].investmentId===fields.investmentId){
+    setActionLoading(true)
+    axios({
+      method:'put',
+      url:`https://localhost:7136/api/investments/Update-Investment-Status?api-version=1`,
+      data:statusArr
+    }).then((response)=>{
+      debugger
+      setSnackOpen(true)
+      setTimeout(handleSnackClose,5000)
+      setActionLoading(false)
+      setArr([])
+      handleStrategyCall()
+      handleRecommendationsClose()
+    },(error)=>{
+      setActionLoading(false)
+      setArr([])
+    })
+   }
+  
+  return
+   },(error)=>{
+console.log(error)
+returner=true
+// alert('something is wrong')
+return
+   })
+
+  }
+  return
+    }
+    if(statusArr.length===0){
+      // setStatusMessage
+      return
+     }
+    //  if(returner){
+    //   return
+    //  }
+     if(statusArr[0].investmentId===fields.investmentId){
+      setActionLoading(true)
+      axios({
+        method:'put',
+        url:`https://localhost:7136/api/investments/Update-Investment-Status?api-version=1`,
+        data:statusArr
+      }).then((response)=>{
+        setSnackOpen(true)
+        setTimeout(handleSnackClose,5000)
+        setActionLoading(false)
+        setArr([])
+        handleStrategyCall()
+        handleRecommendationsClose()
+      },(error)=>{
+        setActionLoading(false)
+        setArr([])
+      })
+     }
+
+  }
+
   const style = {
     position: 'absolute',
     top: '50%',
@@ -1078,15 +1653,16 @@ function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen
   };
   const recommendationStyle = {
     position: 'absolute',
-    top: '45%',
+    top: '50%',
     left: '50%',
     overflow: 'auto',
+    // height:'800px',
     transform: 'translate(-50%, -50%)',
     width: '1267px',
     bgcolor: '#e4f1ff',
-    borderRadius: '20px',
+    borderRadius: '5px',
     boxShadow: 24,
-    p: 4,
+    p: 1,
   };
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -1113,6 +1689,10 @@ function InvestmentContent({ clientId , setDashboardLoading ,setSessionModalOpen
     setRecommendationsOpen(false)
       setListOfStrategies([])
       setStatus("")
+      setStatusId('')
+      // setStrArray([])
+      setStatusArr([])
+      setArr([])
       setActionArray([])
     }
   };
@@ -1120,14 +1700,15 @@ const handleSave=()=>{
 setActionLoading(true)
 axios({
   method:'put',
-  url:`https://investmentportal.azurewebsites.net/api/strategies/Update-Multiple-by-Client?api-version=1`,
+  url:`https://localhost:7136/api/strategies/Update-Multiple-by-Client?api-version=1`,
   data:actionArray
 }).then((response)=>{
 console.log(response)
 setActionLoading(false)
+
+setVisible(false)
 setSnackOpen(true)
 setTimeout(handleSnackClose,5000)
-setVisible(false)
 handleRecommendationsClose()
 },(error)=>{
 console.log(error)
@@ -1147,7 +1728,7 @@ const [value,setValue]=useState(false)
     
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/investments/client/${clientId}?api-version=1`
+      url: `https://localhost:7136/api/investments/client/${clientId}?api-version=1`
     }).then((response) => {
       setDashboardLoading(false)
       setNewLoading(false)
@@ -1219,7 +1800,7 @@ const [value,setValue]=useState(false)
     setLoading(true)
     axios({
       method: 'post',
-      url: `https://investmentportal.azurewebsites.net/api/investments/New Investment?api-version=1`,
+      url: `https://localhost:7136/api/investments/New Investment?api-version=1`,
       data: investmentData
     }).then((response) => {
       console.log(response)
@@ -1279,7 +1860,7 @@ const [value,setValue]=useState(false)
 setActionLoading(true)
       axios({
         method: 'put',
-        url: `https://investmentportal.azurewebsites.net/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
+        url: `https://localhost:7136/api/strategies/${investmentId}/Update-by-Client?api-version=1`,
         data: investmentData
       }).then((response) => {
         console.log(response)
@@ -1355,6 +1936,8 @@ setActionLoading(true)
 
     )
   }
+
+  const [investmentBundle,setInvestmentBundle]=useState([])
   const handleRecommendations = () => {
     
     handleRecommendationsOpen()
@@ -1368,15 +1951,18 @@ setActionLoading(true)
   const handleStrategyCall=()=>{
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/strategies/${clientId}/By-ClientId?api-version=1`
+      // url: `https://localhost:7136/api/strategies/${clientId}/By-ClientId?api-version=1`
+      url:`https://localhost:7136/api/strategies/${clientId}/Newly-Proposed?api-version=1`
     }).then((response) => {
-      let data = response.data.strategies
-      let list= data.filter(x=> x.status== 'Pending');
+      // let data = response.data.strategies
+      let data=response.data.investmentBundles
+      setInvestmentBundle(data)
+      // let list= data.filter(x=> x.status== 'Pending');
       setStrategyLoading(false)
       // list.map((e)=>setData([e.investmentAmount,e.expectedAmount,e.amount,e.returnPercentage]))
-      setListOfStrategies(list)
-      setValue(list.length===0)
-      console.log(list)
+      // setListOfStrategies(list)
+      // setValue(list.length===0)
+      console.log(response)
 
     }, (error) => { 
       setValue(listOfStratgies.length===0)
@@ -1462,9 +2048,9 @@ setActionLoading(true)
                     error={investmentTypeError}
                     onChange={e => setInvestmentType(e.target.value)}
                   >
-                    <MenuItem value={'Low Risk'}>Low Risk(Gold,Fixed Income assets,Bonds etc)</MenuItem>
-                    <MenuItem value={'High Risk'}>High Risk(Equity,Future,Options etc)</MenuItem>
-                    <MenuItem value={'Medium Risk'}>Medium Risk(Mixed of Low and High Risk)</MenuItem>
+                    <MenuItem value={'Low Risk'}>Low Risk</MenuItem>
+                    <MenuItem value={'High Risk'}>High Risk</MenuItem>
+                    <MenuItem value={'Medium Risk'}>Medium Risk</MenuItem>
                     <MenuItem value={'Need Consultation'}>Need Consultation</MenuItem>
                   </Select>
                 </FormControl>
@@ -1509,7 +2095,10 @@ setActionLoading(true)
         <Skeleton variant="rounded" sx={{ width: '100%' }} height={200} />
                 </div>:(
                 <React.Fragment>
-                {listOfStratgies.length===0?   <TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
+                {
+                  investmentBundle.length===0
+                // listOfStratgies.length===0
+                ?   <TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
 
 <Table size="small" aria-label="simple table">
   <TableHead>
@@ -1535,35 +2124,181 @@ setActionLoading(true)
         sx={{ textAlign: "center"}} 
          colSpan={9}>No Pending Strategy Available.Create Investment Request to get Customized Strategies by Financial Experts.</TableCell>
       </TableRow>
-    </React.Fragment> </TableBody></Table></TableContainer>:
+    </React.Fragment> </TableBody></Table></TableContainer>:<>
+    <span className='colorgreen'>* Double-Click on Amount Cell to Change the investment Amount in each Stock</span>
+      <Box
+      className='tableIcon'
+sx={{
+width: '100%',
+height:'490px',
+overflow:'auto',
+'& .super-app-theme--header': { 
+
+color: 'white', fontSize: '16px',
+fontWeight: 'bold',
+ backgroundColor: '#4b49ac'
+},
+}}
+>
+
+   { investmentBundle.map((fields)=>
     
-                <Box
-                className='tableIcon'
-      sx={{
-        width: '100%',
-        '& .super-app-theme--header': { 
-       
-          color: 'white', fontSize: '16px',
-          fontWeight: 'bold',
-           backgroundColor: '#4b49ac'
-         },
+    <div className="datagrid"> 
+
+      <DataGrid
+    //  onRowEditStop={(params, event) => {
+    //   console.log(params.row)
+    //   console.log(event.target.value)
+    // }}
+    // onRowEditCommit={(params,event)=>console.log(params.row)}
+      //  onCellEditStop={handleRowEditCommit}
+      // height={50}
+      editMode="row"
+      processRowUpdate={processRowUpdate}
+
+
+
+    experimentalFeatures={{ newEditingApi: true }}
+      // onCellEditStop={onCellEditCommit}
+      // processRowUpdate={(updatedRow, originalRow) =>
+      //   mySaveOnServerFunction(updatedRow)
+      // }
+      // onProcessRowUpdateError={handleProcessRowUpdateError}
+      autoHeight
+      disableColumnMenu
+      disableColumnSelector
+      disableRowSelectionOnClick
+      getRowId={(fields)=>fields.strategyId}
+      // getRowId={(listOfStratgies) => listOfStratgies.strategyId}
+// rows={listOfStratgies}
+rows={fields.strategies}
+columns={columns}
+initialState={{
+pagination: {
+  paginationModel: { page: 0, pageSize: 5 },
+},
+}}
+pageSizeOptions={[5]}
+/>
+{/* {!!snackbar && (<>
+        <Snackbar
+          open
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          onClose={handleCloseSnackbar}
+          autoHideDuration={6000}
+        >
+          <Alert {...snackbar} onClose={handleCloseSnackbar} />
+        </Snackbar>
+        </>)} */}
+{/* <div className="chartDiv">
+<LineChart
+      xAxis={[
+        {
+          // id: 'Years',
+          // data: years,
+          // label:'Year',
+          // scaleType: 'time',
+          // valueFormatter: (date) => date.getFullYear().toString(),
+          dataKey: 'date',
+          valueFormatter: (v) => v.toString(),
+          label:'Year',
+          min: 2001,
+          max: 2023,
+        },
+      ]}
+      
+      yAxis={[{
+        label:'%age'
+      }]}
+      sx={ {
+        [`.${axisClasses.left} .${axisClasses.label}`]: {
+          transform: 'translate(-25px, 0)',
+        },
       }}
-    >
-                <DataGrid
-                disableColumnMenu
-                disableColumnSelector
-                disableRowSelectionOnClick
-                getRowId={(listOfStratgies) => listOfStratgies.strategyId}
-        rows={listOfStratgies}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5]}
-      />
-      </Box>}
+      series={Object.keys(keyToLabel).map((key) => ({
+        dataKey: key,
+        label: keyToLabel[key],
+       
+        showMark: false,
+       
+      }))}
+    
+      dataset={worldElectricityProduction}
+      {...customize}
+    /> */}
+    {/* <ChartsYAxis  label={{ value: 'Categories', position: 'insideBottom', offset: -10 }} /></LineChart> */}
+
+    {/* <PieChart
+  series={[
+    {
+      data: [
+        { id: 0, value: 10, label: 'series A' },
+        { id: 1, value: 15, label: 'series B' },
+        { id: 2, value: 20, label: 'series C' },
+      ],
+    },
+  ]}
+  sx={{marginTop:'55px'}}
+  
+  width={400}
+  height={250}
+/> */}
+{/* </div> */}
+<RadioGroup
+// color="primary"
+className="radiogroup"
+    row
+    aria-labelledby="demo-radio-buttons-group-label"
+   
+    // onChange={(e)=>setStatus(e.target.value)}
+    onChange={(e)=>handleStatusData(fields.investmentId,fields,e.target.value)}
+    name="radio-buttons-group"
+  >
+    <FormControlLabel className="green" id={fields.investmentId}   value="Approved" control={<Radio    />} label="Approve" />
+    <FormControlLabel className="colorred" id={fields.investmentId}   value="Rejected" control={<Radio  />} label="Reject" />
+    {/* <FormControlLabel value="other" control={<Radio />} label="Other" /> */} 
+ { fields.investmentId===statusId?
+ <> {actionLoading? <Button variant="contained" sx={{bgcolor:'#4b49ac', marginTop:'5px'}} >
+    Submitting...<i class="fa fa-spinner fa-spin"></i>
+   </Button>
+   :
+    <Button variant="contained" onClick={()=>handleStatusSubmit(fields)} 
+    sx={{bgcolor:'#4b49ac', marginTop:'5px'}} >Submit</Button>} </>:''}
+  </RadioGroup>
+ 
+  </div>
+
+    )}
+    </Box>
+    </>
+    //             <Box
+    //             className='tableIcon'
+    //   sx={{
+    //     width: '100%',
+    //     '& .super-app-theme--header': { 
+       
+    //       color: 'white', fontSize: '16px',
+    //       fontWeight: 'bold',
+    //        backgroundColor: '#4b49ac'
+    //      },
+    //   }}
+    // >
+    //             <DataGrid
+    //             disableColumnMenu
+    //             disableColumnSelector
+    //             disableRowSelectionOnClick
+    //             getRowId={(listOfStratgies) => listOfStratgies.strategyId}
+    //     rows={listOfStratgies}
+    //     columns={columns}
+    //     initialState={{
+    //       pagination: {
+    //         paginationModel: { page: 0, pageSize: 5 },
+    //       },
+    //     }}
+    //     pageSizeOptions={[5]}
+    //   />
+    //   </Box>
+      }
 
                   {/* <TableContainer component={Paper} sx={{ overflowY: 'auto' }}>
 
@@ -1639,7 +2374,7 @@ setActionLoading(true)
                     
                     </TableContainer> */}
                     </React.Fragment> )}
-             { visible? <>    {listOfStratgies.length===0?'':<> {actionLoading?<Button sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
+             { visible? <>    {investmentBundle.length===0?'':<> {actionLoading?<Button sx={{backgroundColor:'#1BCFB4',marginTop:'10px', bottom: 0,
           left: '1058px',}} 
                     variant="contained" > 
                     Submitting... 
@@ -1794,7 +2529,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setDashboardLoading(true)
     axios({
       method: 'get',
-      url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/${clientId}?api-version=1`
+      url: `https://localhost:7136/api/ClientSignUp/${clientId}?api-version=1`
     })
       .then((response) => {
         console.log(response.data.client)
@@ -1921,7 +2656,7 @@ function SettingsContent({clientId, setDashboardLoading , setSessionModalOpen}) 
     setLoading(true)
       axios({
         method: 'put',
-        url: `https://investmentportal.azurewebsites.net/api/ClientSignUp/update/${clientId}?api-version=1`,
+        url: `https://localhost:7136/api/ClientSignUp/update/${clientId}?api-version=1`,
         data:updatedClientData
       }).then((response) => {
         console.log(response)

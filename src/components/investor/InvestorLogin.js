@@ -101,7 +101,7 @@ export default function Login(){
     const [signShow,setSignShow]=useState(false)
   const [cResetPasswordHelperText,setCResetPasswordHelperText]=useState('')
   const [forgotEmailHelperText,setForgotEmailHelperText]=useState('')
-
+const [resetOTPHelperText,setResetOTPHelperText]=useState('')
     const [forgotEmailError,setForgotEmailError]=useState(false)
     const [resetOTPError,setResetOTPError]=useState(false)
     const [resetPasswordError,setResetPasswordError]=useState(false)
@@ -110,6 +110,7 @@ export default function Login(){
     const [cPasswordHelperText,setCPasswordHelperText]=useState('')
     const [verifyText,setVerifyText]=useState(false)
     const [OTPError,setOTPError]=useState(false)
+    const [verifyOTPHelperText,setVerifyOTPHelperText]=useState('')
     const [buttonVisible, setButtonVisible] = useState(true);
     const [emailVisible,setEmailVisible]=useState(true)
     const [addressError,setAddressError]= useState(false)
@@ -147,7 +148,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
        method:'post',
-       url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/forgot-password?api-version=1',
+       url:'https://localhost:7136/api/ClientSignUp/forgot-password?api-version=1',
        data:{email:forgotEmail}
       }).then((response)=>{
        console.log(response)
@@ -167,9 +168,10 @@ export default function Login(){
 const handleResetSubmit=()=>{
   setResetPasswordError(false)
   setResetOTPError(false)
+  setResetOTPHelperText('')
   setConfirmResetPasswordError(false)
-  setResetPasswordHelperText(false)
-  setCResetPasswordHelperText(false)
+  setResetPasswordHelperText('')
+  setCResetPasswordHelperText('')
 
   let count=0;
   if(resetOTP===''){
@@ -207,7 +209,7 @@ if (resetPassword !== confirmResetPassword) {
  setResetLoading(true)
  axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/reset-password?api-version=1',
+    url:'https://localhost:7136/api/ClientSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -219,7 +221,13 @@ if (resetPassword !== confirmResetPassword) {
      setConfirmResetPassword('')
   },(error)=>{
       setResetLoading(false)
-      setForgotMessage(error.response.data.message)
+      if(error.response.data.message==='Invalid OTP.'){
+        setResetOTPHelperText(error.response.data.message)
+        setResetOTPError(true)
+      }
+      else{
+        setForgotMessage(error.response.data.message)
+      }
   })
 
 }
@@ -243,6 +251,9 @@ if (resetPassword !== confirmResetPassword) {
     if(reason!=='backdropClick'){
     setMessage("")
     setLoginMessage('')
+    setVerifyOTPHelperText('')
+    setOTPError('')
+    setOTP('')
     setVerifyMessage('')
     setOpen(false)
   }
@@ -258,6 +269,7 @@ if (resetPassword !== confirmResetPassword) {
       setForgotEmail('')
       setForgotEmailError(false)
       setResetOTP('')
+      setEmailVisible(true)
       setButtonVisible(true)
       setOTPError(false)
       setResetPassword('')
@@ -400,6 +412,7 @@ let count=0;
 }
 const handleOTPSubmit=(e)=>{
   setOTPError(false)
+  setVerifyOTPHelperText('')
   if(OTP===""){
     setOTPError(true)
     return
@@ -412,7 +425,7 @@ const handleOTPSubmit=(e)=>{
   setOTPLoading(true)
   axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/ClientSignUp/verify-otp?api-version=1',
+    url:'https://localhost:7136/api/ClientSignUp/verify-otp?api-version=1',
     data:otpData
   }).then((response)=>{
     setOTPLoading(false)
@@ -436,7 +449,7 @@ const handleOTPSubmit=(e)=>{
               setBankName("")
               setIfscCode("")
               setPanNumber("")
-            
+              setVerifyOTPHelperText('')
               setPassword("")
               setConfirmPassword("")
              
@@ -447,6 +460,7 @@ const handleOTPSubmit=(e)=>{
     console.log(error)
       if(error.response.data.message==="Invalid OTP."){
         setOTPError(true)
+        setVerifyOTPHelperText(error.response.data.message)
       }
   })
 }
@@ -529,7 +543,7 @@ if (!panNumber.match(panPattern)) {
       setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/signup?api-version=1",
+        url:"https://localhost:7136/api/ClientSignUp/signup?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -597,7 +611,7 @@ if (!panNumber.match(panPattern)) {
   setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/ClientSignUp/login?api-version=1",
+        url:"https://localhost:7136/api/ClientSignUp/login?api-version=1",
         data:investorData
     }).then(function(response){
       setLoading(false)
@@ -1003,6 +1017,7 @@ if (!panNumber.match(panPattern)) {
                 fullWidth
                 value={OTP}
                 error={OTPError}
+                helperText={verifyOTPHelperText}
                 label="Enter OTP"
                 type="OTP"
                 id="OTP"
@@ -1193,6 +1208,7 @@ if (!panNumber.match(panPattern)) {
                 onChange={e => setResetOTP(e.target.value)}
                 name="resetOTP"
                 fullWidth
+                helperText={resetOTPHelperText}
                 value={resetOTP}
                 error={resetOTPError}
                 label="Enter OTP"

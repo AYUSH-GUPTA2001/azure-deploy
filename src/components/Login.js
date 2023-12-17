@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { Alert } from '@mui/lab';
+import { FOCUSABLE_SELECTOR } from '@testing-library/user-event/dist/utils';
 
 // import { PhoneInput } from 'react-international-phone';
 
@@ -52,6 +53,7 @@ export default function Login(){
   const [loading,setLoading]=useState(false)
   const [OTPloading,setOTPLoading]=useState(false)
   const [resetLoading,setResetLoading]=useState(false)
+  const [resetOTPHelperText,setResetOTPHelperText]=useState('')
   const [address,setAddress]=useState("")
   const [phone, setPhone] = useState('');
   const [firstName, setFirstName] = useState("")
@@ -85,6 +87,7 @@ export default function Login(){
   const [resetPasswordError,setResetPasswordError]=useState(false)
   const [confirmResetPasswordError,setConfirmResetPasswordError]=useState(false)
   const [OTPError,setOTPError]=useState(false)
+  const [verifyOTPHelperText,setVerifyOTPHelperText]=useState('')
   const [addressError,setAddressError]= useState(false)
   const [firstNameError, setFirstNameError] = useState(false)
   const [lastNameError, setLastNameError] = useState(false)
@@ -116,8 +119,11 @@ export default function Login(){
   const handleClose = (event,reason) => {
     if(reason!=='backdropClick'){
     setMessage('')
+    setOTP('')
+    setOTPError(false)
     setLoginMessage('')
     setVerifyMessage('')
+    setVerifyOTPHelperText('')
     setOpen(false)}};
 
     const [forgotOpen, setForgotOpen] = useState(false);
@@ -129,11 +135,14 @@ export default function Login(){
       setForgotEmail('')
       setForgotEmailError(false)
       setResetOTP('')
+      setResetOTPError(false)
+      setResetOTPHelperText('')
       setButtonVisible(true)
       setOTPError(false)
       setResetPassword('')
       setResetPasswordError(false)
       setConfirmResetPassword('')
+      setEmailVisible(true)
       setConfirmResetPasswordError(false)
       setForgotEmailHelperText('')
       setResetPasswordHelperText('')
@@ -179,7 +188,7 @@ export default function Login(){
            setOTPLoading(true)
            axios({
             method:'post',
-            url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/forgot-password?api-version=1',
+            url:'https://localhost:7136/api/AdvisorSignUp/forgot-password?api-version=1',
             data:{email:forgotEmail}
            }).then((response)=>{
             console.log(response)
@@ -197,6 +206,7 @@ export default function Login(){
     }
     const handleOTPSubmit=(e)=>{
       setOTPError(false)
+      setVerifyOTPHelperText('')
       if(OTP===""){
         setOTPError(true)
         return
@@ -209,7 +219,7 @@ export default function Login(){
       setOTPLoading(true)
       axios({
         method:'post',
-        url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/verify-otp?api-version=1',
+        url:'https://localhost:7136/api/AdvisorSignUp/verify-otp?api-version=1',
         data:otpData
       }).then((response)=>{
         setOTPLoading(false)
@@ -231,13 +241,19 @@ export default function Login(){
                 setCity('')
                 setState('')
                 setAddress('')
-              
+              setVerifyOTPHelperText('')
                 
       },(error)=>{
+        debugger
         setOTPLoading(false)
         console.log(error)
           if(error.response.data.message==="Invalid OTP."){
             setOTPError(true)
+            setVerifyOTPHelperText(error.response.data.message)
+            return
+          }
+          else{
+            setVerifyOTPHelperText(error.response.data.message)
           }
       })
     }
@@ -344,7 +360,7 @@ export default function Login(){
     setLoading(true)
     axios({
                 method:"post",
-                url:"https://investmentportal.azurewebsites.net/api/AdvisorSignUp/signup?api-version=1",
+                url:"https://localhost:7136/api/AdvisorSignUp/signup?api-version=1",
                 data:advisorData
             }).then(function(response){
               setLoading(false)
@@ -371,6 +387,7 @@ export default function Login(){
 const handleResetSubmit=()=>{
   setResetPasswordError(false)
   setResetOTPError(false)
+  setResetOTPHelperText('')
   setConfirmResetPasswordError(false)
   setResetPasswordHelperText(false)
   setCResetPasswordHelperText(false)
@@ -412,7 +429,7 @@ if (resetPassword !== confirmResetPassword) {
 setResetLoading(true)
  axios({
     method:'post',
-    url:'https://investmentportal.azurewebsites.net/api/AdvisorSignUp/reset-password?api-version=1',
+    url:'https://localhost:7136/api/AdvisorSignUp/reset-password?api-version=1',
     data:resetData
   }).then((response)=>{
     setResetLoading(false)
@@ -424,7 +441,14 @@ setResetLoading(true)
      setConfirmResetPassword('')
   },(error)=>{
     setResetLoading(false)
+      // setForgotMessage(error.response.data.message)
+      if(error.response.data.message==='Invalid OTP.'){
+      setResetOTPHelperText(error.response.data.message)
+      setResetOTPError(true)
+    }
+    else{
       setForgotMessage(error.response.data.message)
+    }
   })
 
 }
@@ -455,7 +479,7 @@ setResetLoading(true)
   setLoading(true)
       axios({
         method:"post",
-        url:"https://investmentportal.azurewebsites.net/api/AdvisorSignUp/login?api-version=1",
+        url:"https://localhost:7136/api/AdvisorSignUp/login?api-version=1",
         data:advisorData
     }).then(function(response){
       setLoading(false)
@@ -736,15 +760,21 @@ setResetLoading(true)
         {message}
       </Typography>:<>
 
-        {verifyText?<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
-          You are not Verified.Enter OTP sent to the Email</Typography></>:<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">Enter OTP sent to the Email</Typography></>}
-      <TextField sx={{color:'#4b49ac'}}
+        {/* {!verifyText?<><Typography color="primary" id="modal-modal-title" variant="h6" component="h2">
+          You are not Verified.Enter OTP sent to the Email</Typography></>:
+          <> */}
+          <Typography color="primary" id="modal-modal-title" variant="h6" component="h2">Enter OTP sent to the Email</Typography>
+          {/* </>
+          } */}
+    <TextField sx={{color:'#4b49ac'}}
                 size="small"
                 margin="dense"
                 required
                 onChange={e => setOTP(e.target.value)}
                 name="OTP"
                 fullWidth
+                helperText={verifyOTPHelperText}
+                // helperText='hi'
                 value={OTP}
                 error={OTPError}
                 label="Enter OTP"
@@ -941,6 +971,7 @@ setResetLoading(true)
                 onChange={e => setResetOTP(e.target.value)}
                 name="resetOTP"
                 fullWidth
+                helperText={resetOTPHelperText}
                 value={resetOTP}
                 error={resetOTPError}
                 label="Enter OTP"

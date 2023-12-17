@@ -743,5 +743,56 @@ button {
   cursor:not-allowed!important;
   background: #a3a2d4 !important;
 }
+.colorgreen{
+  color: green;
+  font-size: 15px;
+  float:right;
+  margin-right: 35px;
 
-
+}
+.green{
+  color: green;
+}
+.colorred{
+  color: red;
+}
+.radiogroup{
+  justify-content: flex-end;
+}
+.chartDiv{
+  display:flex;
+}
+.visContainer{
+  display: flex;
+  margin-bottom: 20px;
+  height: 250px;
+  /* justify-content: space-between; */
+  /* background-color: white; */
+}
+.netWorth{
+  color:#4b49ac;
+}
+.LineChart{
+  width:500;
+  background-color: white;
+  border-radius: 4px;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.bgWhitePie{
+  border-radius: 4px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width:510px;
+}
+.noChart{
+  display: flex;
+    height: 170px;
+    width: 370px;
+    align-items: center;
+    justify-content: center;
+}

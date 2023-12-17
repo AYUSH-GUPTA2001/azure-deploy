@@ -261,8 +261,8 @@
     background-position: center center;
 }
 #time{
-  color: #fff;
-  background-color: rgb(39 203 67);
+  color: #fff!important;
+  background-color: rgb(39 203 67)!important;
 }
 .green{
   
@@ -271,7 +271,8 @@
 }
 .save{
   margin-top: 10px!important;
-  left: 783px;
+  margin-right: 30px!important;
+  float:right;
 }
 .text-center {
   text-align: center!important;
@@ -285,6 +286,9 @@
     .MuiCard-root{
       /* background: #c5d2de !important; */
         color: white!important;
+    }
+    .termSelected,#timePeriod{
+      font-weight: 800!important;
     }
     
     .css-ag7rrr-MuiTypography-root {
@@ -671,7 +675,23 @@ button {
 .plusIcon{
   margin: -23px!important;
 }
-
-
+.formContainer{
+  border: 1px solid;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+.remove{
+  float: right!important;
+  padding: 0px!important;
+}
+.text1{
+  font-size: 30px!important;
+}
+.datagrid{
+  border: 1px solid !important;
+  padding: 10px!important;
+  margin-bottom: 10px!important;
+}
 
 
